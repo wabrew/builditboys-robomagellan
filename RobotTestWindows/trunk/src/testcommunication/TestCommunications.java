@@ -50,7 +50,7 @@ public class TestCommunications {
 		System.out.println("Links started");
 		
 		try {
-			Thread.sleep(20000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
