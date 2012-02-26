@@ -1,11 +1,11 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.CommParameters.*;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 public abstract class AbstractChannelCollection {
 	
 	// the link that this is part of
-	protected AbstractCommLink link;
+	protected AbstractLink link;
 	
 	// the channel buffers
 	protected AbstractChannel channels[];
@@ -16,7 +16,7 @@ public abstract class AbstractChannelCollection {
 	//--------------------------------------------------------------------------------
 	// Constructors
 
-	public AbstractChannelCollection (AbstractCommLink link) {
+	public AbstractChannelCollection (AbstractLink link) {
 		this.link = link;
 		channels = new AbstractChannel[CHANNEL_NUMBER_MAX];
 		highestChannelNumber = 0;
@@ -25,14 +25,14 @@ public abstract class AbstractChannelCollection {
 	//--------------------------------------------------------------------------------
 	// Getters and Setters
 	
-	public AbstractCommLink getLink() {
+	public AbstractLink getLink() {
 		return link;
 	}
 
 	//--------------------------------------------------------------------------------
 	// Adding channels
 
-	protected void addChannel (AbstractChannel channel) {
+	protected synchronized void addChannel (AbstractChannel channel) {
 		int channelNum = channel.getChannelNumber();
 		AbstractChannel existingChannel = channels[channelNum];
 		if (existingChannel != null) {
@@ -46,7 +46,7 @@ public abstract class AbstractChannelCollection {
 	//--------------------------------------------------------------------------------
 	// Getting Channels
 	
-	public AbstractChannel getChannelByNumber (int channelNumber) {
+	public synchronized AbstractChannel getChannelByNumber (int channelNumber) {
 		AbstractChannel channel = channels[channelNumber];
 		if (channel == null) {
 			throw new IllegalArgumentException();
@@ -56,7 +56,7 @@ public abstract class AbstractChannelCollection {
 	
 	// will get the lowest numbered channel that handles the protocol
 	// not too meaningful to have several channels handling the same protocol
-	public AbstractChannel getChannelByProtocol (AbstractProtocol protocol) {
+	public synchronized AbstractChannel getChannelByProtocol (AbstractProtocol protocol) {
 		AbstractChannel channel;
 		for (int i = 0; i <= highestChannelNumber; i++) {
 			channel = channels[i];
@@ -73,7 +73,7 @@ public abstract class AbstractChannelCollection {
 		return null;
 	}
 	
-	public AbstractChannel getChannelWithMessages () {
+	public synchronized AbstractChannel getChannelWithMessages () {
 		AbstractChannel channel;
 		for (int i = 0; i <= highestChannelNumber; i++) {
 			channel = channels[i];
@@ -90,9 +90,15 @@ public abstract class AbstractChannelCollection {
 	// Coordinating moving messages through
 	
 	// called by the Sender when it needs a message
+	public synchronized void waitForMessage () throws InterruptedException {
+		wait();
+	}
+	
+	// called by the Sender when it needs a message
 	public synchronized void waitForMessage (long timeout) throws InterruptedException {
 		wait(timeout);
 	}
+
 	
 	// called by a channel when it adds a message
 	public synchronized void notifyMessageAdded (AbstractChannel channel) {

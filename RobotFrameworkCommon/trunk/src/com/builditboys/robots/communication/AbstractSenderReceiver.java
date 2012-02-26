@@ -1,12 +1,12 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.CommParameters.*;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 public abstract class AbstractSenderReceiver implements Runnable {
 
-	protected AbstractCommLink link;
+	protected AbstractLink link;
 
-	protected CommPortInterface port;
+	protected LinkPortInterface port;
 
 	protected CRC8Calculator crc8;
 	protected CRC16Calculator crc16;
@@ -17,10 +17,50 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	protected String threadName;
 	protected Thread thread;
 	protected volatile boolean shouldRun = true;
-	
+	protected volatile boolean suspended;
+
+	// --------------------------------------------------------------------------------
+	// Run
+
+	public void run() {
+		while (true) {
+			try {
+				checkThreadControl();
+			} catch (InterruptedException e) {
+					System.out.println(threadName + " check interrupted");
+					continue;
+			}
+			// check said to exit
+			// check resumed from a wait
+			// check said to keep running
+			// if the check was interrupted, control went back to the top
+			if (!shouldRun) {
+				break;
+			}
+			try {
+				doWork();
+			} catch (InterruptedException e) {
+				System.out.println(threadName + " work interrupted");
+			}
+		}
+	}
+
+	public abstract void doWork() throws InterruptedException;
+
 	// --------------------------------------------------------------------------------
 
-	public void startThread (String threadName) {
+	public void threadJoin() throws InterruptedException {
+		thread.join();
+	}
+
+	// --------------------------------------------------------------------------------
+	// Thread control
+
+	public String getThreadName() {
+		return threadName;
+	}
+
+	public void startThread(String threadName) {
 		if (thread != null) {
 			throw new IllegalStateException();
 		}
@@ -32,47 +72,33 @@ public abstract class AbstractSenderReceiver implements Runnable {
 		thread.start();
 	}
 
-	// --------------------------------------------------------------------------------
-	// Run
+	public void suspendThread() {
+		threadControl = ThreadControlEnum.SUSPEND;
+		thread.interrupt();
+	}
 
-	public void run() {
-		try {
-			while (shouldRun) {
-				checkThreadControl();
-				doWork();
-			}
-		} catch (InterruptedException e) {
-			System.out.println(threadName + " interrupted");
+	public void resumeThread() {
+		if (suspended) {
+			threadControl = ThreadControlEnum.RUN;
+			notify();
+		}
+		else {
+			throw new IllegalStateException();
 		}
 	}
-	
-	public abstract void doWork () throws InterruptedException;
 
-	// --------------------------------------------------------------------------------
-	// Thread control
-
-	public void suspendThread () {
-		threadControl = ThreadControlEnum.SUSPEND;
-	}
-	
-	public void resumeThread () {
-		threadControl = ThreadControlEnum.RUN;
-	}
-
-	public void stopThread () {
+	public void stopThread() {
 		threadControl = ThreadControlEnum.STOP;
 		thread.interrupt();
 	}
-	
-	public void threadJoin () throws InterruptedException {
-		thread.join();
-	}
-	
+
 	protected synchronized void checkThreadControl() throws InterruptedException {
 		do {
 			switch (threadControl) {
 			case SUSPEND:
+				suspended = true;
 				wait();
+				suspended = false;
 				break;
 			case RUN:
 				break;
@@ -82,6 +108,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			default:
 				throw new IllegalStateException();
 			}
+		// loop to avoid spurious awakenings
 		} while (threadControl == ThreadControlEnum.SUSPEND);
 	}
 
@@ -99,5 +126,5 @@ public abstract class AbstractSenderReceiver implements Runnable {
 		}
 		return sequenceNumber;
 	}
-
+	
 }

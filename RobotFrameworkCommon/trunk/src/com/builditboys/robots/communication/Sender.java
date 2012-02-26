@@ -1,14 +1,13 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.CommParameters.SEND_ESCAPE_BYTE;
-import static com.builditboys.robots.communication.CommParameters.SEND_INDICATE_ESCAPE;
-import static com.builditboys.robots.communication.CommParameters.SEND_INDICATE_SYNC_1;
-import static com.builditboys.robots.communication.CommParameters.SEND_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.SEND_POST_SYNC_PAD;
-import static com.builditboys.robots.communication.CommParameters.SEND_PREAMBLE_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.SEND_SYNC_1_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.SEND_SYNC_BYTE_1;
-import static com.builditboys.robots.communication.CommParameters.SEND_WAIT_TIMEOUT;
+import static com.builditboys.robots.communication.LinkParameters.SEND_ESCAPE_BYTE;
+import static com.builditboys.robots.communication.LinkParameters.SEND_INDICATE_ESCAPE;
+import static com.builditboys.robots.communication.LinkParameters.SEND_INDICATE_SYNC_1;
+import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.SEND_POST_SYNC_PAD;
+import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_1_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE_1;
 
 import com.builditboys.robots.time.Clock;
 
@@ -17,11 +16,13 @@ public class Sender extends AbstractSenderReceiver {
 	private OutputChannelCollection outputChannels;
 	
 	private int sentSequenceNumber;
+	private AbstractChannel sentChannel;
+	private AbstractProtocol sentProtocol;
 	private int sentChannelNumber;
 	private int sentLength;
 	private byte sentCRC1;
 	private short sentCRC2;
-	private CommMessage sentMessage;
+	private LinkMessage sentMessage;
 	long sentTime;
 
 	private SerializeBuffer preambleBuffer;
@@ -30,15 +31,15 @@ public class Sender extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Constructor
 
-	public Sender(AbstractCommLink link, CommPortInterface port) {
+	public Sender(AbstractLink link, LinkPortInterface port) {
 		this.link = link;
 		this.port = port;
-		resetSequenceNumber();
 		preambleBuffer = new SerializeBuffer(SEND_PREAMBLE_LENGTH);
 		postambleBuffer = new SerializeBuffer(SEND_POSTAMBLE_LENGTH);
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		outputChannels = link.getOutputChannels();
+		reset();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -50,20 +51,43 @@ public class Sender extends AbstractSenderReceiver {
 
 	private void resetMessageInfo() {
 		sentSequenceNumber = 0;
+		sentChannel = null;
+		sentProtocol = null;
 		sentChannelNumber = 0;
 		sentLength = 0;
 		sentCRC1 = 0;
 		sentCRC2 = 0;
 		sentMessage = null;
-		long sentTime = 0;
+		sentTime = 0;
 	}
 
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
 	
+	public synchronized void doWork() throws InterruptedException {
+		
+		while (true) {
+			resetMessageInfo();
+			
+			// try to get a message
+			sentChannel = (OutputChannel) outputChannels.getChannelWithMessages();
+			
+			// if you got one, send it, otherwise wait
+			if (sentChannel != null) {
+				sentProtocol = sentChannel.getProtocol();
+				sendMessage(sentChannel.getMessage());
+			}
+			else {
+				// failed to find a message, wait and try again
+				outputChannels.waitForMessage();
+			}
+		}
+	}
+	
+/*	
 // this is probably more complicated than it needs to be now that the
 // threads are sent an interrupt when they need to be stopped
-	
+
 	public synchronized void doWork() throws InterruptedException {
 		OutputChannel channel;
 		
@@ -74,25 +98,25 @@ public class Sender extends AbstractSenderReceiver {
 			return;
 		}
 		
-		// failed to find a message, wait a little and try again
-		outputChannels.waitForMessage(SEND_WAIT_TIMEOUT);
+		// failed to find a message, wait and try again
+		outputChannels.waitForMessage();
 		
-		// try to get and send a message
+		// try again to get and send a message (could be sprurious awakening)
 		channel = (OutputChannel) outputChannels.getChannelWithMessages();
 		if (channel != null) {
 			sendMessage(channel.getMessage());
 			return;
 		}
 		
-		// if you get here then there was no message to send,
+		// if you get here then there was no message to send (spurious awakening),
 		// so return and try again when you are called again
 	}
-
+*/
 
 	// --------------------------------------------------------------------------------
 	// Send a message
 
-	public void sendMessage(CommMessage message) throws InterruptedException {
+	public void sendMessage(LinkMessage message) throws InterruptedException {
 		resetMessageInfo();
 
 		sentMessage = message;
@@ -113,9 +137,12 @@ public class Sender extends AbstractSenderReceiver {
 
 		sentTime = Clock.clockRead();
 
-		System.out.print("Sent: ");
-		printRaw();
-		System.out.println();
+		synchronized (System.out){
+			System.out.print(Clock.clockRead());
+			System.out.print(" : " + link.getRole() + " Sent    : ");
+			printRaw();
+			System.out.println();
+		}
 	}
 
 	private void sendPreSync() throws InterruptedException {

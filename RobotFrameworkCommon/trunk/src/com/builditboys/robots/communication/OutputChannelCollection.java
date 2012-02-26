@@ -6,7 +6,7 @@ public class OutputChannelCollection extends AbstractChannelCollection {
 	// --------------------------------------------------------------------------------
 	// Constructors
 
-	public OutputChannelCollection (AbstractCommLink link) {
+	public OutputChannelCollection (AbstractLink link) {
 		super(link);
 	}
 	

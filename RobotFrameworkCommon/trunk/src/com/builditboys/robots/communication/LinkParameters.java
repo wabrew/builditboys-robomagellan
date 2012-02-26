@@ -1,6 +1,6 @@
 package com.builditboys.robots.communication;
 
-public class CommParameters {
+public class LinkParameters {
 	
 	//--------------------------------------------------------------------------------
 	// Sequence numbers
@@ -72,5 +72,17 @@ public class CommParameters {
 	// Send parameters
 	
 	public static final long SEND_WAIT_TIMEOUT = 1000;  // milliseconds
+	
+	// master timing out slave messages
+	public static final long DID_PREPARE_TIMEOUT = 1000;
+	public static final long DID_PROCEED_TIMEOUT = 1000;
+	
+	// slave timing out master messages
+	public static final long NEED_PREPARE_TIMEOUT = 5000;
+	public static final long DO_PROCEED_TIMEOUT = 1000;
+	
+	public static final long IM_ALIVE_TIMEOUT = 1000;
+	public static final long KEEP_ALIVE_INTERVAL = 750;
+
 	
 }

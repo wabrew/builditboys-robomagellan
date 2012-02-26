@@ -1,8 +1,8 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.CommParameters.*;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
-public class CommMessage extends FillableBuffer {
+public class LinkMessage extends FillableBuffer {
 	
 	// the channel to which messages are directed
 	private int channelNumber;
@@ -17,12 +17,12 @@ public class CommMessage extends FillableBuffer {
 	//--------------------------------------------------------------------------------
 	// Constructors
 
-	public CommMessage (int channelnum) {
+	public LinkMessage (int channelnum) {
 		super(MAX_PAYLOAD_LEN);
 		channelNumber = channelnum;
 	}
 	
-	public CommMessage (int channelnum, int capacity) {
+	public LinkMessage (int channelnum, int capacity) {
 		super(capacity);
 		channelNumber = channelnum;
 	}

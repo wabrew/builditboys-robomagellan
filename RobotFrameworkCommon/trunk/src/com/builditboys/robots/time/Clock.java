@@ -1,9 +1,10 @@
 package com.builditboys.robots.time;
 
-public class Clock {
 
+public class Clock {
+	
 	static public long clockRead () {
-		return 42;
+		return System.currentTimeMillis();
 	}
 
 }

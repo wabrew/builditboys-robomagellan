@@ -1,7 +1,7 @@
 package com.builditboys.robots.communication;
 
 import java.util.concurrent.ArrayBlockingQueue;
-import static com.builditboys.robots.communication.CommParameters.*;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 public abstract class AbstractChannel {
 		
@@ -15,7 +15,7 @@ public abstract class AbstractChannel {
 	protected AbstractChannelCollection collection;
 	
 	// the message buffer, note blocking queue
-	private ArrayBlockingQueue<CommMessage> messagesQueue;
+	private ArrayBlockingQueue<LinkMessage> messagesQueue;
 	
 	//--------------------------------------------------------------------------------
 	// Constructors
@@ -24,13 +24,13 @@ public abstract class AbstractChannel {
 		channelNumber = channelNum;
 		protocol = protocl;
 		protocol.setChannel(this);
-		messagesQueue = new ArrayBlockingQueue<CommMessage>(DEFAULT_CHANNEL_BUFFER_CAPACITY);
+		messagesQueue = new ArrayBlockingQueue<LinkMessage>(DEFAULT_CHANNEL_BUFFER_CAPACITY);
 	}
 	
 	public AbstractChannel (AbstractProtocol protocol, int channelNum, int capacity) {
 		channelNumber = channelNum;
 		this.protocol = protocol;
-		messagesQueue = new ArrayBlockingQueue<CommMessage>(capacity);
+		messagesQueue = new ArrayBlockingQueue<LinkMessage>(capacity);
 	}
 
 	//--------------------------------------------------------------------------------
@@ -69,9 +69,9 @@ public abstract class AbstractChannel {
 	
 	//--------------------------------------------------------------------------------
 
-	public AbstractCommLink getLink () {
+	public AbstractLink getLink () {
 		AbstractChannelCollection channelCollection = getCollection();
-		AbstractCommLink link = channelCollection.getLink();
+		AbstractLink link = channelCollection.getLink();
 		return link;
 	}
 
@@ -80,7 +80,7 @@ public abstract class AbstractChannel {
 	// Adding/Getting messages
 	
 
-	public void addMessage (CommMessage message) {
+	public void addMessage (LinkMessage message) {
 		if (message.getChannelNumber() != channelNumber) {
 			throw new IllegalArgumentException();	
 		}
@@ -88,7 +88,7 @@ public abstract class AbstractChannel {
 		collection.notifyMessageAdded(this);
 	}
 	
-	public CommMessage getMessage () {
+	public LinkMessage getMessage () {
 		return messagesQueue.remove();
 	}
 	

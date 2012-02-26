@@ -23,7 +23,7 @@ public abstract class AbstractProtocol {
 	//--------------------------------------------------------------------------------
 	// Receive a message, overload this if you wish
 	
-	public void receiveMessage (CommMessage message) {
+	public void receiveMessage (LinkMessage message) {
 		channel.addMessage(message);
 	}
 		
@@ -31,13 +31,13 @@ public abstract class AbstractProtocol {
 	// Sub classes should be able to create notifications from messages
 	// on the input side
 	
-	public abstract AbstractNotification deSerialize (CommMessage message);
+	public abstract AbstractNotification deSerialize (LinkMessage message);
 
 	//--------------------------------------------------------------------------------
 	// Sub classes should be able to create messages from notifications
 	// on the output side
 	
-	public abstract CommMessage serialize (AbstractNotification notice);
+	public abstract LinkMessage serialize (AbstractNotification notice);
 
 
 }

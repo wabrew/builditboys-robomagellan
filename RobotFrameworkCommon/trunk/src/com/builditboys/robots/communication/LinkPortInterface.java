@@ -1,6 +1,6 @@
 package com.builditboys.robots.communication;
 
-public interface CommPortInterface {
+public interface LinkPortInterface {
 	
 	public byte readByte ()  throws InterruptedException;
 	

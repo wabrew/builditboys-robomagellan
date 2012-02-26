@@ -1,14 +1,14 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_ESCAPE_BYTE;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_INDICATE_ESCAPE;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_INDICATE_SYNC_1;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_PREAMBLE_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_SYNC_1_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.RECEIVE_SYNC_BYTE_1;
-import static com.builditboys.robots.communication.CommParameters.SEND_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.CommParameters.SEND_PREAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_ESCAPE_BYTE;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_INDICATE_ESCAPE;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_INDICATE_SYNC_1;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_POSTAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_PREAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_1_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_BYTE_1;
+import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
 
 import com.builditboys.robots.time.Clock;
 
@@ -21,8 +21,11 @@ public class Receiver extends AbstractSenderReceiver {
 	private int receivedLength;
 	private byte receivedCRC1;
 	private short receivedCRC2;
-	private CommMessage receivedMessage;
+	private LinkMessage receivedMessage;
+	private AbstractChannel receivedChannel;
+	private AbstractProtocol receivedProtocol;
 	private long receivedTime;
+	private boolean receivedOk;
 
 	private byte lastSyncByte;
 
@@ -32,15 +35,15 @@ public class Receiver extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Constructor
 
-	public Receiver(AbstractCommLink lnk, CommPortInterface prt) {
+	public Receiver(AbstractLink lnk, LinkPortInterface prt) {
 		link = lnk;
 		port = prt;
-		resetSequenceNumber();
 		preambleBuffer = new DeSerializeBuffer(SEND_PREAMBLE_LENGTH);
 		postambleBuffer = new DeSerializeBuffer(SEND_POSTAMBLE_LENGTH);
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		inputChannels = link.getInputChannels();
+		reset();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -57,17 +60,26 @@ public class Receiver extends AbstractSenderReceiver {
 		receivedCRC1 = 0;
 		receivedCRC2 = 0;
 		receivedMessage = null;
-		long receivedTime = 0;
+		receivedChannel = null;
+		receivedProtocol = null;
+		receivedOk = false;
+		receivedTime = 0;
 	}
 
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
-	
-	public synchronized void doWork () throws InterruptedException {
-		receiveMessage();
-		AbstractChannel channel = inputChannels.getChannelByNumber(receivedChannelNumber);
-		AbstractProtocol protocol = channel.getProtocol();
-		protocol.receiveMessage(receivedMessage);
+
+	public synchronized void doWork() throws InterruptedException {
+		while (true) {
+			resetMessageInfo();
+			receiveMessage();
+			if (receivedOk) {
+				receivedChannel = inputChannels
+						.getChannelByNumber(receivedChannelNumber);
+				receivedProtocol = receivedChannel.getProtocol();
+				handleReceivedMessage();
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -87,14 +99,22 @@ public class Receiver extends AbstractSenderReceiver {
 			receivePreamble();
 			receiveBody();
 			receivePostamble();
+			receivedOk = true;
 		} catch (ReceiveException e) {
 			handleReceiveException(e);
+			receivedOk = false;
 		}
-		receivedTime = Clock.clockRead();
 
-		System.out.print("Received: ");
-		printRaw();
-		System.out.println();
+		if (receivedOk) {
+			receivedTime = Clock.clockRead();
+
+			synchronized (System.out) {
+				System.out.print(Clock.clockRead());
+				System.out.print(" : " + link.getRole() + " Received: ");
+				printRaw();
+				System.out.println();
+			}
+		}
 	}
 
 	private void receivePreSync() throws InterruptedException {
@@ -118,7 +138,8 @@ public class Receiver extends AbstractSenderReceiver {
 		}
 	}
 
-	private void receivePreamble() throws ReceiveException, InterruptedException {
+	private void receivePreamble() throws ReceiveException,
+			InterruptedException {
 		preambleBuffer.addByte(lastSyncByte);
 		for (int i = 0; i < RECEIVE_PREAMBLE_LENGTH - 2; i++) {
 			preambleBuffer.addByte(readEscapedByte());
@@ -144,7 +165,7 @@ public class Receiver extends AbstractSenderReceiver {
 		if (!AbstractChannel.isLegalChannelNumber(receivedChannelNumber)) {
 			throw new ReceiveException("Bad received channel number");
 		}
-		if (!CommMessage.islegalMessageLength(receivedLength)) {
+		if (!LinkMessage.islegalMessageLength(receivedLength)) {
 			throw new ReceiveException("Bad received message length");
 		}
 
@@ -152,7 +173,7 @@ public class Receiver extends AbstractSenderReceiver {
 	}
 
 	private void receiveBody() throws ReceiveException, InterruptedException {
-		receivedMessage = new CommMessage(receivedChannelNumber, receivedLength);
+		receivedMessage = new LinkMessage(receivedChannelNumber, receivedLength);
 
 		for (int i = 0; i < receivedLength; i++) {
 			receivedMessage.addByte(readEscapedByte());
@@ -160,7 +181,8 @@ public class Receiver extends AbstractSenderReceiver {
 		crc16.extend(receivedMessage);
 	}
 
-	private void receivePostamble() throws ReceiveException, InterruptedException {
+	private void receivePostamble() throws ReceiveException,
+			InterruptedException {
 		for (int i = 0; i < RECEIVE_POSTAMBLE_LENGTH; i++) {
 			postambleBuffer.addByte(readEscapedByte());
 		}
@@ -176,7 +198,8 @@ public class Receiver extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Classifying bytes - need to detect byte escapes
 
-	private byte readEscapedByte() throws ReceiveException, InterruptedException {
+	private byte readEscapedByte() throws ReceiveException,
+			InterruptedException {
 		byte bite = port.readByte();
 
 		switch (bite) {
@@ -206,12 +229,19 @@ public class Receiver extends AbstractSenderReceiver {
 			reason = why;
 		}
 	}
-	
-	private void handleReceiveException (ReceiveException e) {
-		AbstractCommLink link = inputChannels.getLink();
-		link.receiveReceiveException(e);
+
+	// --------------------------------------------------------------------------------
+
+	private void handleReceivedMessage() {
+		receivedProtocol.receiveMessage(receivedMessage);
 	}
-	
+
+	private void handleReceiveException(ReceiveException e) {
+		AbstractLink link = inputChannels.getLink();
+		receivedTime = Clock.clockRead();
+		link.receiveReceiverException(e);
+	}
+
 	// --------------------------------------------------------------------------------
 
 	private void printRaw() {
@@ -229,6 +259,5 @@ public class Receiver extends AbstractSenderReceiver {
 		System.out.print(receivedCRC2);
 		System.out.print(" ");
 	}
-
 
 }

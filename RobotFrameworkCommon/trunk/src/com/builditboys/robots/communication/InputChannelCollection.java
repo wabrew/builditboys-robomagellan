@@ -6,7 +6,7 @@ public class InputChannelCollection extends AbstractChannelCollection {
 	// --------------------------------------------------------------------------------
 	// Constructors
 
-	public InputChannelCollection (AbstractCommLink link) {
+	public InputChannelCollection (AbstractLink link) {
 		super(link);
 	}
 
