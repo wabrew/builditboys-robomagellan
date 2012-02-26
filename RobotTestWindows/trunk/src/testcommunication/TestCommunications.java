@@ -1,13 +1,13 @@
 package testcommunication;
 
 import com.builditboys.robots.communication.AbstractChannel;
-import com.builditboys.robots.communication.CommControlProtocol;
-import com.builditboys.robots.communication.CommMessage;
-import com.builditboys.robots.communication.CommPortInterface;
-import com.builditboys.robots.communication.MasterCommLink;
+import com.builditboys.robots.communication.LinkControlProtocol;
+import com.builditboys.robots.communication.LinkMessage;
+import com.builditboys.robots.communication.LinkPortInterface;
+import com.builditboys.robots.communication.MasterLink;
 import com.builditboys.robots.communication.Receiver;
 import com.builditboys.robots.communication.Sender;
-import com.builditboys.robots.communication.SlaveCommLink;
+import com.builditboys.robots.communication.SlaveLink;
 
 public class TestCommunications {
 
@@ -18,29 +18,29 @@ public class TestCommunications {
 
 	static void testCommThreads() {
 		DebuggingCommPortBuffer buffer = new DebuggingCommPortBuffer();
-		CommPortInterface port1 = buffer.getPort1();
-		CommPortInterface port2 = buffer.getPort2();
+		LinkPortInterface port1 = buffer.getPort1();
+		LinkPortInterface port2 = buffer.getPort2();
 		
-		MasterCommLink masterLink = new MasterCommLink(port1);
-		SlaveCommLink slaveLink = new SlaveCommLink(port2);
+		MasterLink masterLink = new MasterLink(port1);
+		SlaveLink slaveLink = new SlaveLink(port2);
 		
-		AbstractChannel masterOut = masterLink.getOutputChannelByProtocol(CommControlProtocol.indicator);
-		CommControlProtocol masterOutProto = (CommControlProtocol) masterOut.getProtocol();
+		AbstractChannel masterOut = masterLink.getOutputChannelByProtocol(LinkControlProtocol.indicator);
+		LinkControlProtocol masterOutProto = (LinkControlProtocol) masterOut.getProtocol();
 //		System.out.println(masterOut);
 //		System.out.println(masterOutProto);
 
-		AbstractChannel masterIn = masterLink.getInputChannelByProtocol(CommControlProtocol.indicator);
-		CommControlProtocol masterInProto = (CommControlProtocol) masterIn.getProtocol();
+		AbstractChannel masterIn = masterLink.getInputChannelByProtocol(LinkControlProtocol.indicator);
+		LinkControlProtocol masterInProto = (LinkControlProtocol) masterIn.getProtocol();
 //		System.out.println(masterIn);
 //		System.out.println(masterInProto);
 
-		AbstractChannel slaveOut = slaveLink.getOutputChannelByProtocol(CommControlProtocol.indicator);
-		CommControlProtocol slaveOutProto = (CommControlProtocol) slaveOut.getProtocol();
+		AbstractChannel slaveOut = slaveLink.getOutputChannelByProtocol(LinkControlProtocol.indicator);
+		LinkControlProtocol slaveOutProto = (LinkControlProtocol) slaveOut.getProtocol();
 //		System.out.println(slaveOut);
 //		System.out.println(slaveOutProto);
 
-		AbstractChannel slaveIn = slaveLink.getInputChannelByProtocol(CommControlProtocol.indicator);
-		CommControlProtocol slaveInProto = (CommControlProtocol) slaveIn.getProtocol();
+		AbstractChannel slaveIn = slaveLink.getInputChannelByProtocol(LinkControlProtocol.indicator);
+		LinkControlProtocol slaveInProto = (LinkControlProtocol) slaveIn.getProtocol();
 //		System.out.println(slaveIn);
 //		System.out.println(slaveInProto);
 
@@ -48,11 +48,9 @@ public class TestCommunications {
 		slaveLink.startThreads("Test");
 
 		System.out.println("Links started");
-
-		masterOutProto.sendDoPrepare();
 		
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(20000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
@@ -61,8 +59,8 @@ public class TestCommunications {
 
 		System.out.println("waiting to join");
 		try {
-			masterLink.threadJoin();
-			slaveLink.threadJoin();
+			masterLink.joinThreads();
+			slaveLink.joinThreads();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -74,14 +72,14 @@ public class TestCommunications {
 
 	static void testCommMessages() throws InterruptedException {
 		DebuggingCommPortBuffer buffer = new DebuggingCommPortBuffer();
-		CommPortInterface port1 = buffer.getPort1();
-		CommPortInterface port2 = buffer.getPort2();
+		LinkPortInterface port1 = buffer.getPort1();
+		LinkPortInterface port2 = buffer.getPort2();
 
-		CommPortInterface thisPort = port1;
+		LinkPortInterface thisPort = port1;
 		
-		MasterCommLink link = new MasterCommLink(thisPort);
-		CommMessage message1 = new CommMessage(5);
-		CommMessage message2 = new CommMessage(5);
+		MasterLink link = new MasterLink(thisPort);
+		LinkMessage message1 = new LinkMessage(5);
+		LinkMessage message2 = new LinkMessage(5);
 		Sender sender = new Sender(link, thisPort);
 		Receiver receiver = new Receiver(link, thisPort);
 
