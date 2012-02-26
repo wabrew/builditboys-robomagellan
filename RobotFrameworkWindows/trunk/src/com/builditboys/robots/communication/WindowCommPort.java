@@ -1,6 +1,6 @@
 package com.builditboys.robots.communication;
 
-public class WindowCommPort implements CommPortInterface {
+public class WindowCommPort implements LinkPortInterface {
 	
 	public byte readByte () {
 		return 0;
