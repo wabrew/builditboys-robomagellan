@@ -210,21 +210,33 @@ public abstract class AbstractLink implements Runnable {
 	// link important information about how the link is working
 	
 	// slave to master
-	protected abstract void receivedNeedDoPrepare (AbstractChannel rchannel, LinkMessage message);
+	protected void receivedNeedDoPrepare (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 	
-	protected abstract void receivedDidPrepare (AbstractChannel rchannel, LinkMessage message);
+	protected void receivedDidPrepare (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 
-	protected abstract void receivedDidProceed (AbstractChannel rchannel, LinkMessage message); 
+	protected void receivedDidProceed (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 	
 	
 	// master to slave
-	protected abstract void receivedDoPrepare (AbstractChannel rchannel, LinkMessage message);
+	protected void receivedDoPrepare (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 
-	protected abstract void receivedDoProceed (AbstractChannel rchannel, LinkMessage message); 
+	protected void receivedDoProceed (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 	
 	
 	// both directions
-	protected abstract void receivedImAlive (AbstractChannel rchannel, LinkMessage message);
+	protected void receivedImAlive (AbstractChannel rchannel, LinkMessage message) {
+		throw new IllegalStateException();
+	}
 	
 	
 	// if receive problems

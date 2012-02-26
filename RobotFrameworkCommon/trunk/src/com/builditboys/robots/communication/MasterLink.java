@@ -50,6 +50,7 @@ public class MasterLink extends AbstractLink {
 			
 			// --------------------
 			// start off by sending a DO_PREPARE
+//			resetSequenceNumbers();
 			oprotocol.sendDoPrepare();
 			setLinkState(LinkStateEnum.LinkSentDoPrepareState);
 			wait(DID_PREPARE_TIMEOUT);
@@ -72,7 +73,9 @@ public class MasterLink extends AbstractLink {
 				setLinkState(LinkStateEnum.LinkActiveState);
 				lastKeepAliveReceivedTime = Clock.clockRead();
 				while (linkState == LinkStateEnum.LinkActiveState) {
-					// make sure you have recently receive a keep alive message
+					// make sure you have recently received a keep alive message
+					// also, you could be awakened by receiving a keep alive so 
+					// keep track of how long you need to wait to send a keep alive
 					if (keepAliveOk()) {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
@@ -100,17 +103,6 @@ public class MasterLink extends AbstractLink {
 	
 	// --------------------------------------------------------------------------------
 	// The receiver link control protocol calls this when it gets a link control message
-	
-	// only the slave should receive this message
-	protected void receivedDoPrepare (AbstractChannel channel, LinkMessage message) {
-		throw new IllegalStateException();
-	}
-	
-	// only the slave should receive this message
-	protected void receivedDoProceed (AbstractChannel channel, LinkMessage message) {
-		throw new IllegalStateException();		
-	}
-
 	
 	protected synchronized void receivedNeedDoPrepare (AbstractChannel channel, LinkMessage message) {
 		switch (linkState) {

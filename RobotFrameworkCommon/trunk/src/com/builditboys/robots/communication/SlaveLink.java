@@ -61,6 +61,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// --------------------
 			// if we got a DO_PREPARE, then send DID_PREPARE
 			if (linkState == LinkStateEnum.LinkReceivedDoPrepareState) {
+//				resetSequenceNumbers();
 				oprotocol.sendDidPrepare();
 				setLinkState(LinkStateEnum.LinkSentDidPrepareState, "three");
 				wait(DO_PROCEED_TIMEOUT);
@@ -88,7 +89,9 @@ public class SlaveLink extends AbstractLink implements Runnable {
 				setLinkState(LinkStateEnum.LinkActiveState, "five");
 				lastKeepAliveReceivedTime = Clock.clockRead();
 				while (linkState == LinkStateEnum.LinkActiveState) {
-					// make sure you have recently receive a keep alive message
+					// make sure you have recently received a keep alive message
+					// also, you could be awakened by receiving a keep alive so 
+					// keep track of how long you need to wait to send a keep alive
 					if (keepAliveOk()) {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
@@ -153,22 +156,6 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		}		
 	}
 		
-	// only the master should receive this
-	protected void receivedNeedDoPrepare (AbstractChannel channel, LinkMessage message) {
-		throw new IllegalStateException();
-	}
-	
-	// only the master should receive this
-	protected void receivedDidPrepare (AbstractChannel channel, LinkMessage message) {
-		throw new IllegalStateException();
-		
-	}
-
-	// only the master should receive this
-	protected void receivedDidProceed (AbstractChannel channel, LinkMessage message) {
-		throw new IllegalStateException();
-	}
-
 	
 	protected synchronized void receivedImAlive (AbstractChannel channel, LinkMessage message) {
 		switch (linkState) {
