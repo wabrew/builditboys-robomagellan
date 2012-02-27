@@ -44,37 +44,42 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// --------------------------------------------------------------------------------
 	// Master to Slave messages
 
-	public void sendDoPrepare() {
-		LinkMessage message = new LinkMessage(channelNumber);
+	public void sendDoPrepare() throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, true);
 		message.addByte((byte) MS_DO_PREPARE);
 		channel.addMessage(message);
+		message.doWait();
 	}
 
-	public void sendDoProceed() {
-		LinkMessage message = new LinkMessage(channelNumber);
+	public void sendDoProceed() throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, true);
 		message.addByte((byte) MS_DO_PROCEED);
 		channel.addMessage(message);
+		message.doWait();
 	}
 
 	// --------------------------------------------------------------------------------
 	// Master to Slave messages
 
-	public void sendNeedDoPrepare() {
-		LinkMessage message = new LinkMessage(channelNumber);
+	public void sendNeedDoPrepare() throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, true);
 		message.addByte((byte) SM_NEED_DO_PREPARE);
 		channel.addMessage(message);
+		message.doWait();
 	}
 
-	public void sendDidPrepare() {
-		LinkMessage message = new LinkMessage(channelNumber);
+	public void sendDidPrepare() throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, true);
 		message.addByte((byte) SM_DID_PREPARE);
 		channel.addMessage(message);
+		message.doWait();
 	}
 
-	public void sendDidProceed() {
-		LinkMessage message = new LinkMessage(channelNumber);
+	public void sendDidProceed() throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, true);
 		message.addByte((byte) SM_DID_PROCEED);
 		channel.addMessage(message);
+		message.doWait();
 	}
 
 	// --------------------------------------------------------------------------------

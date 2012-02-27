@@ -11,13 +11,13 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	protected CRC8Calculator crc8;
 	protected CRC16Calculator crc16;
 
-	protected int sequenceNumber;
-
 	protected volatile ThreadControlEnum threadControl;
 	protected String threadName;
 	protected Thread thread;
 	protected volatile boolean shouldRun = true;
 	protected volatile boolean suspended;
+
+	protected int sequenceNumber;
 
 	// --------------------------------------------------------------------------------
 	// Run
@@ -115,16 +115,15 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	// --------------------------------------------------------------------------------
 	// Sequence numbers
 
-	protected void resetSequenceNumber() {
+	protected void resetSequenceNumber () {
 		sequenceNumber = SEQUENCE_NUM_MIN - 1;
 	}
-
-	protected int nextSequenceNumber() {
+	protected synchronized int nextSequenceNumber() {
 		sequenceNumber++;
 		if (sequenceNumber > SEQUENCE_NUM_MAX) {
 			sequenceNumber = SEQUENCE_NUM_MIN;
 		}
 		return sequenceNumber;
 	}
-	
+
 }

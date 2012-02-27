@@ -1,6 +1,7 @@
 package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
+
 import com.builditboys.robots.time.*;
 
 // a comm link hold together all the pieces
@@ -32,7 +33,7 @@ public abstract class AbstractLink implements Runnable {
 	
 	protected long lastKeepAliveSentTime = 0;
 	protected long lastKeepAliveReceivedTime = 0;
-	
+		
 	// --------------------------------------------------------------------------------
 	// Constructors
 
@@ -199,12 +200,13 @@ public abstract class AbstractLink implements Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
+	// Packet sequence numbers
 
-	protected void resetSequenceNumbers () {
+	protected synchronized void resetSequenceNumbers () {
 		sender.resetSequenceNumber();
 		receiver.resetSequenceNumber();
 	}
-	
+		
 	// --------------------------------------------------------------------------------
 	// These methods are used for the receive side to communicate to the
 	// link important information about how the link is working

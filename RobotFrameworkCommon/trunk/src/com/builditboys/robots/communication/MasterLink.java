@@ -50,10 +50,26 @@ public class MasterLink extends AbstractLink {
 			
 			// --------------------
 			// start off by sending a DO_PREPARE
-//			resetSequenceNumbers();
 			oprotocol.sendDoPrepare();
 			setLinkState(LinkStateEnum.LinkSentDoPrepareState);
+			// told the slave to reset, so we reset also
+			// This is not guaranteed to work for a couple of reasons.
+			// First there is a race condition between when this thread
+			// says to reset and the receive thread receiving the message.
+			// In practice this isn't much of a problem since the travel
+			// times for the messages will mean that the reset will happen
+			// before the reply comes back.
+			// However, there is also the problem that there could be
+			// several messages already in transit so even if you do get
+			// the receive sequence number set, the in flight messages
+			// will screw up the sequence number before the reply comes
+			// back.  Since somewhere in the stream of messages you will
+			// do the reset of the sequence numbers, one of the messages
+			// will trip up and start the sync over again.
+			// 
+			resetSequenceNumbers();
 			wait(DID_PREPARE_TIMEOUT);
+
 
 			// --------------------
 			// if we got a DID_PREPARE, then send a DO_PROCEED

@@ -7,6 +7,36 @@ public class LinkMessage extends FillableBuffer {
 	// the channel to which messages are directed
 	private int channelNumber;
 	
+	private boolean sendNotify = false;
+	private boolean doReset = false;
+	
+	//--------------------------------------------------------------------------------
+	// Constructors
+
+	public LinkMessage (int channelnum) {
+		super(MAX_PAYLOAD_LEN);
+		channelNumber = channelnum;
+		sendNotify = false;
+	}
+	
+	public LinkMessage (int channelnum, boolean notify) {
+		super(MAX_PAYLOAD_LEN);
+		channelNumber = channelnum;
+		sendNotify = notify;
+	}
+	
+	public LinkMessage (int channelnum, int capacity) {
+		super(capacity);
+		channelNumber = channelnum;
+		sendNotify = false;
+	}
+	
+	public LinkMessage (int channelnum, boolean notify, int capacity) {
+		super(capacity);
+		channelNumber = channelnum;
+		sendNotify = notify;
+	}
+
 	//--------------------------------------------------------------------------------
 	// Getter/Setters
 	
@@ -14,17 +44,30 @@ public class LinkMessage extends FillableBuffer {
 		return channelNumber;
 	}
 
-	//--------------------------------------------------------------------------------
-	// Constructors
+	public boolean isSendNotify() {
+		return sendNotify;
+	}
 
-	public LinkMessage (int channelnum) {
-		super(MAX_PAYLOAD_LEN);
-		channelNumber = channelnum;
+	public void setSendNotify(boolean doNotify) {
+		this.sendNotify = doNotify;
 	}
 	
-	public LinkMessage (int channelnum, int capacity) {
-		super(capacity);
-		channelNumber = channelnum;
+	public boolean isDoReset() {
+		return doReset;
+	}
+
+	public void setDoReset(boolean doReset) {
+		this.doReset = doReset;
+	}
+
+	//--------------------------------------------------------------------------------
+
+	public synchronized void doWait () throws InterruptedException {
+		wait();
+	}
+
+	public synchronized void doNotify () {
+		notify();
 	}
 	
 	//--------------------------------------------------------------------------------

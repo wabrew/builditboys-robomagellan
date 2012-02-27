@@ -43,15 +43,10 @@ public class Receiver extends AbstractSenderReceiver {
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		inputChannels = link.getInputChannels();
-		reset();
+		resetMessageInfo();
 	}
 
 	// --------------------------------------------------------------------------------
-
-	public void reset() {
-		resetSequenceNumber();
-		resetMessageInfo();
-	}
 
 	private void resetMessageInfo() {
 		receivedSequenceNumber = 0;
@@ -74,8 +69,7 @@ public class Receiver extends AbstractSenderReceiver {
 			resetMessageInfo();
 			receiveMessage();
 			if (receivedOk) {
-				receivedChannel = inputChannels
-						.getChannelByNumber(receivedChannelNumber);
+				receivedChannel = inputChannels.getChannelByNumber(receivedChannelNumber);
 				receivedProtocol = receivedChannel.getProtocol();
 				handleReceivedMessage();
 			}
@@ -160,6 +154,9 @@ public class Receiver extends AbstractSenderReceiver {
 			throw new ReceiveException("Preamble CRC mismatch");
 		}
 		if (receivedSequenceNumber != expectedSequenceNumber) {
+			System.out.println("Expected, Received");
+			System.out.println(expectedSequenceNumber);
+			System.out.println(receivedSequenceNumber);
 			throw new ReceiveException("Bad received sequence number");
 		}
 		if (!AbstractChannel.isLegalChannelNumber(receivedChannelNumber)) {

@@ -39,15 +39,10 @@ public class Sender extends AbstractSenderReceiver {
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		outputChannels = link.getOutputChannels();
-		reset();
+		resetMessageInfo();
 	}
 
 	// --------------------------------------------------------------------------------
-
-	public void reset() {
-		resetSequenceNumber();
-		resetMessageInfo();
-	}
 
 	private void resetMessageInfo() {
 		sentSequenceNumber = 0;
@@ -142,6 +137,10 @@ public class Sender extends AbstractSenderReceiver {
 			System.out.print(" : " + link.getRole() + " Sent    : ");
 			printRaw();
 			System.out.println();
+		}
+		
+		if (message.isSendNotify()) {
+			message.doNotify();
 		}
 	}
 

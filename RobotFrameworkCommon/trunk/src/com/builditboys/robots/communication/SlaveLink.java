@@ -61,7 +61,13 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// --------------------
 			// if we got a DO_PREPARE, then send DID_PREPARE
 			if (linkState == LinkStateEnum.LinkReceivedDoPrepareState) {
-//				resetSequenceNumbers();
+				// master told us to reset, so we do
+				resetSequenceNumbers();
+				// A small hack, delay a little bit before replying
+				// so that the master side has time to do its reset before
+				// the reply comes back.  See the comment in the master's
+				// do_work method.
+				wait(DELAY_DID_PROCEED);
 				oprotocol.sendDidPrepare();
 				setLinkState(LinkStateEnum.LinkSentDidPrepareState, "three");
 				wait(DO_PROCEED_TIMEOUT);

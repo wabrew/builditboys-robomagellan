@@ -76,6 +76,7 @@ public class LinkParameters {
 	// master timing out slave messages
 	public static final long DID_PREPARE_TIMEOUT = 1000;
 	public static final long DID_PROCEED_TIMEOUT = 1000;
+	public static final long DELAY_DID_PROCEED = 10;
 	
 	// slave timing out master messages
 	public static final long NEED_PREPARE_TIMEOUT = 5000;
