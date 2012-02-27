@@ -19,7 +19,9 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		
 		LinkReceivedImAliveState,
 		
-		LinkActiveState;
+		LinkActiveState,
+		
+		LinkReadyState;
 	}
 
 	protected LinkStateEnum linkState;
@@ -47,30 +49,35 @@ public class SlaveLink extends AbstractLink implements Runnable {
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
 
+	// be sure to look at isSendableChannel, etc to understand how the various
+	// states affect the actions of the sender and receiver
+
 	public synchronized void doWork () throws InterruptedException {
 		while (true) {
 			setLinkState(LinkStateEnum.LinkInitState, "one");
-			resetSequenceNumbers();
 			
 			// --------------------
-			// start off by sending a NEED_DO_PREPARE
-			oprotocol.sendNeedDoPrepare();
-			setLinkState(LinkStateEnum.LinkSentNeedDoPrepareState, "two");
-			wait(NEED_PREPARE_TIMEOUT);
+			// wait a little to give the master a chance to start things
+			// off before the slave starts chiming in
+			linkWait(SLAVE_START_DELAY);
+
+			// --------------------
+			// if the master has not already started the init process
+			// remind the master to do so by sending a NEED_DO_PREPARE
+			// if the master did start things already, just fall through
+			if (linkState != LinkStateEnum.LinkReceivedDoPrepareState) {
+				oprotocol.sendNeedDoPrepare(false);
+				setLinkState(LinkStateEnum.LinkSentNeedDoPrepareState, "two");
+				linkWait(NEED_PREPARE_TIMEOUT);
+			}
 
 			// --------------------
 			// if we got a DO_PREPARE, then send DID_PREPARE
 			if (linkState == LinkStateEnum.LinkReceivedDoPrepareState) {
 				// master told us to reset, so we do
-				resetSequenceNumbers();
-				// A small hack, delay a little bit before replying
-				// so that the master side has time to do its reset before
-				// the reply comes back.  See the comment in the master's
-				// do_work method.
-				wait(DELAY_DID_PROCEED);
-				oprotocol.sendDidPrepare();
+				oprotocol.sendDidPrepare(false);
 				setLinkState(LinkStateEnum.LinkSentDidPrepareState, "three");
-				wait(DO_PROCEED_TIMEOUT);
+				linkWait(DO_PROCEED_TIMEOUT);
 			}
 			else {
 				// failure, start over
@@ -80,9 +87,9 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// --------------------
 			// if we got a DO_PROCEED, then send a DID_PROCEED
 			if (linkState == LinkStateEnum.LinkReceivedDoProceedState) {
-				oprotocol.sendDidProceed();
+				oprotocol.sendDidProceed(false);
 				setLinkState(LinkStateEnum.LinkSentDidProceedState, "four");
-				wait(IM_ALIVE_TIMEOUT);
+				linkWait(IM_ALIVE_TIMEOUT);
 			}
 			else {
 				// failure, start over
@@ -94,7 +101,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
 				setLinkState(LinkStateEnum.LinkActiveState, "five");
 				lastKeepAliveReceivedTime = Clock.clockRead();
-				while (linkState == LinkStateEnum.LinkActiveState) {
+				while ((linkState == LinkStateEnum.LinkActiveState)
+						|| (linkState == LinkStateEnum.LinkReadyState)) {
 					// make sure you have recently received a keep alive message
 					// also, you could be awakened by receiving a keep alive so 
 					// keep track of how long you need to wait to send a keep alive
@@ -105,7 +113,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 							lastKeepAliveSentTime = Clock.clockRead();
 						}
 						else {
-							wait(timeToNextSend);
+							linkWait(timeToNextSend);
 						}
 					}
 					else {
@@ -194,6 +202,40 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		notify();
 	}
 	
+	// --------------------------------------------------------------------------------
+	// Interaction with the sender and receiver
+	
+	public synchronized boolean isSendableChannel (AbstractChannel channel) {
+//		synchronized (System.out){
+//			System.out.println("slave is sendable");
+//			System.out.println(controlChannelOut);
+//			System.out.println(controlChannelIn);
+//			System.out.println(channel);
+//		}
+		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkReadyState);
+	}
+	
+	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
+//		synchronized (System.out){
+//			System.out.println("slave is receivable");
+//			System.out.println(controlChannelOut);
+//			System.out.println(controlChannelIn);
+//			System.out.println(channel);
+//		}
+		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkReadyState);
+	}
+	
+	public synchronized boolean isForceInitialSequenceNumbers () {
+		switch (linkState) {
+		case LinkInitState:
+		case LinkSentNeedDoPrepareState:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+
 	// --------------------------------------------------------------------------------
 
 	public String getRole () {

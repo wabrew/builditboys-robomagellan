@@ -200,12 +200,12 @@ public abstract class AbstractLink implements Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Packet sequence numbers
+	// Sequence numbers
 
-	protected synchronized void resetSequenceNumbers () {
-		sender.resetSequenceNumber();
-		receiver.resetSequenceNumber();
-	}
+//	protected synchronized void resetSequenceNumbers () {
+//		sender.resetSequenceNumber();
+//		receiver.resetSequenceNumber();
+//	}
 		
 	// --------------------------------------------------------------------------------
 	// These methods are used for the receive side to communicate to the
@@ -246,6 +246,18 @@ public abstract class AbstractLink implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 
+	public abstract boolean isSendableChannel (AbstractChannel channel);
+	public abstract boolean isReceivableChannel (AbstractChannel channel);
+	public abstract boolean isForceInitialSequenceNumbers ();
+	
+	protected void linkWait (long timeout) throws InterruptedException {
+//		System.out.println(getRole() + " start wait");
+		wait(timeout);
+//		System.out.println(getRole() + " end wait");
+	}
+	
+	// --------------------------------------------------------------------------------
+	
 	public abstract String getRole ();
 
 }

@@ -69,8 +69,16 @@ public class Sender extends AbstractSenderReceiver {
 			
 			// if you got one, send it, otherwise wait
 			if (sentChannel != null) {
-				sentProtocol = sentChannel.getProtocol();
-				sendMessage(sentChannel.getMessage());
+				// ask the link if we should really send messages from this channel
+				// if not, discard
+				if (link.isSendableChannel(sentChannel)) {
+					sentProtocol = sentChannel.getProtocol();
+					LinkMessage message = sentChannel.getMessage();
+					sendMessage(message);
+				}
+				else {
+					System.out.println(link.getRole() + " discarding send");
+				}
 			}
 			else {
 				// failed to find a message, wait and try again
@@ -78,35 +86,6 @@ public class Sender extends AbstractSenderReceiver {
 			}
 		}
 	}
-	
-/*	
-// this is probably more complicated than it needs to be now that the
-// threads are sent an interrupt when they need to be stopped
-
-	public synchronized void doWork() throws InterruptedException {
-		OutputChannel channel;
-		
-		// try to get and send a message
-		channel = (OutputChannel) outputChannels.getChannelWithMessages();
-		if (channel != null) {
-			sendMessage(channel.getMessage());
-			return;
-		}
-		
-		// failed to find a message, wait and try again
-		outputChannels.waitForMessage();
-		
-		// try again to get and send a message (could be sprurious awakening)
-		channel = (OutputChannel) outputChannels.getChannelWithMessages();
-		if (channel != null) {
-			sendMessage(channel.getMessage());
-			return;
-		}
-		
-		// if you get here then there was no message to send (spurious awakening),
-		// so return and try again when you are called again
-	}
-*/
 
 	// --------------------------------------------------------------------------------
 	// Send a message
@@ -151,7 +130,7 @@ public class Sender extends AbstractSenderReceiver {
 	}
 
 	private void sendPreamble() throws InterruptedException {
-		sentSequenceNumber = nextSequenceNumber();
+		sentSequenceNumber = bestSequenceNumber();
 
 		preambleBuffer.serializeBytes1(sentSequenceNumber);
 		preambleBuffer.serializeBytes1(sentChannelNumber);

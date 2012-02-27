@@ -115,13 +115,18 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	// --------------------------------------------------------------------------------
 	// Sequence numbers
 
-	protected void resetSequenceNumber () {
+	protected synchronized void resetSequenceNumber () {
 		sequenceNumber = SEQUENCE_NUM_MIN - 1;
 	}
-	protected synchronized int nextSequenceNumber() {
-		sequenceNumber++;
-		if (sequenceNumber > SEQUENCE_NUM_MAX) {
+	protected synchronized int bestSequenceNumber() {
+		if (link.isForceInitialSequenceNumbers()) {
 			sequenceNumber = SEQUENCE_NUM_MIN;
+		}
+		else {
+			sequenceNumber++;
+			if (sequenceNumber > SEQUENCE_NUM_MAX) {
+				sequenceNumber = SEQUENCE_NUM_MIN;
+			}
 		}
 		return sequenceNumber;
 	}

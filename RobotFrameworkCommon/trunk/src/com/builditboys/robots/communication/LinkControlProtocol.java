@@ -44,42 +44,52 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// --------------------------------------------------------------------------------
 	// Master to Slave messages
 
-	public void sendDoPrepare() throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, true);
+	public void sendDoPrepare(boolean doWait) throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) MS_DO_PREPARE);
 		channel.addMessage(message);
-		message.doWait();
+		if (doWait) {
+			message.doWait();
+		}
 	}
 
-	public void sendDoProceed() throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, true);
+	public void sendDoProceed(boolean doWait) throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) MS_DO_PROCEED);
 		channel.addMessage(message);
-		message.doWait();
+		if (doWait) {
+			message.doWait();
+		}
 	}
 
 	// --------------------------------------------------------------------------------
 	// Master to Slave messages
 
-	public void sendNeedDoPrepare() throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, true);
+	public void sendNeedDoPrepare(boolean doWait) throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_NEED_DO_PREPARE);
 		channel.addMessage(message);
-		message.doWait();
+		if (doWait) {
+			message.doWait();
+		}
 	}
 
-	public void sendDidPrepare() throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, true);
+	public void sendDidPrepare(boolean doWait) throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_DID_PREPARE);
 		channel.addMessage(message);
-		message.doWait();
+		if (doWait) {
+			message.doWait();
+		}
 	}
 
-	public void sendDidProceed() throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, true);
+	public void sendDidProceed(boolean doWait) throws InterruptedException {
+		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_DID_PROCEED);
 		channel.addMessage(message);
-		message.doWait();
+		if (doWait) {
+			message.doWait();
+		}
 	}
 
 	// --------------------------------------------------------------------------------

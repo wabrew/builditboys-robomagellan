@@ -15,7 +15,9 @@ public class MasterLink extends AbstractLink {
 		LinkSentDoProceedState,
 		LinkReceivedDidProceedState,
 		
-		LinkActiveState;
+		LinkActiveState,
+		
+		LinkReadyState;
 	}
 
 	protected LinkStateEnum linkState;
@@ -42,41 +44,27 @@ public class MasterLink extends AbstractLink {
 	
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
+	
+	// be sure to look at isSendableChannel, etc to understand how the various
+	// states affect the actions of the sender and receiver
 
 	public synchronized void doWork () throws InterruptedException {
 		while (true) {
 			setLinkState(LinkStateEnum.LinkInitState);
-			resetSequenceNumbers();
 			
 			// --------------------
 			// start off by sending a DO_PREPARE
-			oprotocol.sendDoPrepare();
+			oprotocol.sendDoPrepare(false);
 			setLinkState(LinkStateEnum.LinkSentDoPrepareState);
-			// told the slave to reset, so we reset also
-			// This is not guaranteed to work for a couple of reasons.
-			// First there is a race condition between when this thread
-			// says to reset and the receive thread receiving the message.
-			// In practice this isn't much of a problem since the travel
-			// times for the messages will mean that the reset will happen
-			// before the reply comes back.
-			// However, there is also the problem that there could be
-			// several messages already in transit so even if you do get
-			// the receive sequence number set, the in flight messages
-			// will screw up the sequence number before the reply comes
-			// back.  Since somewhere in the stream of messages you will
-			// do the reset of the sequence numbers, one of the messages
-			// will trip up and start the sync over again.
-			// 
-			resetSequenceNumbers();
-			wait(DID_PREPARE_TIMEOUT);
+			linkWait(DID_PREPARE_TIMEOUT);
 
 
 			// --------------------
 			// if we got a DID_PREPARE, then send a DO_PROCEED
 			if (linkState == LinkStateEnum.LinkReceivedDidPrepareState) {
-				oprotocol.sendDoProceed();
+				oprotocol.sendDoProceed(false);
 				setLinkState(LinkStateEnum.LinkSentDoProceedState);
-				wait(DID_PROCEED_TIMEOUT);
+				linkWait(DID_PROCEED_TIMEOUT);
 			}
 			else {
 				// failure, start over
@@ -88,7 +76,8 @@ public class MasterLink extends AbstractLink {
 			if (linkState == LinkStateEnum.LinkReceivedDidProceedState) {
 				setLinkState(LinkStateEnum.LinkActiveState);
 				lastKeepAliveReceivedTime = Clock.clockRead();
-				while (linkState == LinkStateEnum.LinkActiveState) {
+				while ((linkState == LinkStateEnum.LinkActiveState)
+						|| (linkState == LinkStateEnum.LinkReadyState)) {
 					// make sure you have recently received a keep alive message
 					// also, you could be awakened by receiving a keep alive so 
 					// keep track of how long you need to wait to send a keep alive
@@ -99,7 +88,7 @@ public class MasterLink extends AbstractLink {
 							lastKeepAliveSentTime = Clock.clockRead();
 						}
 						else {
-							wait(timeToNextSend);
+							linkWait(timeToNextSend);
 						}
 					}
 					else {
@@ -197,6 +186,39 @@ public class MasterLink extends AbstractLink {
 		notify();
 	}
 	
+	// --------------------------------------------------------------------------------
+	// Interaction with the sender and receiver
+
+	public synchronized boolean isSendableChannel (AbstractChannel channel) {
+//		synchronized (System.out){
+//			System.out.println("master is sendable");
+//			System.out.println(controlChannelOut);
+//			System.out.println(controlChannelIn);
+//			System.out.println(channel);
+//		}
+		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkReadyState);
+	}
+	
+	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
+//		synchronized (System.out){
+//			System.out.println("master is receivable");
+//			System.out.println(controlChannelOut);
+//			System.out.println(controlChannelIn);
+//			System.out.println(channel);
+//		}
+		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkReadyState);
+	}
+	
+	public synchronized boolean isForceInitialSequenceNumbers () {
+		switch (linkState) {
+		case LinkInitState:
+		case LinkSentDoPrepareState:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	// --------------------------------------------------------------------------------
 
 	public String getRole () {

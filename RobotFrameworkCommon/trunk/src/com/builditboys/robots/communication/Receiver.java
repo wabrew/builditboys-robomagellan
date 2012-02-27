@@ -71,7 +71,15 @@ public class Receiver extends AbstractSenderReceiver {
 			if (receivedOk) {
 				receivedChannel = inputChannels.getChannelByNumber(receivedChannelNumber);
 				receivedProtocol = receivedChannel.getProtocol();
-				handleReceivedMessage();
+				
+				// ask the link if we are currently receiving from the channel
+				// if not, discard
+				if (link.isReceivableChannel(receivedChannel)) {
+					handleReceivedMessage();
+				}
+				else {
+					System.out.println(link.getRole() + " discarding receive");
+				}
 			}
 		}
 	}
@@ -139,7 +147,7 @@ public class Receiver extends AbstractSenderReceiver {
 			preambleBuffer.addByte(readEscapedByte());
 		}
 
-		int expectedSequenceNumber = nextSequenceNumber();
+		int expectedSequenceNumber = bestSequenceNumber();
 		receivedSequenceNumber = preambleBuffer.deSerializeBytes1();
 		receivedChannelNumber = preambleBuffer.deSerializeBytes1();
 		receivedLength = preambleBuffer.deSerializeBytes1();
