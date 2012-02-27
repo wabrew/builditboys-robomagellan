@@ -15,9 +15,9 @@ public class MasterLink extends AbstractLink {
 		LinkSentDoProceedState,
 		LinkReceivedDidProceedState,
 		
-		LinkActiveState,
+		LinkReadyState,
 		
-		LinkReadyState;
+		LinkActiveState;
 	}
 
 	protected LinkStateEnum linkState;
@@ -42,6 +42,26 @@ public class MasterLink extends AbstractLink {
 		outputChannels.addChannel(controlChannelOut);
 	}
 	
+	// --------------------------------------------------------------------------------
+	
+	public void enable() {
+		if (linkState == LinkStateEnum.LinkReadyState) {
+			linkState = LinkStateEnum.LinkActiveState;
+		}
+		else {
+			throw new IllegalStateException();
+		}
+	}
+	
+	public void disable() {
+		if (linkState == LinkStateEnum.LinkActiveState) {
+			linkState = LinkStateEnum.LinkReadyState;
+		}
+		// for any other states, just do nothing since you are already
+		// effectively disabled
+	}
+
+
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
 	
@@ -73,11 +93,12 @@ public class MasterLink extends AbstractLink {
 
 			// --------------------
 			// if we got a DID_PROCEED, then the link is happy
+			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedDidProceedState) {
-				setLinkState(LinkStateEnum.LinkActiveState);
+				setLinkState(LinkStateEnum.LinkReadyState);
 				lastKeepAliveReceivedTime = Clock.clockRead();
-				while ((linkState == LinkStateEnum.LinkActiveState)
-						|| (linkState == LinkStateEnum.LinkReadyState)) {
+				while ((linkState == LinkStateEnum.LinkReadyState)
+						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
 					// also, you could be awakened by receiving a keep alive so 
 					// keep track of how long you need to wait to send a keep alive
@@ -166,6 +187,7 @@ public class MasterLink extends AbstractLink {
 		case LinkSentDoPrepareState:
 			break;
 		// stay active
+		case LinkReadyState:
 		case LinkActiveState:
 			break;
 		// otherwise, out of sync
@@ -196,7 +218,7 @@ public class MasterLink extends AbstractLink {
 //			System.out.println(controlChannelIn);
 //			System.out.println(channel);
 //		}
-		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkReadyState);
+		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
@@ -206,7 +228,7 @@ public class MasterLink extends AbstractLink {
 //			System.out.println(controlChannelIn);
 //			System.out.println(channel);
 //		}
-		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkReadyState);
+		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isForceInitialSequenceNumbers () {

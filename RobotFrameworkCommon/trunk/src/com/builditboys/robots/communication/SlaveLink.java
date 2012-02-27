@@ -19,9 +19,9 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		
 		LinkReceivedImAliveState,
 		
-		LinkActiveState,
+		LinkReadyState,
 		
-		LinkReadyState;
+		LinkActiveState;
 	}
 
 	protected LinkStateEnum linkState;
@@ -44,6 +44,25 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 		inputChannels.addChannel(controlChannelIn);
 		outputChannels.addChannel(controlChannelOut);
+	}
+
+	// --------------------------------------------------------------------------------
+	
+	public void enable() {
+		if (linkState == LinkStateEnum.LinkReadyState) {
+			linkState = LinkStateEnum.LinkActiveState;
+		}
+		else {
+			throw new IllegalStateException();
+		}
+	}
+	
+	public void disable() {
+		if (linkState == LinkStateEnum.LinkActiveState) {
+			linkState = LinkStateEnum.LinkReadyState;
+		}
+		// for any other states, just do nothing since you are already
+		// effectively disabled
 	}
 
 	// --------------------------------------------------------------------------------
@@ -98,11 +117,12 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 			// --------------------
 			// if we got an IM_ALIVE, then the link is happy
+			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
-				setLinkState(LinkStateEnum.LinkActiveState, "five");
+				setLinkState(LinkStateEnum.LinkReadyState, "five");
 				lastKeepAliveReceivedTime = Clock.clockRead();
-				while ((linkState == LinkStateEnum.LinkActiveState)
-						|| (linkState == LinkStateEnum.LinkReadyState)) {
+				while ((linkState == LinkStateEnum.LinkReadyState)
+						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
 					// also, you could be awakened by receiving a keep alive so 
 					// keep track of how long you need to wait to send a keep alive
@@ -182,6 +202,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			notify();
 			break;
 		// stay active
+		case LinkReadyState:
 		case LinkActiveState:
 			break;
 		// otherwise, out of sync
@@ -212,7 +233,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 //			System.out.println(controlChannelIn);
 //			System.out.println(channel);
 //		}
-		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkReadyState);
+		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
@@ -222,7 +243,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 //			System.out.println(controlChannelIn);
 //			System.out.println(channel);
 //		}
-		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkReadyState);
+		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isForceInitialSequenceNumbers () {

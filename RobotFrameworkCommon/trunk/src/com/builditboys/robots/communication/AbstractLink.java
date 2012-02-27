@@ -46,6 +46,15 @@ public abstract class AbstractLink implements Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
+	// Starting things up
+	
+	// see startThreads below
+	
+	// enable and disable let you turn on and off normal message processing
+	public abstract void enable();
+	public abstract void disable();
+	
+	// --------------------------------------------------------------------------------
 	// Channel collections
 	
 	protected InputChannelCollection getInputChannels() {
@@ -198,15 +207,7 @@ public abstract class AbstractLink implements Runnable {
 	protected long timeToNextKeepAlive () {
 		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Clock.clockRead());
 	}
-
-	// --------------------------------------------------------------------------------
-	// Sequence numbers
-
-//	protected synchronized void resetSequenceNumbers () {
-//		sender.resetSequenceNumber();
-//		receiver.resetSequenceNumber();
-//	}
-		
+	
 	// --------------------------------------------------------------------------------
 	// These methods are used for the receive side to communicate to the
 	// link important information about how the link is working
