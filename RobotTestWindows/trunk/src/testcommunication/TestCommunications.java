@@ -1,23 +1,28 @@
 package testcommunication;
 
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
+
+import java.io.IOException;
+
 import com.builditboys.robots.communication.AbstractChannel;
 import com.builditboys.robots.communication.LinkControlProtocol;
-import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
-import com.builditboys.robots.communication.Receiver;
-import com.builditboys.robots.communication.Sender;
 import com.builditboys.robots.communication.SlaveLink;
+import com.builditboys.robots.communication.WindowsLinkPort;
 
 public class TestCommunications {
 
-	public static void main(String args[]) {
-		testCommThreads();
-//		testCommMessages();
+	public static void main(String args[]) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+		testLinkThreadsComm();
+//		testLinkThreadsSelf();
+//		testLinkMessages();
 	}
 
-	static void testCommThreads() {
-		DebuggingCommPortBuffer buffer = new DebuggingCommPortBuffer();
+	static void testLinkThreadsSelf() {
+		DebuggingLinkPortBuffer buffer = new DebuggingLinkPortBuffer();
 		LinkPortInterface port1 = buffer.getPort1();
 		LinkPortInterface port2 = buffer.getPort2();
 		
@@ -70,8 +75,41 @@ public class TestCommunications {
 
 	// --------------------------------------------------------------------------------
 
-	static void testCommMessages() throws InterruptedException {
-		DebuggingCommPortBuffer buffer = new DebuggingCommPortBuffer();
+	static void testLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200);	
+		MasterLink masterLink = new MasterLink(port1);
+		
+		try {
+			masterLink.startThreads("Test");
+			System.out.println("Link started");
+		
+			Thread.sleep(10000);
+		}
+		catch (Exception e) {
+			System.out.println("Catching top level error");
+		}
+		finally {
+			port1.close();
+			
+		}
+		masterLink.stopThreads();
+
+		System.out.println("waiting to join");
+		try {
+			masterLink.joinThreads();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Link stopped");
+	}
+
+	// --------------------------------------------------------------------------------
+
+/*
+	static void testLinkMessages() throws InterruptedException, IOException {
+		DebuggingLinkPortBuffer buffer = new DebuggingLinkPortBuffer();
 		LinkPortInterface port1 = buffer.getPort1();
 		LinkPortInterface port2 = buffer.getPort2();
 
@@ -99,5 +137,6 @@ public class TestCommunications {
 		receiver.receiveMessage();
 
 	}
+*/
 
 }
