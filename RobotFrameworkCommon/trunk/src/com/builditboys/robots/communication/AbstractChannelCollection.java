@@ -48,9 +48,6 @@ public abstract class AbstractChannelCollection {
 	
 	public synchronized AbstractChannel getChannelByNumber (int channelNumber) {
 		AbstractChannel channel = channels[channelNumber];
-		if (channel == null) {
-			throw new IllegalArgumentException();
-		}
 		return channel;
 	}
 	

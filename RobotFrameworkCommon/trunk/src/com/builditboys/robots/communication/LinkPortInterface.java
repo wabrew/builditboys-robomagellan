@@ -1,17 +1,12 @@
 package com.builditboys.robots.communication;
 
+import java.io.IOException;
+
 public interface LinkPortInterface {
 	
 	public byte readByte ()  throws InterruptedException;
 	
-//	public byte[] readBytes ();
+	public void writeByte (byte bite) throws InterruptedException, IOException;
 	
-	public void writeByte (byte bite) throws InterruptedException;
-	
-	public void writeBytes (byte bites[]) throws InterruptedException;
-	
-	public void tossInput ();
-	
-	public void tossOutput ();
-
+	public void close () throws IOException;
 }

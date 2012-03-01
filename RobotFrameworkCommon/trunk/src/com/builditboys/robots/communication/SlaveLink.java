@@ -34,11 +34,11 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		setLinkState(LinkStateEnum.LinkInitState, "constructor");
 		
 		// the protocol's channel will be set when the protocol is associated with a channel
-		iprotocol = new LinkControlProtocol(null, LinkControlProtocol.CommControlRoleEnum.SLAVE);
-		oprotocol = new LinkControlProtocol(null, LinkControlProtocol.CommControlRoleEnum.SLAVE);
+		iprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.SLAVE);
+		oprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.SLAVE);
 	
-		controlChannelIn = new InputChannel(iprotocol, COMM_CONTROL_CHANNEL_NUMBER);
-		controlChannelOut = new OutputChannel(oprotocol, COMM_CONTROL_CHANNEL_NUMBER);
+		controlChannelIn = iprotocol.getInputChannel();
+		controlChannelOut = oprotocol.getOutputChannel();
 
 		AbstractChannel.pairChannels(controlChannelIn, controlChannelOut);
 

@@ -2,6 +2,8 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import java.io.IOException;
+
 public abstract class AbstractSenderReceiver implements Runnable {
 
 	protected AbstractLink link;
@@ -41,11 +43,13 @@ public abstract class AbstractSenderReceiver implements Runnable {
 				doWork();
 			} catch (InterruptedException e) {
 				System.out.println(threadName + " work interrupted");
+			} catch (IOException e) {
+				System.out.println(threadName + " IO Exception");
 			}
 		}
 	}
 
-	public abstract void doWork() throws InterruptedException;
+	public abstract void doWork() throws InterruptedException, IOException;
 
 	// --------------------------------------------------------------------------------
 

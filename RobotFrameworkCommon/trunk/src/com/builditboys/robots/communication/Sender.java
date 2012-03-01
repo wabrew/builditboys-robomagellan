@@ -9,6 +9,8 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_
 import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_1_LENGTH;
 import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE_1;
 
+import java.io.IOException;
+
 import com.builditboys.robots.time.Clock;
 
 public class Sender extends AbstractSenderReceiver {
@@ -59,7 +61,7 @@ public class Sender extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
 	
-	public synchronized void doWork() throws InterruptedException {
+	public synchronized void doWork() throws InterruptedException, IOException {
 		
 		while (true) {
 			resetMessageInfo();
@@ -77,7 +79,7 @@ public class Sender extends AbstractSenderReceiver {
 					sendMessage(message);
 				}
 				else {
-					System.out.println(link.getRole() + " discarding send");
+					System.out.println(link.getRole() + " discarding unsent message for channel " + sentChannel.getChannelNumber());
 				}
 			}
 			else {
@@ -90,7 +92,7 @@ public class Sender extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Send a message
 
-	public void sendMessage(LinkMessage message) throws InterruptedException {
+	public void sendMessage(LinkMessage message) throws InterruptedException, IOException {
 		resetMessageInfo();
 
 		sentMessage = message;
@@ -123,13 +125,13 @@ public class Sender extends AbstractSenderReceiver {
 		}
 	}
 
-	private void sendPreSync() throws InterruptedException {
+	private void sendPreSync() throws InterruptedException, IOException {
 		for (int i = 0; i < SEND_SYNC_1_LENGTH; i++) {
 			port.writeByte(SEND_SYNC_BYTE_1);
 		}
 	}
 
-	private void sendPreamble() throws InterruptedException {
+	private void sendPreamble() throws InterruptedException, IOException {
 		sentSequenceNumber = bestSequenceNumber();
 
 		preambleBuffer.serializeBytes1(sentSequenceNumber);
@@ -146,12 +148,12 @@ public class Sender extends AbstractSenderReceiver {
 
 	}
 
-	private void sendBody() throws InterruptedException {
+	private void sendBody() throws InterruptedException, IOException {
 		sendBytes(sentMessage);
 		crc16.extend(sentMessage);
 	}
 
-	private void sendPostamble() throws InterruptedException {
+	private void sendPostamble() throws InterruptedException, IOException {
 		crc16.end();
 
 		sentCRC2 = crc16.get();
@@ -159,7 +161,7 @@ public class Sender extends AbstractSenderReceiver {
 		sendBytes(postambleBuffer);
 	}
 
-	private void sendPostSync() throws InterruptedException {
+	private void sendPostSync() throws InterruptedException, IOException {
 		for (int i = 0; i < SEND_POST_SYNC_PAD; i++) {
 			port.writeByte(SEND_SYNC_BYTE_1);
 		}
@@ -168,7 +170,7 @@ public class Sender extends AbstractSenderReceiver {
 	// --------------------------------------------------------------------------------
 	// Byte escaping
 
-	private void sendByte(byte bite) throws InterruptedException {
+	private void sendByte(byte bite) throws InterruptedException, IOException {
 		switch (bite) {
 		case SEND_SYNC_BYTE_1:
 			port.writeByte(SEND_ESCAPE_BYTE);
@@ -184,19 +186,19 @@ public class Sender extends AbstractSenderReceiver {
 		}
 	}
 
-	private void sendBytes(byte[] bytes) throws InterruptedException {
+	private void sendBytes(byte[] bytes) throws InterruptedException, IOException {
 		for (byte b : bytes) {
 			sendByte(b);
 		}
 	}
 
-	private void sendBytes(byte[] bytes, int count) throws InterruptedException {
+	private void sendBytes(byte[] bytes, int count) throws InterruptedException, IOException {
 		for (int i = 0; i < count; i++) {
 			sendByte(bytes[i]);
 		}
 	}
 
-	private void sendBytes(FillableBuffer buff) throws InterruptedException {
+	private void sendBytes(FillableBuffer buff) throws InterruptedException, IOException {
 		for (int i = 0; i < buff.size(); i++) {
 			sendByte(buff.getByte(i));
 		}

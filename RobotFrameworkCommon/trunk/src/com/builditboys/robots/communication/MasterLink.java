@@ -30,11 +30,11 @@ public class MasterLink extends AbstractLink {
 		setLinkState(LinkStateEnum.LinkInitState);
 		
 		// the protocol's channel will be set when the protocol is associated with a channel
-		iprotocol = new LinkControlProtocol(null, LinkControlProtocol.CommControlRoleEnum.MASTER);
-		oprotocol = new LinkControlProtocol(null, LinkControlProtocol.CommControlRoleEnum.MASTER);
+		iprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.MASTER);
+		oprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.MASTER);
 
-		controlChannelIn = new InputChannel(iprotocol, COMM_CONTROL_CHANNEL_NUMBER);
-		controlChannelOut = new OutputChannel(oprotocol, COMM_CONTROL_CHANNEL_NUMBER);
+		controlChannelIn = iprotocol.getInputChannel();
+		controlChannelOut = oprotocol.getOutputChannel();
 
 		AbstractChannel.pairChannels(controlChannelIn, controlChannelOut);
 

@@ -1,6 +1,7 @@
 package com.builditboys.robots.communication;
 
 import com.builditboys.robots.infrastructure.AbstractNotification;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class LinkControlProtocol extends AbstractProtocol {
 
@@ -16,13 +17,25 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// Constructors
 
 	private LinkControlProtocol() {
-		super(null);
 	}
 
-	public LinkControlProtocol(AbstractChannel channel, CommControlRoleEnum role) {
-		super(channel);
+	public LinkControlProtocol(CommControlRoleEnum rol) {
+		role = rol;
 	}
 
+	//--------------------------------------------------------------------------------
+	// Channel factories
+	
+	public InputChannel getInputChannel () {
+		channel = new InputChannel(this, COMM_CONTROL_CHANNEL_NUMBER);
+		return (InputChannel) channel;
+	}
+	
+	public OutputChannel getOutputChannel () {
+		channel = new OutputChannel(this, COMM_CONTROL_CHANNEL_NUMBER);
+		return (OutputChannel) channel;
+	}
+	
 	// --------------------------------------------------------------------------------
 
 	public AbstractProtocol getIndicator() {
@@ -31,7 +44,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 
 	// --------------------------------------------------------------------------------
 	// Link Control Messages - keep in sync with the PSoC
-
+	
 	public static final int MS_DO_PREPARE = 0;
 	public static final int MS_DO_PROCEED = 1;
 
@@ -41,8 +54,23 @@ public class LinkControlProtocol extends AbstractProtocol {
 
 	public static final int IM_ALIVE = 5;
 
+	/*
+    xxx.ordinal() does not work in the switch statement the decodes the messages
+    
+	private enum LinkControlMessageEnum {
+		MS_DO_PREPARE,
+		MS_DO_PROCEED,
+		
+		SM_NEED_DO_PREPARE,
+		SM_DID_PREPARE,
+		SM_DID_PROCEED,
+		
+		IM_ALIVE;
+	}
+	*/
+
 	// --------------------------------------------------------------------------------
-	// Master to Slave messages
+	// Sending messages - Master to Slave messages
 
 	public void sendDoPrepare(boolean doWait) throws InterruptedException {
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
@@ -63,7 +91,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Master to Slave messages
+	// Sending messages - Slave to Master messages
 
 	public void sendNeedDoPrepare(boolean doWait) throws InterruptedException {
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
@@ -93,7 +121,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Shared messages
+	// Sending messages - Shared messages
 
 	public void sendKeepAlive() {
 		LinkMessage message = new LinkMessage(channelNumber);
@@ -102,12 +130,11 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	// --------------------------------------------------------------------------------
-
-	// this is on the receive side protocol object
-
+	// Receiving messages
+	
 	public void receiveMessage(LinkMessage message) {
 		AbstractLink link = channel.getLink();
-		byte indicator = message.getByte(0);
+		int indicator = message.getByte(0);
 		switch (indicator) {
 		case MS_DO_PREPARE:
 			link.receivedDoPrepare(channel, message);

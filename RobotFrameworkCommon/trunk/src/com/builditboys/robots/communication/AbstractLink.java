@@ -85,6 +85,19 @@ public abstract class AbstractLink implements Runnable {
 	}
 	
 	// --------------------------------------------------------------------------------
+	// Adding a protocol
+	
+	public void addProtocol (AbstractProtocol iproto, AbstractProtocol oproto) {
+		InputChannel channelIn = iproto.getInputChannel();
+		OutputChannel channelOut = oproto.getOutputChannel();
+
+		AbstractChannel.pairChannels(channelIn, channelOut);
+
+		inputChannels.addChannel(channelIn);
+		outputChannels.addChannel(channelOut);
+	}
+
+	// --------------------------------------------------------------------------------
 	// Run
 
 	public void run() {

@@ -70,15 +70,20 @@ public class Receiver extends AbstractSenderReceiver {
 			receiveMessage();
 			if (receivedOk) {
 				receivedChannel = inputChannels.getChannelByNumber(receivedChannelNumber);
-				receivedProtocol = receivedChannel.getProtocol();
+				if (receivedChannel != null) {
+					receivedProtocol = receivedChannel.getProtocol();
 				
-				// ask the link if we are currently receiving from the channel
-				// if not, discard
-				if (link.isReceivableChannel(receivedChannel)) {
-					handleReceivedMessage();
+					// ask the link if we are currently receiving from the channel
+					// if not, discard
+					if (link.isReceivableChannel(receivedChannel)) {
+						handleReceivedMessage();
+					}
+					else {
+						System.out.println(link.getRole() + " discarding received message for channel " + receivedChannelNumber);
+					}
 				}
 				else {
-					System.out.println(link.getRole() + " discarding receive");
+					System.out.println(link.getRole() + " discarding received message for uninstalled channel " + receivedChannelNumber);
 				}
 			}
 		}

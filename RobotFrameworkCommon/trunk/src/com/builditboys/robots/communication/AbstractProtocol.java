@@ -7,10 +7,24 @@ public abstract class AbstractProtocol {
 	protected AbstractChannel channel;
 	protected int channelNumber;
 	
+	//--------------------------------------------------------------------------------
+	// Constructors
+	
+	protected AbstractProtocol () {
+	}
+
 	protected AbstractProtocol (AbstractChannel chan) {
 		channel = chan;
 	}
 	
+	//--------------------------------------------------------------------------------
+	// Channel factories - call one or the other, not both
+	
+	public abstract InputChannel getInputChannel ();
+	
+	public abstract OutputChannel getOutputChannel ();
+	
+
 	//--------------------------------------------------------------------------------
 
 	public abstract AbstractProtocol getIndicator();

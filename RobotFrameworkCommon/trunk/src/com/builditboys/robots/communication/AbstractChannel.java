@@ -109,4 +109,5 @@ public abstract class AbstractChannel {
 		return ((channelNumber >= CHANNEL_NUMBER_MIN) 
 				&& (channelNumber <= CHANNEL_NUMBER_MAX));
 	}
+
 }

@@ -15,8 +15,6 @@ public class LinkParameters {
 	public static final int CHANNEL_NUMBER_MAX = 100;
 
 	public static final int DEFAULT_CHANNEL_BUFFER_CAPACITY = 10;
-
-	public static final int COMM_CONTROL_CHANNEL_NUMBER = 0;
 	
 	//--------------------------------------------------------------------------------
 	// Message sync and escaping
@@ -83,5 +81,10 @@ public class LinkParameters {
 	public static final long IM_ALIVE_TIMEOUT = 1000;
 	public static final long KEEP_ALIVE_INTERVAL = 750;
 
+	//--------------------------------------------------------------------------------
+    // Channel numbers, keep in sync with PSOC
 	
+	public static final int COMM_CONTROL_CHANNEL_NUMBER = 0;
+	public static final int TIME_SYNC_CHANNEL_NUMBER = 10;
+
 }
