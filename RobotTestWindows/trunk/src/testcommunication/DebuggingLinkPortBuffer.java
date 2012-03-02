@@ -2,7 +2,6 @@ package testcommunication;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.builditboys.robots.communication.FillableBuffer;
 
 public class DebuggingLinkPortBuffer {
 
