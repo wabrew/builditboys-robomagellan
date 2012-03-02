@@ -1,9 +1,8 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.AngleUnits.DEGREES;
 import static com.builditboys.robots.units.LengthUnits.*;
 
-import com.builditboys.robots.units.AngleUnits;
+
 import com.builditboys.robots.units.LengthUnits;
 
 

@@ -1,6 +1,6 @@
 package com.builditboys.robots.communication;
 
-import com.builditboys.robots.infrastructure.AbstractNotification;
+
 
 public class OutputChannel extends AbstractChannel {
 	
