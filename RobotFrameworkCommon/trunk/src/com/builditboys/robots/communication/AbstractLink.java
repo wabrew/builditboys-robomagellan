@@ -2,6 +2,8 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import java.io.IOException;
+
 import com.builditboys.robots.time.*;
 
 // a comm link hold together all the pieces
@@ -24,16 +26,16 @@ public abstract class AbstractLink implements Runnable {
 	protected Thread thread;
 	protected volatile boolean shouldRun;
 	protected volatile boolean suspended;
-	
+
 	protected InputChannel controlChannelIn;
 	protected OutputChannel controlChannelOut;
 
 	protected LinkControlProtocol iprotocol;
 	protected LinkControlProtocol oprotocol;
-	
+
 	protected long lastKeepAliveSentTime = 0;
 	protected long lastKeepAliveReceivedTime = 0;
-		
+
 	// --------------------------------------------------------------------------------
 	// Constructors
 
@@ -47,16 +49,17 @@ public abstract class AbstractLink implements Runnable {
 
 	// --------------------------------------------------------------------------------
 	// Starting things up
-	
+
 	// see startThreads below
-	
+
 	// enable and disable let you turn on and off normal message processing
 	public abstract void enable();
+
 	public abstract void disable();
-	
+
 	// --------------------------------------------------------------------------------
 	// Channel collections
-	
+
 	protected InputChannelCollection getInputChannels() {
 		return inputChannels;
 	}
@@ -67,27 +70,27 @@ public abstract class AbstractLink implements Runnable {
 
 	// --------------------------------------------------------------------------------
 	// Finding channels
-	
-	public AbstractChannel getInputChannelN (int channelNumber) {
+
+	public AbstractChannel getInputChannelN(int channelNumber) {
 		return inputChannels.getChannelByNumber(channelNumber);
 	}
-	
-	public AbstractChannel getOutputChannelN (int channelNumber) {
+
+	public AbstractChannel getOutputChannelN(int channelNumber) {
 		return outputChannels.getChannelByNumber(channelNumber);
 	}
-	
-	public AbstractChannel getInputChannelByProtocol (AbstractProtocol protocol) {
+
+	public AbstractChannel getInputChannelByProtocol(AbstractProtocol protocol) {
 		return inputChannels.getChannelByProtocol(protocol);
 	}
-	
-	public AbstractChannel getOutputChannelByProtocol (AbstractProtocol protocol) {
+
+	public AbstractChannel getOutputChannelByProtocol(AbstractProtocol protocol) {
 		return outputChannels.getChannelByProtocol(protocol);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	// Adding a protocol
-	
-	public void addProtocol (AbstractProtocol iproto, AbstractProtocol oproto) {
+
+	public void addProtocol(AbstractProtocol iproto, AbstractProtocol oproto) {
 		InputChannel channelIn = iproto.getInputChannel();
 		OutputChannel channelOut = oproto.getOutputChannel();
 
@@ -105,8 +108,8 @@ public abstract class AbstractLink implements Runnable {
 			try {
 				checkThreadControl();
 			} catch (InterruptedException e) {
-					System.out.println(threadName + " check interrupted");
-					continue;
+				System.out.println(threadName + ": thread check interrupted");
+				continue;
 			}
 			// check said to exit
 			// check resumed from a wait
@@ -118,26 +121,49 @@ public abstract class AbstractLink implements Runnable {
 			try {
 				doWork();
 			} catch (InterruptedException e) {
-				System.out.println(threadName + " work interrupted");
+				System.out.println(threadName + ": thread work interrupted");
 			}
 		}
+		System.out.println(threadName + ": thread exiting");
 	}
 
 	public abstract void doWork() throws InterruptedException;
 
 	// --------------------------------------------------------------------------------
 	// Thread control for all of the link's threads
-	
-	public void startThreads(String threadNm) {
-		startThread(threadNm + " Master Comm Link");
-		sender.startThread(threadName + " Sender");
-		receiver.startThread(threadName + " Receiver");
+
+	public void startLink(String threadNm) {
+		try {
+			commPort.open();
+		} catch (IOException e) {
+			System.out.println("Comm port open interrupted");
+		}
+
+		if (commPort.isOpen()) {
+			startThread(threadNm + " Master Comm Link");
+			sender.startThread(threadName + " Sender");
+			receiver.startThread(threadName + " Receiver");
+		} else {
+			throw new IllegalStateException("link port failed to open");
+		}
 	}
 
-	public void stopThreads() {
-		stopThread();
+	public void stopLink() throws InterruptedException {
 		sender.stopThread();
 		receiver.stopThread();
+		stopThread();
+
+		joinThreads();
+		// This should really be in a finally block somewhere
+		// but the problem is where.  You need to wait for everything
+		// to shut down before you can close the port.
+		try {
+			System.out.println(threadName + ": closing the link port");
+			commPort.close();
+		} catch (IOException e) {
+			System.out.println(threadName + ": IO exception while closing the link " + e);
+			e.printStackTrace();
+		}
 	}
 
 	public void joinThreads() throws InterruptedException {
@@ -167,7 +193,7 @@ public abstract class AbstractLink implements Runnable {
 		shouldRun = true;
 		threadControl = ThreadControlEnum.RUN;
 		thread = new Thread(this, threadName);
-		System.out.println("Starting " + threadName);
+		System.out.println("Starting " + threadName + " thread");
 		thread.start();
 	}
 
@@ -180,8 +206,7 @@ public abstract class AbstractLink implements Runnable {
 		if (suspended) {
 			threadControl = ThreadControlEnum.RUN;
 			notify();
-		}
-		else {
+		} else {
 			throw new IllegalStateException();
 		}
 	}
@@ -191,7 +216,8 @@ public abstract class AbstractLink implements Runnable {
 		thread.interrupt();
 	}
 
-	protected synchronized void checkThreadControl() throws InterruptedException {
+	protected synchronized void checkThreadControl()
+			throws InterruptedException {
 		do {
 			switch (threadControl) {
 			case SUSPEND:
@@ -207,71 +233,76 @@ public abstract class AbstractLink implements Runnable {
 			default:
 				throw new IllegalStateException();
 			}
-		// loop to avoid spurious awakenings
+			// loop to avoid spurious awakenings
 		} while (threadControl == ThreadControlEnum.SUSPEND);
 	}
 
 	// --------------------------------------------------------------------------------
 
-	protected boolean keepAliveOk () {
-		return ((Clock.clockRead() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
+	protected boolean keepAliveOk() {
+		return ((Time.getAbsoluteTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
 	}
-	
-	protected long timeToNextKeepAlive () {
-		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Clock.clockRead());
+
+	protected long timeToNextKeepAlive() {
+		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Time
+				.getAbsoluteTime());
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	// These methods are used for the receive side to communicate to the
 	// link important information about how the link is working
-	
+
 	// slave to master
-	protected void receivedNeedDoPrepare (AbstractChannel rchannel, LinkMessage message) {
-		throw new IllegalStateException();
-	}
-	
-	protected void receivedDidPrepare (AbstractChannel rchannel, LinkMessage message) {
+	protected void receivedNeedDoPrepare(AbstractChannel rchannel,
+			LinkMessage message) {
 		throw new IllegalStateException();
 	}
 
-	protected void receivedDidProceed (AbstractChannel rchannel, LinkMessage message) {
+	protected void receivedDidPrepare(AbstractChannel rchannel,
+			LinkMessage message) {
 		throw new IllegalStateException();
 	}
-	
-	
+
+	protected void receivedDidProceed(AbstractChannel rchannel,
+			LinkMessage message) {
+		throw new IllegalStateException();
+	}
+
 	// master to slave
-	protected void receivedDoPrepare (AbstractChannel rchannel, LinkMessage message) {
+	protected void receivedDoPrepare(AbstractChannel rchannel,
+			LinkMessage message) {
 		throw new IllegalStateException();
 	}
 
-	protected void receivedDoProceed (AbstractChannel rchannel, LinkMessage message) {
+	protected void receivedDoProceed(AbstractChannel rchannel,
+			LinkMessage message) {
 		throw new IllegalStateException();
 	}
-	
-	
+
 	// both directions
-	protected void receivedImAlive (AbstractChannel rchannel, LinkMessage message) {
+	protected void receivedImAlive(AbstractChannel rchannel, LinkMessage message) {
 		throw new IllegalStateException();
 	}
-	
-	
+
 	// if receive problems
-	protected abstract void receiveReceiverException (Exception e);
-	
+	protected abstract void receiveReceiverException(Exception e);
+
 	// --------------------------------------------------------------------------------
 
-	public abstract boolean isSendableChannel (AbstractChannel channel);
-	public abstract boolean isReceivableChannel (AbstractChannel channel);
-	public abstract boolean isForceInitialSequenceNumbers ();
-	
-	protected void linkWait (long timeout) throws InterruptedException {
-//		System.out.println(getRole() + " start wait");
+	public abstract boolean isSendableChannel(AbstractChannel channel);
+
+	public abstract boolean isReceivableChannel(AbstractChannel channel);
+
+	public abstract boolean isForceInitialSequenceNumbers();
+
+	protected void linkWait(long timeout) throws InterruptedException {
+		// System.out.println(getRole() + " start wait");
 		wait(timeout);
-//		System.out.println(getRole() + " end wait");
+		// System.out.println(getRole() + " end wait");
 	}
-	
+
 	// --------------------------------------------------------------------------------
-	
-	public abstract String getRole ();
+
+	public abstract String getRole();
 
 }

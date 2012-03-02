@@ -2,7 +2,7 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
-import com.builditboys.robots.time.Clock;
+import com.builditboys.robots.time.Time;
 
 public class SlaveLink extends AbstractLink implements Runnable {
 	
@@ -120,7 +120,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
 				setLinkState(LinkStateEnum.LinkReadyState, "five");
-				lastKeepAliveReceivedTime = Clock.clockRead();
+				lastKeepAliveReceivedTime = Time.getAbsoluteTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
@@ -130,7 +130,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
 							oprotocol.sendKeepAlive();
-							lastKeepAliveSentTime = Clock.clockRead();
+							lastKeepAliveSentTime = Time.getAbsoluteTime();
 						}
 						else {
 							linkWait(timeToNextSend);
@@ -211,7 +211,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			notify();
 			break;
 		}
-		lastKeepAliveReceivedTime = Clock.clockRead();
+		lastKeepAliveReceivedTime = Time.getAbsoluteTime();
 	}
 		
 	// --------------------------------------------------------------------------------

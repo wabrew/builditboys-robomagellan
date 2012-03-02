@@ -11,7 +11,7 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE
 
 import java.io.IOException;
 
-import com.builditboys.robots.time.Clock;
+import com.builditboys.robots.time.Time;
 
 public class Sender extends AbstractSenderReceiver {
 
@@ -27,8 +27,8 @@ public class Sender extends AbstractSenderReceiver {
 	private LinkMessage sentMessage;
 	long sentTime;
 
-	private SerializeBuffer preambleBuffer;
-	private SerializeBuffer postambleBuffer;
+	private FillableBuffer preambleBuffer;
+	private FillableBuffer postambleBuffer;
 
 	// --------------------------------------------------------------------------------
 	// Constructor
@@ -36,8 +36,8 @@ public class Sender extends AbstractSenderReceiver {
 	public Sender(AbstractLink link, LinkPortInterface port) {
 		this.link = link;
 		this.port = port;
-		preambleBuffer = new SerializeBuffer(SEND_PREAMBLE_LENGTH);
-		postambleBuffer = new SerializeBuffer(SEND_POSTAMBLE_LENGTH);
+		preambleBuffer = new FillableBuffer(SEND_PREAMBLE_LENGTH);
+		postambleBuffer = new FillableBuffer(SEND_POSTAMBLE_LENGTH);
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		outputChannels = link.getOutputChannels();
@@ -111,10 +111,10 @@ public class Sender extends AbstractSenderReceiver {
 		sendPostamble();
 		sendPostSync();
 
-		sentTime = Clock.clockRead();
+		sentTime = Time.getAbsoluteTime();
 
 		synchronized (System.out){
-			System.out.print(Clock.clockRead());
+			System.out.print(Time.getAbsoluteTime());
 			System.out.print(" : " + link.getRole() + " Sent    : ");
 			printRaw();
 			System.out.println();

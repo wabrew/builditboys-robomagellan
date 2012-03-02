@@ -98,5 +98,70 @@ public class FillableBuffer implements Iterable<Byte> {
 	public Iterator<Byte> iterator() {
 		return new FillableBufferIterator();
 	}
+	
+	// --------------------------------------------------------------------------------
+	// The serialization methods
+	
+	public void serializeBytes1 (int value) {
+		addByte((byte) value);
+	}
+
+	public void serializeBytes2 (int value) {
+		addByte((byte) value);
+		value = value >>> 8;
+		addByte((byte) value);
+	}
+
+	public void serializeBytes4 (int value) {
+		addByte((byte) value);
+		value = value >>> 8;
+		addByte((byte) value);
+		value = value >>> 8;
+		addByte((byte) value);
+		value = value >>> 8;
+		addByte((byte) value);
+	}
+
+	// --------------------------------------------------------------------------------
+	// The deserialization methods
+	
+	public byte deSerializeBytes1 () {
+		byte bite1 = getByte();
+		byte value;
+		
+		value = bite1;
+		return value;
+	}
+
+	public short deSerializeBytes2 () {
+		byte bite1 = getByte();
+		byte bite2 = getByte();
+		short value;
+		
+		value = bite2;
+		value <<= 8;
+		value |= bite1;
+			
+		return value;
+	}
+
+	public int deSerializeBytes4 () {
+		byte bite1 = getByte();
+		byte bite2 = getByte();
+		byte bite3 = getByte();
+		byte bite4 = getByte();
+		int value;
+		
+		value = bite4;
+		value <<= 8;
+		value |= bite3;
+		value <<= 8;
+		value |= bite2;
+		value <<= 8;
+		value |= bite1;
+			
+		return value;
+	}
+
 
 }

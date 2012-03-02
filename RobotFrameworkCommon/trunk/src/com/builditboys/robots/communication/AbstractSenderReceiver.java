@@ -29,7 +29,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			try {
 				checkThreadControl();
 			} catch (InterruptedException e) {
-					System.out.println(threadName + " check interrupted");
+					System.out.println(threadName + ": thread check interrupted");
 					continue;
 			}
 			// check said to exit
@@ -42,11 +42,13 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			try {
 				doWork();
 			} catch (InterruptedException e) {
-				System.out.println(threadName + " work interrupted");
+				System.out.println(threadName + ": thread work interrupted");
 			} catch (IOException e) {
-				System.out.println(threadName + " IO Exception");
+				System.out.println(threadName + ": thread IO Exception " + e);
+				e.printStackTrace();
 			}
 		}
+		System.out.println(threadName + ": thread exiting");
 	}
 
 	public abstract void doWork() throws InterruptedException, IOException;
@@ -72,7 +74,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 		shouldRun = true;
 		threadControl = ThreadControlEnum.RUN;
 		thread = new Thread(this, threadName);
-		System.out.println("Starting " + threadName);
+		System.out.println("Starting " + threadName + " thread");
 		thread.start();
 	}
 

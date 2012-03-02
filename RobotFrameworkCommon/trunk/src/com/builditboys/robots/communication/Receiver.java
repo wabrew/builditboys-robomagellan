@@ -10,7 +10,7 @@ import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_B
 import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
 import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
 
-import com.builditboys.robots.time.Clock;
+import com.builditboys.robots.time.Time;
 
 public class Receiver extends AbstractSenderReceiver {
 
@@ -29,8 +29,8 @@ public class Receiver extends AbstractSenderReceiver {
 
 	private byte lastSyncByte;
 
-	private DeSerializeBuffer preambleBuffer;
-	private DeSerializeBuffer postambleBuffer;
+	private FillableBuffer preambleBuffer;
+	private FillableBuffer postambleBuffer;
 
 	// --------------------------------------------------------------------------------
 	// Constructor
@@ -38,8 +38,8 @@ public class Receiver extends AbstractSenderReceiver {
 	public Receiver(AbstractLink lnk, LinkPortInterface prt) {
 		link = lnk;
 		port = prt;
-		preambleBuffer = new DeSerializeBuffer(SEND_PREAMBLE_LENGTH);
-		postambleBuffer = new DeSerializeBuffer(SEND_POSTAMBLE_LENGTH);
+		preambleBuffer = new FillableBuffer(SEND_PREAMBLE_LENGTH);
+		postambleBuffer = new FillableBuffer(SEND_POSTAMBLE_LENGTH);
 		crc8 = new CRC8Calculator();
 		crc16 = new CRC16Calculator();
 		inputChannels = link.getInputChannels();
@@ -113,10 +113,10 @@ public class Receiver extends AbstractSenderReceiver {
 		}
 
 		if (receivedOk) {
-			receivedTime = Clock.clockRead();
+			receivedTime = Time.getAbsoluteTime();
 
 			synchronized (System.out) {
-				System.out.print(Clock.clockRead());
+				System.out.print(Time.getAbsoluteTime());
 				System.out.print(" : " + link.getRole() + " Received: ");
 				printRaw();
 				System.out.println();
@@ -242,13 +242,13 @@ public class Receiver extends AbstractSenderReceiver {
 
 	// --------------------------------------------------------------------------------
 
-	private void handleReceivedMessage() {
+	private void handleReceivedMessage() throws InterruptedException {
 		receivedProtocol.receiveMessage(receivedMessage);
 	}
 
 	private void handleReceiveException(ReceiveException e) {
 		AbstractLink link = inputChannels.getLink();
-		receivedTime = Clock.clockRead();
+		receivedTime = Time.getAbsoluteTime();
 		link.receiveReceiverException(e);
 	}
 

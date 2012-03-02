@@ -31,7 +31,7 @@ public class LinkMessage extends FillableBuffer {
 		sendNotify = false;
 	}
 	
-	public LinkMessage (int channelnum, boolean notify, int capacity) {
+	public LinkMessage (int channelnum, int capacity, boolean notify) {
 		super(capacity);
 		channelNumber = channelnum;
 		sendNotify = notify;

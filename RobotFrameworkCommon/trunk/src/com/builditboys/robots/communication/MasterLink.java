@@ -96,7 +96,7 @@ public class MasterLink extends AbstractLink {
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedDidProceedState) {
 				setLinkState(LinkStateEnum.LinkReadyState);
-				lastKeepAliveReceivedTime = Clock.clockRead();
+				lastKeepAliveReceivedTime = Time.getAbsoluteTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
@@ -106,7 +106,7 @@ public class MasterLink extends AbstractLink {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
 							oprotocol.sendKeepAlive();
-							lastKeepAliveSentTime = Clock.clockRead();
+							lastKeepAliveSentTime = Time.getAbsoluteTime();
 						}
 						else {
 							linkWait(timeToNextSend);
@@ -196,7 +196,7 @@ public class MasterLink extends AbstractLink {
 			notify();
 			break;
 		}
-		lastKeepAliveReceivedTime = Clock.clockRead();
+		lastKeepAliveReceivedTime = Time.getAbsoluteTime();
 	}
 	
 	// --------------------------------------------------------------------------------

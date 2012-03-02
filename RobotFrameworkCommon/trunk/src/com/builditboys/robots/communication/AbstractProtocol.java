@@ -37,7 +37,7 @@ public abstract class AbstractProtocol {
 	//--------------------------------------------------------------------------------
 	// Receive a message, overload this if you wish
 	
-	public void receiveMessage (LinkMessage message) {
+	public void receiveMessage (LinkMessage message) throws InterruptedException {
 		channel.addMessage(message);
 	}
 		

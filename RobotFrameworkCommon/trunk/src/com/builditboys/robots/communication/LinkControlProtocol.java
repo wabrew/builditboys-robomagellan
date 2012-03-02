@@ -45,35 +45,22 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// --------------------------------------------------------------------------------
 	// Link Control Messages - keep in sync with the PSoC
 	
-	public static final int MS_DO_PREPARE = 0;
-	public static final int MS_DO_PROCEED = 1;
+	public static final int COMM_CONTROL_MESSAGE_LENGTH = 1;
+	
+	public static final int MS_DO_PREPARE      = 0;
+	public static final int MS_DO_PROCEED      = 1;
 
 	public static final int SM_NEED_DO_PREPARE = 2;
-	public static final int SM_DID_PREPARE = 3;
-	public static final int SM_DID_PROCEED = 4;
+	public static final int SM_DID_PREPARE     = 3;
+	public static final int SM_DID_PROCEED     = 4;
 
-	public static final int IM_ALIVE = 5;
-
-	/*
-    xxx.ordinal() does not work in the switch statement the decodes the messages
-    
-	private enum LinkControlMessageEnum {
-		MS_DO_PREPARE,
-		MS_DO_PROCEED,
-		
-		SM_NEED_DO_PREPARE,
-		SM_DID_PREPARE,
-		SM_DID_PROCEED,
-		
-		IM_ALIVE;
-	}
-	*/
+	public static final int IM_ALIVE           = 5;
 
 	// --------------------------------------------------------------------------------
 	// Sending messages - Master to Slave messages
 
 	public void sendDoPrepare(boolean doWait) throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, doWait);
+		LinkMessage message = new LinkMessage(channelNumber, COMM_CONTROL_MESSAGE_LENGTH, doWait);
 		message.addByte((byte) MS_DO_PREPARE);
 		channel.addMessage(message);
 		if (doWait) {
@@ -136,6 +123,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 		AbstractLink link = channel.getLink();
 		int indicator = message.getByte(0);
 		switch (indicator) {
+		// Slave side
 		case MS_DO_PREPARE:
 			link.receivedDoPrepare(channel, message);
 			break;
@@ -143,6 +131,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 			link.receivedDoProceed(channel, message);
 			break;
 
+		// Master side
 		case SM_NEED_DO_PREPARE:
 			link.receivedNeedDoPrepare(channel, message);
 			break;
@@ -153,6 +142,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 			link.receivedDidProceed(channel, message);
 			break;
 
+		// Common
 		case IM_ALIVE:
 			link.receivedImAlive(channel, message);
 			break;
