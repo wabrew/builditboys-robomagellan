@@ -1,5 +1,7 @@
 package com.builditboys.robots.communication;
 
+import java.io.IOException;
+
 public class IOIOLinkPort implements LinkPortInterface {
 	
 	
@@ -20,8 +22,19 @@ public class IOIOLinkPort implements LinkPortInterface {
 
 	// --------------------------------------------------------------------------------
 
+	public void open() throws IOException {
+		System.out.println("IOIOLinkPort open not implemented");
+		throw new IllegalStateException();
+	}
+	
 	public void close () {
 		System.out.println("IOIOLinkPort close not implemented");
+		throw new IllegalStateException();
+	}
+
+	
+	public boolean isOpen() {
+		System.out.println("IOIOLinkPort isOpen not implemented");
 		throw new IllegalStateException();
 	}
 
