@@ -75,7 +75,7 @@ public class Time {
 	// Absolute time
 	
 	public static long getAbsoluteTime () {
-		return 0;
+		return System.currentTimeMillis();
 	}
 	
 	public static long secondToAbsoluteTime (long sec) {
