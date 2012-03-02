@@ -13,8 +13,8 @@ public class WindowsLinkPort implements LinkPortInterface {
 	// --------------------------------------------------------------------------------
 	// Constructors
 	
-	public WindowsLinkPort (String portName, int baud) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
-		commPort = new WindowsCommPort(portName, baud, true);
+	public WindowsLinkPort (String portName, int baud, boolean bufferRead) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+		commPort = new WindowsCommPort(portName, baud, bufferRead);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -29,7 +29,23 @@ public class WindowsLinkPort implements LinkPortInterface {
 	
 	// --------------------------------------------------------------------------------
 
+	public void open () throws IOException{
+		try {
+			commPort.open();
+		} catch (NoSuchPortException e) {
+			throw new IOException("No such port");
+		} catch (PortInUseException e) {
+			throw new IOException("Port in use");
+		} catch (UnsupportedCommOperationException e) {
+			throw new IOException("Unsupport port operation");
+		}
+	}
+	
 	public void close () throws IOException {
 		commPort.close();
+	}
+
+	public boolean isOpen() {
+		return commPort.isConnected();
 	}
 }
