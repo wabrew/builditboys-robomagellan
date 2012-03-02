@@ -16,6 +16,7 @@ import com.builditboys.robots.communication.WindowsLinkPort;
 public class TestCommunications {
 
 	public static void main(String args[]) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+//		xxtestLinkThreadsComm();
 		testLinkThreadsComm();
 //		testLinkThreadsSelf();
 //		testLinkMessages();
@@ -49,8 +50,8 @@ public class TestCommunications {
 //		System.out.println(slaveIn);
 //		System.out.println(slaveInProto);
 
-		masterLink.startThreads("Test");
-		slaveLink.startThreads("Test");
+		masterLink.startLink("Test");
+		slaveLink.startLink("Test");
 
 		System.out.println("Links started");
 		
@@ -59,8 +60,14 @@ public class TestCommunications {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		masterLink.stopThreads();
-		slaveLink.stopThreads();
+		
+		try {
+			masterLink.stopLink();
+			slaveLink.stopLink();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		System.out.println("waiting to join");
 		try {
@@ -75,28 +82,37 @@ public class TestCommunications {
 
 	// --------------------------------------------------------------------------------
 
+	
+	static void xxtestLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200, true);
+		port1.open();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		port1.close();
+	}
+	
 	static void testLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
-		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200);	
+		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200, true);	
 		MasterLink masterLink = new MasterLink(port1);
 		
 		try {
-			masterLink.startThreads("Test");
+			masterLink.startLink("Test");
 			System.out.println("Link started");
 		
-			Thread.sleep(10000);
+			Thread.sleep(5000);
 		}
 		catch (Exception e) {
-			System.out.println("Catching top level error");
+			System.out.println("Catching top level error " + e);
+			e.printStackTrace();
 		}
-		finally {
-			port1.close();
-			
-		}
-		masterLink.stopThreads();
 
-		System.out.println("waiting to join");
+		System.out.println("waiting to stop");
 		try {
-			masterLink.joinThreads();
+			masterLink.stopLink();
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();

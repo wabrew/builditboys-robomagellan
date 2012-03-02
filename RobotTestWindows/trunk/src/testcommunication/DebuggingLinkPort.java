@@ -1,11 +1,18 @@
 package testcommunication;
 
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
+
+import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.builditboys.robots.communication.LinkPortInterface;
 
 public class DebuggingLinkPort implements LinkPortInterface {
+	
+	private boolean isOpen = false;
 
 	ArrayBlockingQueue<Byte> readBuffer;
 	ArrayBlockingQueue<Byte> writeBuffer;
@@ -30,8 +37,18 @@ public class DebuggingLinkPort implements LinkPortInterface {
 	
 	// --------------------------------------------------------------------------------
 
+	public void open() throws IOException {
+		System.out.println("Openning debugging link port");
+		isOpen = true;
+	}
+	
 	public void close () {
 		System.out.println("Closing debugging link port");
+		isOpen = false;
+	}
+
+	public boolean isOpen() {
+		return isOpen;
 	}
 
 }
