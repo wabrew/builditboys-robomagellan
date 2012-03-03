@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import com.builditboys.robots.system.AbstractRobotSystem;
+
 // see RXTX for more info
 // see http://java.sun.com/products/javacomm/reference/docs/API_users_guide_3.html
 // see http://docs.oracle.com/cd/E17802_01/products/products/javacomm/reference/api/index.html
@@ -62,7 +64,13 @@ public class WindowsCommPort {
 	// --------------------------------------------------------------------------------
 
 	public void open() throws NoSuchPortException, PortInUseException,
-			IOException, UnsupportedCommOperationException {
+							  IOException, UnsupportedCommOperationException {
+		// This is a little unorthodox, but there are problems opening a comm
+		// port if it was not closed properly.  If the comm port was never openned
+		// then closing it does not hurt anything.  I tried to put a close
+		// in a finally block somewhere but  its kind of hard to find a spot
+		// that is late enough after all the other threads have been shutdown.
+		close();
 		connect();
 	}
 
@@ -246,7 +254,7 @@ public class WindowsCommPort {
 
 	// --------------------------------------------------------------------------------
 
-	private static class SerialReader implements Runnable {
+	private class SerialReader implements Runnable {
 		InputStream readerStream;
 		ArrayBlockingQueue<Byte> portBuffer;
 
@@ -274,13 +282,17 @@ public class WindowsCommPort {
 					}
 				}
 			} catch (InterruptedException e) {
-				System.out.println("Comm Port Reader: work interrupted");
-			} catch (IOException e) {
-				System.out.println("Comm Port Reader: IO Exception " + e);
-				e.printStackTrace();
+				System.out.println("Comm Port Reader: thread interrupted");
+			} catch (Exception e) {
+				handleThreadException(e);
 			}
 			System.out.println("Comm Port Reader: thread exiting");
 		}
+			
+	}
+	
+	private void handleThreadException (Exception e) {
+		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
 	}
 
 }
