@@ -1,8 +1,10 @@
 package com.builditboys.robots.system;
 
+import java.io.IOException;
+
+import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.system.SystemNotification.SystemActionEnum;
-
 
 public abstract class AbstractRobotSystem {
 	
@@ -14,6 +16,10 @@ public abstract class AbstractRobotSystem {
 	private static final SystemNotification start2Notice = new SystemNotification(SystemActionEnum.START2);
 	private static final SystemNotification stopNotice = new SystemNotification(SystemActionEnum.STOP);
 	
+	
+	
+	protected LinkPortInterface linkPort;
+
 	//--------------------------------------------------------------------------------
 
 	static AbstractRobotSystem getIntance () {
@@ -25,7 +31,7 @@ public abstract class AbstractRobotSystem {
 		}
 	}
 	
-	public void startRobotSystem () {
+	public void startRobotSystem () throws IOException {
 		start1Notice.publish();
 		start2Notice.publish();
 	}
