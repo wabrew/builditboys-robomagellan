@@ -1,6 +1,6 @@
 package com.builditboys.robots.robomagellan;
 
-import com.builditboys.robots.system.RobotSystem;
+import com.builditboys.robots.system.AbstractRobotSystem;
 
 public class RoboMagellan {
 	
@@ -8,11 +8,9 @@ public class RoboMagellan {
 	private static RoboMagellanConfiguration config;
 	
 	public static void startRoboMagellan () {
-		RobotSystem.startRobotSystem();
 	}
 	
 	public static void stopRoboMagellan () {
-		RobotSystem.stopRobotSystem();
 		
 	}
 	
