@@ -140,12 +140,15 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		TimeSyncMessage mObject = new TimeSyncMessage();
 		mObject.deSerialize(message);
 		switch (role) {
+		
 		case MASTER:
 			receiveMasterMessage(mObject);
 			break;
+			
 		case SLAVE:
 			receiveSlaveMessage(mObject);
 			break;
+			
 		default:
 			throw new IllegalStateException();
 		}
@@ -156,43 +159,43 @@ public class TimeSyncProtocol extends AbstractProtocol {
 
 	public void receiveMasterMessage (TimeSyncMessage messageObject) throws InterruptedException {
 		switch (messageObject.indicator) {
+		
+		// got a sync request, reply to it
 		case SM_START_SYNC:
 			messageObject.time2 = Time.getLocalTime();
 			sendReplySync(messageObject, false);
 			break;
+			
 		default:
-			throw new IllegalStateException();
+			throw new IllegalArgumentException("Unknown clock sync message: " + messageObject.indicator);
 		}
 	}
 	
 	//--------------------------------------------------------------------------------
 	// Receiving messages - Slave
 
-	// slave side is not implemented in Java, only the PSOC acts as a slave
-	
 	public void receiveSlaveMessage (TimeSyncMessage messageObject) {
 		switch (messageObject.indicator){ 
+		
+		// in Java, no need to set the clock since it is a long and has plenty of room
 		case MS_SET_CLOCK:
+			break;
+		
+		// setup up the correspondence between the masters local time and our local time
 		case MS_CORRESPOND_CLOCK:
+			Time.correspondLocalInternalTimes(messageObject.time1);
+			
+		// slave side is not implemented in Java yet, only the PSOC acts as a slave	
 		case MS_REPLY_SYNC:	
-			throw new IllegalStateException();
+			throw new IllegalArgumentException("Unsupported clock sync message: " + messageObject.indicator);
+			
 		default:
-			throw new IllegalStateException();
+			throw new IllegalArgumentException("Unknown clock sync message: " + messageObject.indicator);
 		}
 	}
 		
 	// --------------------------------------------------------------------------------
 
-	public AbstractNotification deSerialize(LinkMessage message) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public LinkMessage serialize(AbstractNotification notice) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 	private class TimeSyncMessage {
 		int indicator = 0;
 		long time1 = 0;
@@ -238,5 +241,19 @@ public class TimeSyncProtocol extends AbstractProtocol {
 			time4 = buff.deSerializeBytes4();		
 		}
 	}
+	
+	// --------------------------------------------------------------------------------
+
+	public AbstractNotification deSerialize(LinkMessage message) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LinkMessage serialize(AbstractNotification notice) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 }
