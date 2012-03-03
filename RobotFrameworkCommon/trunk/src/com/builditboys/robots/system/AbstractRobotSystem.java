@@ -6,6 +6,7 @@ import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.system.SystemNotification.SystemActionEnum;
+import com.builditboys.robots.time.Time;
 
 public abstract class AbstractRobotSystem {
 
@@ -38,6 +39,8 @@ public abstract class AbstractRobotSystem {
 		masterLink = new MasterLink(linkPort);
 		masterLink.startLink();
 		System.out.println("Link started");
+		Time.initializeLocalTime();
+		System.out.println("Local time initialized");
 
 		start1Notice.publish(this);
 		wait(ROBOT_SYSTEM_PHASE_WAIT);

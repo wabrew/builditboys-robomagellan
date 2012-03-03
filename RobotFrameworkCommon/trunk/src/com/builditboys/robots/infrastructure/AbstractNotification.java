@@ -40,7 +40,7 @@ public abstract class AbstractNotification {
 	// synchronize so that subscriber list is stable, see subscribe, unsubscribe
 	public synchronized void publish (Object publishedBy) {
 		publisher = publishedBy;
-		publicationTime = Time.getAbsoluteTime();
+		publicationTime = Time.getLocalTime();
 		notePublication();
 		for (SubscriberInterface subscriber: subscribers) {
 			publishSelf(subscriber);
@@ -50,14 +50,18 @@ public abstract class AbstractNotification {
 	public abstract void publishSelf (SubscriberInterface subscriber);
 	
 	private void notePublication () {
-		System.out.println(publisher 
+		System.out.println(publisher.getClass().getSimpleName() + '@' + Integer.toHexString(publisher.hashCode())
 						   + " is publishing " 
 						   + this 
-						   + " at " 
+						   + " at time " 
 						   + publicationTime 
 						   + " to " 
 						   + subscribers.size() 
 						   + " subscribers");
+	}
+	
+	public String toString () {
+		return getClass().getSimpleName() + '@' + Integer.toHexString(hashCode());
 	}
 	
 }

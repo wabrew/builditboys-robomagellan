@@ -244,8 +244,7 @@ public abstract class AbstractLink implements Runnable {
 	}
 
 	protected long timeToNextKeepAlive() {
-		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Time
-				.getAbsoluteTime());
+		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Time.getAbsoluteTime());
 	}
 
 	// --------------------------------------------------------------------------------

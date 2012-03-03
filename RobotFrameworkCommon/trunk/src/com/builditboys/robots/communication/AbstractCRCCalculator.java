@@ -1,5 +1,7 @@
 package com.builditboys.robots.communication;
 
+import com.builditboys.robots.utilities.FillableBuffer;
+
 public abstract class AbstractCRCCalculator {
 
 	//--------------------------------------------------------------------------------

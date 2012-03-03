@@ -1,4 +1,4 @@
-package com.builditboys.robots.communication;
+package com.builditboys.robots.utilities;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

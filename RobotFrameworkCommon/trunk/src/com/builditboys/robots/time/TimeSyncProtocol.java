@@ -4,11 +4,11 @@ import static com.builditboys.robots.communication.LinkParameters.TIME_SYNC_CHAN
 
 import com.builditboys.robots.communication.AbstractLink;
 import com.builditboys.robots.communication.AbstractProtocol;
-import com.builditboys.robots.communication.FillableBuffer;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
 import com.builditboys.robots.infrastructure.AbstractNotification;
+import com.builditboys.robots.utilities.FillableBuffer;
 
 public class TimeSyncProtocol extends AbstractProtocol {
 

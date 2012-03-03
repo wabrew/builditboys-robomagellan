@@ -12,6 +12,7 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE
 import java.io.IOException;
 
 import com.builditboys.robots.time.Time;
+import com.builditboys.robots.utilities.FillableBuffer;
 
 public class Sender extends AbstractSenderReceiver {
 

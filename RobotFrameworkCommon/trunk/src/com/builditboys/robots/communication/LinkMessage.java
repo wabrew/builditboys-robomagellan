@@ -2,6 +2,8 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import com.builditboys.robots.utilities.FillableBuffer;
+
 public class LinkMessage extends FillableBuffer {
 	
 	// the channel to which messages are directed
