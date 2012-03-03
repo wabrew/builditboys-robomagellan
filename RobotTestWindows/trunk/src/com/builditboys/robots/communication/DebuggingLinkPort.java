@@ -1,4 +1,4 @@
-package testcommunication;
+package com.builditboys.robots.communication;
 
 
 import java.io.IOException;

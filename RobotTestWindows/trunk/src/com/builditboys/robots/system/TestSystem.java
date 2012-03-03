@@ -1,4 +1,4 @@
-package testsystem;
+package com.builditboys.robots.system;
 
 import java.io.IOException;
 
@@ -13,23 +13,11 @@ public class TestSystem {
 		WindowsRobotSystem robosys = null;
 		try {
 			robosys = WindowsRobotSystem.launchWindowsRobotSystem("Test");
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		try {
+			
+			Thread.sleep(5000);  // this is when the robot would really do something
+			
 			robosys.stopRobotSystem();
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

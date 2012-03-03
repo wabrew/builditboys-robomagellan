@@ -1,4 +1,4 @@
-package testinfrastructure;
+package com.builditboys.robots.infrastruture;
 
 import com.builditboys.robots.infrastructure.ParameterServer;
 

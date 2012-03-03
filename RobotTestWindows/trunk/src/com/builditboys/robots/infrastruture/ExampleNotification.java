@@ -1,4 +1,4 @@
-package testinfrastructure;
+package com.builditboys.robots.infrastruture;
 
 import com.builditboys.robots.infrastructure.AbstractNotification;
 import com.builditboys.robots.infrastructure.SubscriberInterface;

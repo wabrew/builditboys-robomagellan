@@ -1,4 +1,4 @@
-package testcommunication;
+package com.builditboys.robots.communication;
 
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
