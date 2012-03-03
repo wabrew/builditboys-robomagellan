@@ -17,12 +17,17 @@ public class TestCommunications {
 
 	public static void main(String args[]) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
 //		xxtestLinkThreadsComm();
-		testLinkThreadsComm();
+		try {
+			testLinkThreadsComm();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 //		testLinkThreadsSelf();
 //		testLinkMessages();
 	}
 
-	static void testLinkThreadsSelf() {
+	static void testLinkThreadsSelf() throws IOException, InterruptedException {
 		DebuggingLinkPortBuffer buffer = new DebuggingLinkPortBuffer();
 		LinkPortInterface port1 = buffer.getPort1();
 		LinkPortInterface port2 = buffer.getPort2();
@@ -50,8 +55,8 @@ public class TestCommunications {
 //		System.out.println(slaveIn);
 //		System.out.println(slaveInProto);
 
-		masterLink.startLink("Test");
-		slaveLink.startLink("Test");
+		masterLink.startLink();
+		slaveLink.startLink();
 
 		System.out.println("Links started");
 		
@@ -61,13 +66,8 @@ public class TestCommunications {
 			e1.printStackTrace();
 		}
 		
-		try {
-			masterLink.stopLink();
-			slaveLink.stopLink();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		masterLink.stopLink();
+		slaveLink.stopLink();
 
 		System.out.println("waiting to join");
 		try {
@@ -95,12 +95,12 @@ public class TestCommunications {
 		port1.close();
 	}
 	
-	static void testLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
+	static void testLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException, InterruptedException {
 		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200, true);	
 		MasterLink masterLink = new MasterLink(port1);
 		
 		try {
-			masterLink.startLink("Test");
+			masterLink.startLink();
 			System.out.println("Link started");
 		
 			Thread.sleep(5000);
@@ -111,12 +111,7 @@ public class TestCommunications {
 		}
 
 		System.out.println("waiting to stop");
-		try {
-			masterLink.stopLink();
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		masterLink.stopLink();
 
 		System.out.println("Link stopped");
 	}

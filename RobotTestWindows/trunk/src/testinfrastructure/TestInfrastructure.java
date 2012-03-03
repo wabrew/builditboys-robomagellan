@@ -31,7 +31,7 @@ public class TestInfrastructure {
 		// publish/subscribe
 		ExampleNotification.subscribe(subscriber1);
 		ExampleNotification.subscribe(subscriber2);
-		notice.publish();
+		notice.publish(this);
 			
 	}
 
