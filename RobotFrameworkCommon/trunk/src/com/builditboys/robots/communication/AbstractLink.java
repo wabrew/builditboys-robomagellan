@@ -4,6 +4,7 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 import java.io.IOException;
 
+import com.builditboys.robots.system.AbstractRobotSystem;
 import com.builditboys.robots.time.*;
 
 // a comm link hold together all the pieces
@@ -108,7 +109,7 @@ public abstract class AbstractLink implements Runnable {
 			try {
 				checkThreadControl();
 			} catch (InterruptedException e) {
-				System.out.println(threadName + ": thread check interrupted");
+				System.out.println(threadName + ": thread interrupted");
 				continue;
 			}
 			// check said to exit
@@ -121,7 +122,9 @@ public abstract class AbstractLink implements Runnable {
 			try {
 				doWork();
 			} catch (InterruptedException e) {
-				System.out.println(threadName + ": thread work interrupted");
+				System.out.println(threadName + ": thread interrupted");
+			} catch (Exception e) {
+				handleThreadException(e);
 			}
 		}
 		System.out.println(threadName + ": thread exiting");
@@ -129,18 +132,19 @@ public abstract class AbstractLink implements Runnable {
 
 	public abstract void doWork() throws InterruptedException;
 
+	private void handleThreadException (Exception e) {
+		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
+		threadControl = ThreadControlEnum.STOP;
+	}
+
 	// --------------------------------------------------------------------------------
 	// Thread control for all of the link's threads
 
-	public void startLink(String threadNm) {
-		try {
-			commPort.open();
-		} catch (IOException e) {
-			System.out.println("Comm port open interrupted");
-		}
+	public void startLink() throws IOException {
+		commPort.open();
 
 		if (commPort.isOpen()) {
-			startThread(threadNm + " Master Comm Link");
+			startThread("Master Comm Link");
 			sender.startThread(threadName + " Sender");
 			receiver.startThread(threadName + " Receiver");
 		} else {
@@ -148,22 +152,18 @@ public abstract class AbstractLink implements Runnable {
 		}
 	}
 
-	public void stopLink() throws InterruptedException {
+	public void stopLink() throws IOException, InterruptedException {
 		sender.stopThread();
 		receiver.stopThread();
 		stopThread();
 
 		joinThreads();
 		// This should really be in a finally block somewhere
-		// but the problem is where.  You need to wait for everything
+		// but the problem is where. You need to wait for everything
 		// to shut down before you can close the port.
-		try {
-			System.out.println(threadName + ": closing the link port");
-			commPort.close();
-		} catch (IOException e) {
-			System.out.println(threadName + ": IO exception while closing the link " + e);
-			e.printStackTrace();
-		}
+
+		System.out.println(threadName + ": closing the link port");
+		commPort.close();
 	}
 
 	public void joinThreads() throws InterruptedException {

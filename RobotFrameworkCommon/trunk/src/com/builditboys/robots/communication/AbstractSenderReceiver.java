@@ -4,6 +4,8 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 import java.io.IOException;
 
+import com.builditboys.robots.system.AbstractRobotSystem;
+
 public abstract class AbstractSenderReceiver implements Runnable {
 
 	protected AbstractLink link;
@@ -29,7 +31,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			try {
 				checkThreadControl();
 			} catch (InterruptedException e) {
-					System.out.println(threadName + ": thread check interrupted");
+					System.out.println(threadName + ": thread interrupted");
 					continue;
 			}
 			// check said to exit
@@ -41,14 +43,18 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			}
 			try {
 				doWork();
-			} catch (InterruptedException e) {
-				System.out.println(threadName + ": thread work interrupted");
-			} catch (IOException e) {
-				System.out.println(threadName + ": thread IO Exception " + e);
-				e.printStackTrace();
-			}
+			} catch (InterruptedException e1) {
+				System.out.println(threadName + ": thread interrupted");
+			} catch (Exception e) {
+				handleThreadException(e);
+			} 
 		}
 		System.out.println(threadName + ": thread exiting");
+	}
+	
+	private void handleThreadException (Exception e) {
+		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
+		threadControl = ThreadControlEnum.STOP;
 	}
 
 	public abstract void doWork() throws InterruptedException, IOException;
