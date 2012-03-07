@@ -32,8 +32,8 @@ public class TestCommunications {
 		LinkPortInterface port1 = buffer.getPort1();
 		LinkPortInterface port2 = buffer.getPort2();
 		
-		MasterLink masterLink = new MasterLink(port1);
-		SlaveLink slaveLink = new SlaveLink(port2);
+		MasterLink masterLink = new MasterLink("Test Master Link", port1);
+		SlaveLink slaveLink = new SlaveLink("Test Slave Link", port2);
 		
 		AbstractChannel masterOut = masterLink.getOutputChannelByProtocol(LinkControlProtocol.indicator);
 		LinkControlProtocol masterOutProto = (LinkControlProtocol) masterOut.getProtocol();
@@ -97,7 +97,7 @@ public class TestCommunications {
 	
 	static void testLinkThreadsComm() throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException, InterruptedException {
 		WindowsLinkPort port1 = new WindowsLinkPort("COM10", 115200, true);	
-		MasterLink masterLink = new MasterLink(port1);
+		MasterLink masterLink = new MasterLink("Test Master Link", port1);
 		
 		try {
 			masterLink.startLink();
