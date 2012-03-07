@@ -61,21 +61,6 @@ public class Time {
 		return getInternalTime() - localTimeOffset;
 	}
 	
-	public static long secondToLocalTime (long sec) {
-		return sec * 1000;
-	}
-	
-	public static long millisecToLocalTime (long millisec) {
-		return millisec;
-	}
-
-	public static long localTimeToSecond (long ltime) {
-		return ltime / 1000;
-	}
-	
-	public static long localTimeToMillisec (long ltime) {
-		return ltime;
-	}
 	
 	
 	
@@ -96,22 +81,6 @@ public class Time {
 		return System.currentTimeMillis();
 	}
 	
-	public static long secondToInternalTime (long sec) {
-		return sec * 1000;
-	}
-	
-	public static long millisecToInternalTime (long millisec) {
-		return millisec;
-	}
-
-	public static long internalTimeToSecond (long ltime) {
-		return ltime / 1000;
-	}
-	
-	public static long internalTimeToMillisec (long ltime) {
-		return ltime;
-	}
-	
 	
 	
 	public static long absoluteTimeToInternalTime (long atime) {
@@ -130,21 +99,6 @@ public class Time {
 		return System.currentTimeMillis();
 	}
 	
-	public static long secondToAbsoluteTime (long sec) {
-		return sec * 1000;
-	}
-	
-	public static long millisecToAbsoluteTime (long millisec) {
-		return millisec;
-	}
-
-	public static long absoluteTimeToSecond (long atime) {
-		return atime / 1000;
-	}
-	
-	public static long absoluteTimeToMillisec (long atime) {
-		return atime;
-	}
 
 	//--------------------------------------------------------------------------------
 

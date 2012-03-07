@@ -1,7 +1,7 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.AngleUnits.*;
-import com.builditboys.robots.units.AngleUnits;
+import static com.builditboys.robots.units.AngleUnit.*;
+import com.builditboys.robots.units.AngleUnit;
 
 
 // Angle objects model angles.  They are lockable.  For efficiency, they cache
@@ -10,10 +10,10 @@ import com.builditboys.robots.units.AngleUnits;
 
 public final class Angle {
 	
-    // The angle in radians
+    // The angle value and units
 	private double angleValue;
 	
-	private static final AngleUnits nativeUnits = RADIANS;
+	private static final AngleUnit nativeUnits = RADIANS;
 	
 	private boolean isLocked;
 
@@ -42,7 +42,7 @@ public final class Angle {
 	   return new Angle(angle.angleValue);
    }
    
-   public static Angle newAngle (double val, AngleUnits units) {
+   public static Angle newAngle (double val, AngleUnit units) {
 	   return new Angle(nativeUnits.convert(val,  units));
    }
    
@@ -65,7 +65,7 @@ public final class Angle {
 	//--------------------------------------------------------------------------------
 	// Basic Accessors
 	
-	public AngleUnits getNativeUnits() {
+	public AngleUnit getNativeUnits() {
 		return nativeUnits;
 	}
 	
@@ -79,7 +79,7 @@ public final class Angle {
 		return nativeUnits.convert(angleValue, DEGREES);
 	}
 	
-	public double getInUnits(AngleUnits units) {
+	public double getInUnits(AngleUnit units) {
 		if (units == nativeUnits) {
 			return angleValue;
 		}
@@ -109,7 +109,7 @@ public final class Angle {
 		}
 	}
 	
-	public void setInUnits(double val, AngleUnits units) {
+	public void setInUnits(double val, AngleUnit units) {
 		if (!isLocked) {
 			if (units == nativeUnits) {
 				angleValue = val;

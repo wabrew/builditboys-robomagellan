@@ -25,8 +25,8 @@ public class MasterLink extends AbstractLink {
 	//--------------------------------------------------------------------------------
 	// Constructors
 
-	public MasterLink (LinkPortInterface port) {
-		super(port);
+	public MasterLink (String nm, LinkPortInterface port) {
+		super(nm, port);
 		setLinkState(LinkStateEnum.LinkInitState);
 		
 		// the protocol's channel will be set when the protocol is associated with a channel

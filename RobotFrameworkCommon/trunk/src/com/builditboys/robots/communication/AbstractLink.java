@@ -4,6 +4,7 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 import java.io.IOException;
 
+import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.system.AbstractRobotSystem;
 import com.builditboys.robots.time.*;
 
@@ -12,8 +13,10 @@ import com.builditboys.robots.time.*;
 // the send and receive threads
 // the input and output channel collections
 
-public abstract class AbstractLink implements Runnable {
+public abstract class AbstractLink implements ParameterInterface, Runnable {
 
+	protected String name;
+	
 	protected Sender sender;
 	protected Receiver receiver;
 
@@ -40,7 +43,8 @@ public abstract class AbstractLink implements Runnable {
 	// --------------------------------------------------------------------------------
 	// Constructors
 
-	protected AbstractLink(LinkPortInterface port) {
+	protected AbstractLink(String nm, LinkPortInterface port) {
+		name = nm;
 		commPort = port;
 		inputChannels = new InputChannelCollection(this);
 		outputChannels = new OutputChannelCollection(this);
@@ -48,6 +52,12 @@ public abstract class AbstractLink implements Runnable {
 		receiver = new Receiver(this, commPort);
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public String getName () {
+		return name;
+	}
+	
 	// --------------------------------------------------------------------------------
 	// Starting things up
 
@@ -144,7 +154,7 @@ public abstract class AbstractLink implements Runnable {
 		commPort.open();
 
 		if (commPort.isOpen()) {
-			startThread("Master Comm Link");
+			startThread(name);
 			sender.startThread(threadName + " Sender");
 			receiver.startThread(threadName + " Receiver");
 		} else {

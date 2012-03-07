@@ -1,17 +1,17 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.LengthUnits.*;
+import static com.builditboys.robots.units.LengthUnit.*;
 
 
-import com.builditboys.robots.units.LengthUnits;
+import com.builditboys.robots.units.LengthUnit;
 
 
 public class Length {
 	
-    // The dimensions value, and units
+    // The length's value, and units
 	private double lengthValue;
 	
-	private static final LengthUnits nativeUnits = METERS;
+	private static final LengthUnit nativeUnits = METERS;
 	
 	private boolean isLocked;
 	
@@ -34,18 +34,18 @@ public class Length {
 	   return new Length(len.lengthValue);
    }
   
-   public static Length newLength (double val, LengthUnits units) {
+   public static Length newLength (double val, LengthUnit units) {
 	   return new Length(units.convert(val, nativeUnits));
    }
    
 	//--------------------------------------------------------------------------------
 	// Basic Accessors
 	
-	public LengthUnits getNativeUnits() {
+	public LengthUnit getNativeUnits() {
 		return nativeUnits;
 	}
 	
-	public double getInUnits(LengthUnits units) {
+	public double getInUnits(LengthUnit units) {
 		if (units == nativeUnits) {
 			return lengthValue;
 		}
@@ -54,7 +54,7 @@ public class Length {
 		}
 	}
 	
-	public void setInUnits(double val, LengthUnits units) {
+	public void setInUnits(double val, LengthUnit units) {
 		if (!isLocked) {
 			if (units == nativeUnits) {
 				lengthValue = val;

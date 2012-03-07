@@ -29,8 +29,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 	//--------------------------------------------------------------------------------
 	// Constructors
 
-	public SlaveLink (LinkPortInterface port) {
-		super(port);
+	public SlaveLink (String nm, LinkPortInterface port) {
+		super(nm, port);
 		setLinkState(LinkStateEnum.LinkInitState, "constructor");
 		
 		// the protocol's channel will be set when the protocol is associated with a channel

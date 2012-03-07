@@ -1,24 +1,24 @@
 package com.builditboys.robots.units;
 
-
-public enum LengthUnits {
-	METERS(1.0),
-	CENTIMETERS(0.01), 
-	INCHES(1/Constants.INCHES_PER_METER), 
-	FEET(Constants.INCHES_PER_FOOT/Constants.INCHES_PER_METER);
+public enum RoboTimeUnit {
+	SECONDS(1*1000*1000),
+	MILLISECONDS(1*1000),
+	MICROSECONDS(1),
+	ABSOLUTES(1*1000),
+	LOCALS(1*1000);
 	
 	// Conversion factor to convert a unit to the common unit
-	private final double conversionFactor;
-	
+	private final long conversionFactor;
+
 	//--------------------------------------------------------------------------------
     // Constructor
 	
-	private LengthUnits (double conversionFactor) {
+	private RoboTimeUnit (long conversionFactor) {
 		this.conversionFactor = conversionFactor;
 	}
 	
-	public double convert (double val, LengthUnits target) {
-		if (target == METERS) {
+	public long convert (long val, RoboTimeUnit target) {
+		if (conversionFactor == target.conversionFactor){
 			return val;
 		}
 		else {
@@ -26,3 +26,4 @@ public enum LengthUnits {
 		}
 	}
 }
+

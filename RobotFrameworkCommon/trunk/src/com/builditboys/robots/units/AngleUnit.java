@@ -1,7 +1,7 @@
 package com.builditboys.robots.units;
 
 
-public enum AngleUnits {
+public enum AngleUnit {
 	RADIANS(1.0),
 	DEGREES(Math.PI/180.0);
 	
@@ -11,12 +11,12 @@ public enum AngleUnits {
 	//--------------------------------------------------------------------------------
 	// Constructor
 
-	private AngleUnits (double conversionFactor) {
+	private AngleUnit (double conversionFactor) {
 		this.conversionFactor = conversionFactor;
 	}
 	
-	public double convert (double val, AngleUnits target) {
-		if (target == RADIANS) {
+	public double convert (double val, AngleUnit target) {
+		if (conversionFactor == target.conversionFactor){
 			return val;
 		}
 		else {

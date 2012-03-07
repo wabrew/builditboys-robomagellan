@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
+import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
+import com.builditboys.robots.infrastructure.StringParameter;
 import com.builditboys.robots.system.SystemNotification.SystemActionEnum;
 import com.builditboys.robots.time.Time;
 
-public abstract class AbstractRobotSystem {
+public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	public static ParameterServer parameterServer = ParameterServer.getInstance();
 
@@ -21,8 +23,10 @@ public abstract class AbstractRobotSystem {
 
 	private static final int ROBOT_SYSTEM_PHASE_WAIT = 200;
 
-	protected LinkPortInterface linkPort;
+	protected String configFileName;
 	protected String robotName;
+	
+	protected LinkPortInterface linkPort;
 	protected MasterLink masterLink;
 
 	// --------------------------------------------------------------------------------
@@ -36,9 +40,16 @@ public abstract class AbstractRobotSystem {
 	}
 
 	public synchronized void startRobotSystem() throws InterruptedException, IOException {
-		masterLink = new MasterLink(linkPort);
+		ParameterServer.getInstance().addParameter(this);
+		StringParameter robotNameParameter = (StringParameter) ParameterServer.getInstance().getParameter("ROBOT_NAME");
+
+		robotName = robotNameParameter.getValue();
+		
+		masterLink = new MasterLink("Robot Link", linkPort);
+		ParameterServer.getInstance().addParameter(masterLink);
 		masterLink.startLink();
 		System.out.println("Link started");
+
 		Time.initializeLocalTime();
 		System.out.println("Local time initialized");
 
@@ -64,6 +75,11 @@ public abstract class AbstractRobotSystem {
 		eStopNotice.publish(instance);
 	}
 	
+	// --------------------------------------------------------------------------------
+
+	public String getName () {
+		return robotName;
+	}
 	// --------------------------------------------------------------------------------
 
 }
