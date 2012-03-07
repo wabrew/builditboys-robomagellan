@@ -1,31 +1,34 @@
 package com.builditboys.robots.system;
 
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
-
 import java.io.IOException;
 
 import com.builditboys.robots.communication.WindowsLinkPort;
+import com.builditboys.robots.infrastructure.IntegerParameter;
+import com.builditboys.robots.infrastructure.ParameterServer;
+import com.builditboys.robots.infrastructure.StringParameter;
 
 public class WindowsRobotSystem extends AbstractRobotSystem {
 
 	// --------------------------------------------------------------------------------
 
-	public static WindowsRobotSystem launchWindowsRobotSystem(String roboName) throws InterruptedException, IOException {
+	public static WindowsRobotSystem launchWindowsRobotSystem(String configName) throws InterruptedException, IOException {
 		instance = new WindowsRobotSystem();
-		instance.robotName = roboName;
-
+		instance.configFileName = configName;
+		Configuration.loadConfiguration(instance.configFileName);
 		instance.startRobotSystem();
-
 		return (WindowsRobotSystem) instance;
 	}
 
 	// --------------------------------------------------------------------------------
 
 	public void startRobotSystem() throws InterruptedException, IOException {
+		StringParameter commPortNameParameter = (StringParameter) ParameterServer.getInstance().getParameter("COMM_PORT");
+		IntegerParameter baudRateParameter = (IntegerParameter) ParameterServer.getInstance().getParameter("COMM_PORT_BAUD_RATE");
+		
 		// windows specific stuff here
-		linkPort = new WindowsLinkPort("COM10", 115200, true);
+		linkPort = new WindowsLinkPort(commPortNameParameter.getValue(),
+									   baudRateParameter.getValue(),
+									   true);
 
 		super.startRobotSystem();
 
