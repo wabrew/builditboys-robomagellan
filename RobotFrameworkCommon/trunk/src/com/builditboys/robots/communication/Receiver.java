@@ -10,7 +10,7 @@ import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_B
 import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
 import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
 
-import com.builditboys.robots.time.Time;
+import com.builditboys.robots.time.InternalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class Receiver extends AbstractSenderReceiver {
@@ -20,8 +20,8 @@ public class Receiver extends AbstractSenderReceiver {
 	private int receivedSequenceNumber;
 	private int receivedChannelNumber;
 	private int receivedLength;
-	private byte receivedCRC1;
-	private short receivedCRC2;
+	private int receivedCRC1;
+	private int receivedCRC2;
 	private LinkMessage receivedMessage;
 	private AbstractChannel receivedChannel;
 	private AbstractProtocol receivedProtocol;
@@ -114,10 +114,10 @@ public class Receiver extends AbstractSenderReceiver {
 		}
 
 		if (receivedOk) {
-			receivedTime = Time.getAbsoluteTime();
+			receivedTime = InternalTimeSystem.currentInternalTime();
 
 			synchronized (System.out) {
-				System.out.print(Time.getAbsoluteTime());
+				System.out.print(InternalTimeSystem.currentInternalTime());
 				System.out.print(" : " + link.getRole() + " Received: ");
 				printRaw();
 				System.out.println();
@@ -154,14 +154,14 @@ public class Receiver extends AbstractSenderReceiver {
 		}
 
 		int expectedSequenceNumber = bestSequenceNumber();
-		receivedSequenceNumber = preambleBuffer.deSerializeBytes1();
-		receivedChannelNumber = preambleBuffer.deSerializeBytes1();
-		receivedLength = preambleBuffer.deSerializeBytes1();
+		receivedSequenceNumber = preambleBuffer.reConstructBytes1();
+		receivedChannelNumber = preambleBuffer.reConstructBytes1();
+		receivedLength = preambleBuffer.reConstructBytes1();
 
 		crc8.extend(preambleBuffer);
 
 		preambleBuffer.addByte(readEscapedByte());
-		receivedCRC1 = preambleBuffer.deSerializeBytes1();
+		receivedCRC1 = preambleBuffer.reConstructBytes1();
 		crc8.end();
 
 		if (receivedCRC1 != crc8.get()) {
@@ -198,7 +198,7 @@ public class Receiver extends AbstractSenderReceiver {
 			postambleBuffer.addByte(readEscapedByte());
 		}
 
-		receivedCRC2 = postambleBuffer.deSerializeBytes2();
+		receivedCRC2 = postambleBuffer.reConstructBytes2();
 
 		crc16.end();
 		if (receivedCRC2 != crc16.get()) {
@@ -249,7 +249,7 @@ public class Receiver extends AbstractSenderReceiver {
 
 	private void handleReceiveException(ReceiveException e) {
 		AbstractLink link = inputChannels.getLink();
-		receivedTime = Time.getAbsoluteTime();
+		receivedTime = InternalTimeSystem.currentInternalTime();
 		link.receiveReceiverException(e);
 	}
 

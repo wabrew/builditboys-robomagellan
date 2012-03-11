@@ -4,22 +4,20 @@ import java.io.IOException;
 
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
+import com.builditboys.robots.infrastructure.DistributionList;
 import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.infrastructure.StringParameter;
-import com.builditboys.robots.system.SystemNotification.SystemActionEnum;
-import com.builditboys.robots.time.Time;
+import com.builditboys.robots.time.LocalTimeSystem;
 
 public abstract class AbstractRobotSystem implements ParameterInterface {
 
-	public static ParameterServer parameterServer = ParameterServer.getInstance();
-
 	public static AbstractRobotSystem instance;
 
-	private static final SystemNotification start1Notice = new SystemNotification(SystemActionEnum.START1);
-	private static final SystemNotification start2Notice = new SystemNotification(SystemActionEnum.START2);
-	private static final SystemNotification eStopNotice = new SystemNotification(SystemActionEnum.ESTOP);
-	private static final SystemNotification stopNotice = new SystemNotification(SystemActionEnum.NORMAL_STOP);
+	private static final SystemNotification start1Notice = SystemNotification.newStart1Notification();
+	private static final SystemNotification start2Notice = SystemNotification.newStart2Notification();
+	private static final SystemNotification eStopNotice = SystemNotification.newEstopNotification();
+	private static final SystemNotification stopNotice = SystemNotification.newStopNotification();
 
 	private static final int ROBOT_SYSTEM_PHASE_WAIT = 200;
 
@@ -28,6 +26,8 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	
 	protected LinkPortInterface linkPort;
 	protected MasterLink masterLink;
+	
+	protected DistributionList systemDistList = SystemNotification.getDistributionList();
 
 	// --------------------------------------------------------------------------------
 
@@ -40,17 +40,17 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	}
 
 	public synchronized void startRobotSystem() throws InterruptedException, IOException {
-		ParameterServer.getInstance().addParameter(this);
-		StringParameter robotNameParameter = (StringParameter) ParameterServer.getInstance().getParameter("ROBOT_NAME");
+		ParameterServer.addParameter(this);
+		StringParameter robotNameParameter = (StringParameter) ParameterServer.getParameter("ROBOT_NAME");
 
 		robotName = robotNameParameter.getValue();
 		
 		masterLink = new MasterLink("Robot Link", linkPort);
-		ParameterServer.getInstance().addParameter(masterLink);
+		ParameterServer.addParameter(masterLink);
 		masterLink.startLink();
 		System.out.println("Link started");
 
-		Time.initializeLocalTime();
+		LocalTimeSystem.startLocalTimeNow();
 		System.out.println("Local time initialized");
 
 		start1Notice.publish(this);
@@ -70,9 +70,13 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	// --------------------------------------------------------------------------------
 
 	public static void notifyRobotSystemError (String threadName, Exception e) {
+		instance.notifyRobotSystemErrorI(threadName, e);
+	}
+	
+	public void notifyRobotSystemErrorI (String threadName, Exception e) {
 		System.out.println("Exception in thread " + threadName + ": " + e);
 		e.printStackTrace();
-		eStopNotice.publish(instance);
+		eStopNotice.publish(instance, systemDistList);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -80,6 +84,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	public String getName () {
 		return robotName;
 	}
-	// --------------------------------------------------------------------------------
+	
+
 
 }

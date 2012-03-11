@@ -2,7 +2,7 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
-import com.builditboys.robots.time.Time;
+import com.builditboys.robots.time.InternalTimeSystem;
 
 public class SlaveLink extends AbstractLink implements Runnable {
 	
@@ -34,8 +34,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		setLinkState(LinkStateEnum.LinkInitState, "constructor");
 		
 		// the protocol's channel will be set when the protocol is associated with a channel
-		iprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.SLAVE);
-		oprotocol = new LinkControlProtocol(LinkControlProtocol.CommControlRoleEnum.SLAVE);
+		iprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.SLAVE);
+		oprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.SLAVE);
 	
 		controlChannelIn = iprotocol.getInputChannel();
 		controlChannelOut = oprotocol.getOutputChannel();
@@ -120,7 +120,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
 				setLinkState(LinkStateEnum.LinkReadyState, "five");
-				lastKeepAliveReceivedTime = Time.getAbsoluteTime();
+				lastKeepAliveReceivedTime = InternalTimeSystem.currentInternalTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
@@ -130,7 +130,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
 							oprotocol.sendKeepAlive();
-							lastKeepAliveSentTime = Time.getAbsoluteTime();
+							lastKeepAliveSentTime = InternalTimeSystem.currentInternalTime();
 						}
 						else {
 							linkWait(timeToNextSend);
@@ -211,7 +211,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			notify();
 			break;
 		}
-		lastKeepAliveReceivedTime = Time.getAbsoluteTime();
+		lastKeepAliveReceivedTime = InternalTimeSystem.currentInternalTime();
 	}
 		
 	// --------------------------------------------------------------------------------

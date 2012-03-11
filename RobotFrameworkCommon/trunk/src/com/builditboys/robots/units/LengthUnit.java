@@ -1,30 +1,44 @@
 package com.builditboys.robots.units;
 
 
-public enum LengthUnit {
-	METERS(1.0),
-	CENTIMETERS(0.01), 
-	INCHES(1/UnitConstants.INCHES_PER_METER), 
-	FEET(UnitConstants.INCHES_PER_FOOT/UnitConstants.INCHES_PER_METER);
+public class LengthUnit extends AbstractUnit {
+	public static final LengthUnit MICROMETERS = new LengthUnit("micrometers", 1.0);
+	public static final LengthUnit baseUnit = MICROMETERS;
 	
-	// Conversion factor to convert a unit to the common unit
-	private final double conversionFactor;
+	public static final LengthUnit METERS =      new LengthUnit("meters", 1000000.0);
+	public static final LengthUnit CENTIMETERS = new LengthUnit("centimeters", 10000.0);
+	public static final LengthUnit MILLIMETERS = new LengthUnit("millimeters", 1000.0);
+	public static final LengthUnit INCHES =      new LengthUnit("inches", 1/UnitConstants.INCHES_PER_METER * 1000000.0);
+	public static final LengthUnit FEET =        new LengthUnit("feet", UnitConstants.INCHES_PER_FOOT/UnitConstants.INCHES_PER_METER * 1000000.0);
+	public static final LengthUnit COUNTS =      new LengthUnit("feet", 500.0);
 	
-
+	private static LengthUnit defaultUnit = baseUnit;
+	protected static boolean defaultUnitLocked = false;
 
 	//--------------------------------------------------------------------------------
     // Constructor
 	
-	private LengthUnit (double conversionFactor) {
-		this.conversionFactor = conversionFactor;
+	private LengthUnit (String nm, double conversionFact) {
+		super(nm, conversionFact);
 	}
-	
-	public double convert (double val, LengthUnit target) {
-		if (conversionFactor == target.conversionFactor) {
-			return val;
+
+	//--------------------------------------------------------------------------------
+
+	public static LengthUnit getDefaultUnit() {
+		return defaultUnit;
+	}
+
+	public static void setDefaultUnit(LengthUnit defaultLengthUnit) {
+		if (!defaultUnitLocked) {
+			LengthUnit.defaultUnit = defaultLengthUnit;
 		}
 		else {
-			return val * conversionFactor / target.conversionFactor;
+			throw new IllegalStateException("Default length unit is locked");
 		}
 	}
+	
+	public static void lockDefaultUnit () {
+		defaultUnitLocked = true;
+	}
+		
 }

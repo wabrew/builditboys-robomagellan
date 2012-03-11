@@ -8,7 +8,7 @@ import com.builditboys.robots.units.LengthUnit;
 
 public class Length {
 	
-    // The length's value, and units
+	// The length's value, and units
 	private double lengthValue;
 	
 	private static final LengthUnit nativeUnits = METERS;
@@ -21,22 +21,22 @@ public class Length {
 	//--------------------------------------------------------------------------------
 	// Constructor (note that it is private, use factory methods)
 
-   private Length (double val) {
+	private Length (double val) {
     	lengthValue = val;
      	isLocked = false;
     }
 
 	//--------------------------------------------------------------------------------
-   	// Factory methods
+	// Creation methods
 
-   public static Length newLength (Length len) {
+	public static Length newLength (Length len) {
 	   // assumes native units are all the same
 	   return new Length(len.lengthValue);
-   }
+	}
   
-   public static Length newLength (double val, LengthUnit units) {
-	   return new Length(units.convert(val, nativeUnits));
-   }
+	public static Length newLength (double val, LengthUnit units) {
+		return new Length(convert(val, units, nativeUnits));
+	}
    
 	//--------------------------------------------------------------------------------
 	// Basic Accessors
@@ -50,7 +50,7 @@ public class Length {
 			return lengthValue;
 		}
 		else {
-			return nativeUnits.convert(lengthValue, units);
+			return convert(lengthValue, nativeUnits, units);
 		}
 	}
 	
@@ -60,7 +60,7 @@ public class Length {
 				lengthValue = val;
 			}
 			else {
-				lengthValue = units.convert(val, nativeUnits);
+				lengthValue = convert(val, units, nativeUnits);
 			}
 		}
 		else {
@@ -96,7 +96,7 @@ public class Length {
 	}
 
 	//--------------------------------------------------------------------------------
-	// Some other length operators - return properties of the length
+	// Some length properties - return properties of the length
 	
 	public boolean isClose0 () {
 		return GeometricCompare.isLengthClose0(lengthValue);

@@ -13,9 +13,9 @@ public class Configuration {
 		StringParameter commPortNameParameter = new StringParameter("COMM_PORT", "COM10");
 		IntegerParameter baudRateParameter = new IntegerParameter("COMM_PORT_BAUD_RATE", 115200);
 
-		ParameterServer.getInstance().addParameter(robotNameParameter);
-		ParameterServer.getInstance().addParameter(commPortNameParameter);
-		ParameterServer.getInstance().addParameter(baudRateParameter);
+		ParameterServer.addParameter(robotNameParameter);
+		ParameterServer.addParameter(commPortNameParameter);
+		ParameterServer.addParameter(baudRateParameter);
 	}
 
 }

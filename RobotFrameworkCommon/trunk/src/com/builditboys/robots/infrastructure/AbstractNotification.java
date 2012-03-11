@@ -1,16 +1,11 @@
 package com.builditboys.robots.infrastructure;
 
-import java.util.ArrayList;
+import com.builditboys.robots.time.LocalTimeSystem;
 
-import com.builditboys.robots.time.Time;
-
-public abstract class AbstractNotification {
+public abstract class AbstractNotification implements NotificationInterface {
 	
-	// the objects that the dispatch will be delivered to
-	private static ArrayList<SubscriberInterface> subscribers = new ArrayList<SubscriberInterface>();
-	
-	private Object publisher;
-	private long publicationTime;
+	protected Object publisher;
+	protected long publicationTime;
 
 	//--------------------------------------------------------------------------------
 
@@ -23,42 +18,20 @@ public abstract class AbstractNotification {
 	}
 
 	//--------------------------------------------------------------------------------
-	// Adding/removing dispatch receivers
-	
-	public static synchronized void subscribe (SubscriberInterface subscriber) {
-		subscribers.add(subscriber);
-	}
-	
-	// synchronize so that subscriber list is stable 
-	public static synchronized void unsubscribe (SubscriberInterface subscriber) {
-		subscribers.remove(subscriber);
-	}
-
-	//--------------------------------------------------------------------------------
 	// Dispatching
 	
-	// synchronize so that subscriber list is stable, see subscribe, unsubscribe
-	public synchronized void publish (Object publishedBy) {
+	// synchronize so that the notice is stable for all subscribers
+	public synchronized void publish (Object publishedBy, DistributionList distList) {
 		publisher = publishedBy;
-		publicationTime = Time.getLocalTime();
-		notePublication();
-		for (SubscriberInterface subscriber: subscribers) {
-			publishSelf(subscriber);
-		}
+		publicationTime = LocalTimeSystem.currentLocalTime();				
+		distList.publish(this);
 	}
-	
+		
+	// must be overridden
 	public abstract void publishSelf (SubscriberInterface subscriber);
-	
-	private void notePublication () {
-		System.out.println(publisher.getClass().getSimpleName() + '@' + Integer.toHexString(publisher.hashCode())
-						   + " is publishing " 
-						   + this 
-						   + " at time " 
-						   + publicationTime 
-						   + " to " 
-						   + subscribers.size() 
-						   + " subscribers");
-	}
+
+	//--------------------------------------------------------------------------------
+
 	
 	public String toString () {
 		return getClass().getSimpleName() + '@' + Integer.toHexString(hashCode());

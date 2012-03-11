@@ -250,11 +250,11 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	// --------------------------------------------------------------------------------
 
 	protected boolean keepAliveOk() {
-		return ((Time.getAbsoluteTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
+		return ((InternalTimeSystem.currentInternalTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
 	}
 
 	protected long timeToNextKeepAlive() {
-		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - Time.getAbsoluteTime());
+		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - InternalTimeSystem.currentInternalTime());
 	}
 
 	// --------------------------------------------------------------------------------

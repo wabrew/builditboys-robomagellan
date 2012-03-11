@@ -18,6 +18,14 @@ public abstract class AbstractCRCCalculator {
 	//--------------------------------------------------------------------------------
 	// Common methods
 	
+	public void extend (int ibite) {
+		extend((byte) ibite);
+	}
+	
+	public void extend (short sbite) {
+		extend((byte) sbite);
+	}
+
 	public void extend (byte[] bytes) {
 		for (byte b: bytes) {
 			extend(b);

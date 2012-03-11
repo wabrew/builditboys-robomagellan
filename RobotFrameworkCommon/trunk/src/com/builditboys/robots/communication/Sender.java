@@ -11,7 +11,7 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE
 
 import java.io.IOException;
 
-import com.builditboys.robots.time.Time;
+import com.builditboys.robots.time.InternalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class Sender extends AbstractSenderReceiver {
@@ -23,8 +23,8 @@ public class Sender extends AbstractSenderReceiver {
 	private AbstractProtocol sentProtocol;
 	private int sentChannelNumber;
 	private int sentLength;
-	private byte sentCRC1;
-	private short sentCRC2;
+	private int sentCRC1;
+	private int sentCRC2;
 	private LinkMessage sentMessage;
 	long sentTime;
 
@@ -112,10 +112,10 @@ public class Sender extends AbstractSenderReceiver {
 		sendPostamble();
 		sendPostSync();
 
-		sentTime = Time.getAbsoluteTime();
+		sentTime = InternalTimeSystem.currentInternalTime();
 
 		synchronized (System.out){
-			System.out.print(Time.getAbsoluteTime());
+			System.out.print(InternalTimeSystem.currentInternalTime());
 			System.out.print(" : " + link.getRole() + " Sent    : ");
 			printRaw();
 			System.out.println();
@@ -135,14 +135,14 @@ public class Sender extends AbstractSenderReceiver {
 	private void sendPreamble() throws InterruptedException, IOException {
 		sentSequenceNumber = bestSequenceNumber();
 
-		preambleBuffer.serializeBytes1(sentSequenceNumber);
-		preambleBuffer.serializeBytes1(sentChannelNumber);
-		preambleBuffer.serializeBytes1(sentLength);
+		preambleBuffer.deConstructBytes1(sentSequenceNumber);
+		preambleBuffer.deConstructBytes1(sentChannelNumber);
+		preambleBuffer.deConstructBytes1(sentLength);
 
 		crc8.extend(preambleBuffer);
 		crc8.end();
 		sentCRC1 = crc8.get();
-		preambleBuffer.serializeBytes1(sentCRC1);
+		preambleBuffer.deConstructBytes1(sentCRC1);
 		crc16.extend(preambleBuffer);
 
 		sendBytes(preambleBuffer);
@@ -158,7 +158,7 @@ public class Sender extends AbstractSenderReceiver {
 		crc16.end();
 
 		sentCRC2 = crc16.get();
-		postambleBuffer.serializeBytes2(sentCRC2);
+		postambleBuffer.deConstructBytes2(sentCRC2);
 		sendBytes(postambleBuffer);
 	}
 

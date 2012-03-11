@@ -84,7 +84,14 @@ public class LinkParameters {
 	//--------------------------------------------------------------------------------
     // Channel numbers, keep in sync with PSOC
 	
-	public static final int COMM_CONTROL_CHANNEL_NUMBER = 0;
+	public static final int LINK_CONTROL_CHANNEL_NUMBER = 0;
+	
 	public static final int TIME_SYNC_CHANNEL_NUMBER = 10;
+	public static final int SENSOR_CHANNEL_NUMBER = 11;
+	public static final int ROBOT_CONTROL_CHANNEL_NUMBER = 12;
+	public static final int DRIVER_CHANNEL_NUMBER = 13;
+
+
+	//--------------------------------------------------------------------------------
 
 }

@@ -2,9 +2,12 @@ package com.builditboys.robots.infrastructure;
 
 import java.util.HashMap;
 
-public class ParameterServer {
+public final class ParameterServer {
 
-	private HashMap<String, ParameterInterface> parameters;
+	// Singleton
+	private static final ParameterServer instance = new ParameterServer();
+
+	private final HashMap<String, ParameterInterface> parameters;
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -14,19 +17,14 @@ public class ParameterServer {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Singleton
-
-	private static final ParameterServer instance = new ParameterServer();
-
-	public static ParameterServer getInstance() {
-		return instance;
-	}
-
-	// --------------------------------------------------------------------------------
 	// Adding parameters
 
+	public static void addParameter (ParameterInterface parm) {
+		instance.addParameterI(parm);
+	}
+	
 	// synchronized so that you see a stable set of parameters
-	public synchronized void addParameter(ParameterInterface parm) {
+	private synchronized void addParameterI (ParameterInterface parm) {
 		String name = parm.getName();
 
 		if (parameters.get(name) == null) {
@@ -36,24 +34,36 @@ public class ParameterServer {
 		}
 	}
 
+	public static void replaceParameter (ParameterInterface parm) {
+		instance.replaceParameterI(parm);
+	}
+	
 	// synchronized so that you see a stable set of parameters
-	public synchronized void replaceParameter(ParameterInterface parm) {
+	private synchronized void replaceParameterI (ParameterInterface parm) {
 		parameters.put(parm.getName(), parm);
 	}
 
 	// --------------------------------------------------------------------------------
 	// Removing parameters
 
+	public static void removeParameter (String key) {
+		instance.removeParameterI(key);
+	}
+	
 	// synchronized so that you see a stable set of parameters
-	public synchronized void removeParameter(String key) {
+	private synchronized void removeParameterI(String key) {
 		parameters.remove(key);
 	}
 
 	// --------------------------------------------------------------------------------
 	// Getting parameters
 
+	public static ParameterInterface getParameter (String key) {
+		return instance.getParameterI(key);
+	}
+	
 	// synchronized so that you see a stable set of parameters
-	public synchronized ParameterInterface getParameter(String key) {
+	private synchronized ParameterInterface getParameterI(String key) {
 		ParameterInterface parm = parameters.get(key);
 
 		if (parm != null) {
@@ -63,8 +73,12 @@ public class ParameterServer {
 		}
 	}
 
+	public static ParameterInterface maybeGetParameter (String key) {
+		return instance.maybeGetParameterI(key);
+	}
+	
 	// synchronized so that you see a stable set of parameters
-	public synchronized ParameterInterface getParameterMaybe(String key) {
+	private synchronized ParameterInterface maybeGetParameterI(String key) {
 		return parameters.get(key);
 	}
 	

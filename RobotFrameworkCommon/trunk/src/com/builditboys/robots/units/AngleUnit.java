@@ -1,27 +1,40 @@
 package com.builditboys.robots.units;
 
 
-public enum AngleUnit {
-	RADIANS(1.0),
-	DEGREES(Math.PI/180.0);
+public class AngleUnit extends AbstractUnit {
+	public static final AngleUnit MICRORADIANS = new AngleUnit("degrees", 1);
+	public static final AngleUnit baseUnit = MICRORADIANS;
+
+	public static final AngleUnit RADIANS = new AngleUnit("radians", 1000.0);
+	public static final AngleUnit DEGREES = new AngleUnit("degrees", (Math.PI/180.0) * 1000);
 	
-	// Conversion factor to convert a unit to the common unit
-	private final double conversionFactor;
+	private static AngleUnit defaultUnit = baseUnit;
+	protected static boolean defaultUnitLocked = false;
 
 	//--------------------------------------------------------------------------------
 	// Constructor
 
-	private AngleUnit (double conversionFactor) {
-		this.conversionFactor = conversionFactor;
+	private AngleUnit (String nm, double conversionFact) {
+		super(nm, conversionFact);
 	}
 	
-	public double convert (double val, AngleUnit target) {
-		if (conversionFactor == target.conversionFactor){
-			return val;
+	//--------------------------------------------------------------------------------
+	
+	public static AngleUnit getDefaultUnit() {
+		return defaultUnit;
+	}
+
+	public static void setDefaultUnit(AngleUnit defaultAngleUnit) {
+		if (!defaultUnitLocked) {
+			AngleUnit.defaultUnit = defaultAngleUnit;
 		}
 		else {
-			return val * conversionFactor / target.conversionFactor;
+			throw new IllegalStateException("Default angle unit is locked");
 		}
 	}
 
+	public static void lockDefaultUnit () {
+		defaultUnitLocked = true;
+	}
+	
 }

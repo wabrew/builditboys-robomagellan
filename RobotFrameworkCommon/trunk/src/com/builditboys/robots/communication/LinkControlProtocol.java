@@ -5,13 +5,9 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class LinkControlProtocol extends AbstractProtocol {
 
-	public enum CommControlRoleEnum {
-		MASTER, SLAVE;
-	};
-
-	private CommControlRoleEnum role;
-
 	public static AbstractProtocol indicator = new LinkControlProtocol();
+
+	private static int myChannelNumber = LINK_CONTROL_CHANNEL_NUMBER;
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -19,7 +15,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 	private LinkControlProtocol() {
 	}
 
-	public LinkControlProtocol(CommControlRoleEnum rol) {
+	public LinkControlProtocol(ProtocolRoleEnum rol) {
 		role = rol;
 	}
 
@@ -27,12 +23,12 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// Channel factories
 	
 	public InputChannel getInputChannel () {
-		channel = new InputChannel(this, COMM_CONTROL_CHANNEL_NUMBER);
+		channel = new InputChannel(this, myChannelNumber);
 		return (InputChannel) channel;
 	}
 	
 	public OutputChannel getOutputChannel () {
-		channel = new OutputChannel(this, COMM_CONTROL_CHANNEL_NUMBER);
+		channel = new OutputChannel(this, myChannelNumber);
 		return (OutputChannel) channel;
 	}
 	
@@ -150,16 +146,6 @@ public class LinkControlProtocol extends AbstractProtocol {
 		default:
 			throw new IllegalStateException();
 		}
-	}
-
-	// --------------------------------------------------------------------------------
-
-	public AbstractNotification deSerialize(LinkMessage message) {
-		return null;
-	}
-
-	public LinkMessage serialize(AbstractNotification notice) {
-		return null;
 	}
 
 }
