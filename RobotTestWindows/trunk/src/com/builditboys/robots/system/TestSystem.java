@@ -2,6 +2,7 @@ package com.builditboys.robots.system;
 
 import java.io.IOException;
 
+import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.system.WindowsRobotSystem;
 
 public class TestSystem {
@@ -26,6 +27,7 @@ public class TestSystem {
 			e.printStackTrace();
 		}
 		
+		ParameterServer.print();
 		System.out.println("Finished");
 		
 	}
