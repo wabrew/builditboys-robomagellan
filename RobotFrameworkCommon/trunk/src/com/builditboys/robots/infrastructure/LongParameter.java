@@ -1,10 +1,8 @@
 package com.builditboys.robots.infrastructure;
 
-public class LongParameter  implements ParameterInterface {
+public class LongParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
-	
-	Long value;
+	Long value = (long) 0;
 	
 	//--------------------------------------------------------------------------------
 
@@ -19,11 +17,6 @@ public class LongParameter  implements ParameterInterface {
 
 	//--------------------------------------------------------------------------------
 
-	public String getName () {
-		return name;
-	}
-	
-
 	public synchronized Long getValue() {
 		return value;
 	}
@@ -31,5 +24,11 @@ public class LongParameter  implements ParameterInterface {
 	public synchronized void setValue(Long value) {
 		this.value = value;
 	}
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Long parm: " + value;
+	}
+
 
 }

@@ -54,13 +54,13 @@ public class DistributionList implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 
 	private void notePublication (AbstractNotification notice) {
-		System.out.println(MiscUtilities.objectShortName(notice.getPublisher())
+		System.out.println(MiscUtilities.bestObjectName(notice.getPublisher())
 						   + " is publishing " 
 						   + notice
 						   + " at time " 
 						   + notice.getPublicationTime()
-						   + " to list "
-						   + MiscUtilities.objectShortName(this)
+						   + " to "
+						   + this
 						   + " with "
 						   + subscribers.size() 
 						   + " subscribers");
@@ -79,6 +79,13 @@ public class DistributionList implements ParameterInterface {
 	// Get a distribution list from the parameter server
 	public static DistributionList getDistributionListNamed (String name) {
 		return (DistributionList) ParameterServer.getParameter(name);
+	}
+	
+	
+	//--------------------------------------------------------------------------------
+
+	public String toString () {
+		return "Dist List: \"" + name + "\"";
 	}
 }
 

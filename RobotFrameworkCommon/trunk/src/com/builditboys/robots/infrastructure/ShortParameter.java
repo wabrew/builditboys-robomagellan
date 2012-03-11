@@ -1,10 +1,8 @@
 package com.builditboys.robots.infrastructure;
 
-public class ShortParameter  implements ParameterInterface {
+public class ShortParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
-	
-	Short value;
+	Short value = 0;
 	
 	//--------------------------------------------------------------------------------
 	
@@ -19,10 +17,6 @@ public class ShortParameter  implements ParameterInterface {
 
 	//--------------------------------------------------------------------------------
 
-	public String getName () {
-		return name;
-	}
-
 	public synchronized Short getValue() {
 		return value;
 	}
@@ -30,5 +24,12 @@ public class ShortParameter  implements ParameterInterface {
 	public synchronized void setValue(Short value) {
 		this.value = value;
 	}
+	
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Short parm: " + value;
+	}
+
 
 }

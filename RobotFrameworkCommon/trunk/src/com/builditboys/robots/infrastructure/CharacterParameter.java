@@ -1,15 +1,11 @@
 package com.builditboys.robots.infrastructure;
 
-public class CharacterParameter  implements ParameterInterface {
+public class CharacterParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
+	Character value = 0;
 	
-	Character value;
-	
-	public String getName () {
-		return name;
-	}
-	
+	//--------------------------------------------------------------------------------
+
 	public CharacterParameter (String nm) {
 		name = nm;
 	}
@@ -19,6 +15,8 @@ public class CharacterParameter  implements ParameterInterface {
 		value = val;
 	}
 
+	//--------------------------------------------------------------------------------
+
 	public synchronized Character getValue() {
 		return value;
 	}
@@ -26,5 +24,11 @@ public class CharacterParameter  implements ParameterInterface {
 	public synchronized void setValue(Character value) {
 		this.value = value;
 	}
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Character parm: " + value;
+	}
+
 
 }

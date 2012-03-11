@@ -1,10 +1,8 @@
 package com.builditboys.robots.infrastructure;
 
-public class StringParameter implements ParameterInterface {
+public class StringParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
-	
-	String value;
+	String value = null;
 	
 	//--------------------------------------------------------------------------------
 
@@ -19,11 +17,6 @@ public class StringParameter implements ParameterInterface {
 	
 	//--------------------------------------------------------------------------------
 
-	public String getName () {
-		return name;
-	}
-	
-
 	public synchronized String getValue() {
 		return value;
 	}
@@ -32,6 +25,10 @@ public class StringParameter implements ParameterInterface {
 		this.value = value;
 	}
 	
-	
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "String parm: \"" + value + "\"";
+	}
 
 }

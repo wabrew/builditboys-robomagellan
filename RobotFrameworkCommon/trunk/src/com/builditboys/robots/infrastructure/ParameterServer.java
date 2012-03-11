@@ -1,6 +1,9 @@
 package com.builditboys.robots.infrastructure;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import com.builditboys.robots.utilities.MiscUtilities;
 
 public final class ParameterServer {
 
@@ -26,12 +29,13 @@ public final class ParameterServer {
 	// synchronized so that you see a stable set of parameters
 	private synchronized void addParameterI (ParameterInterface parm) {
 		String name = parm.getName();
-
-		if (parameters.get(name) == null) {
-			parameters.put(name, parm);
-		} else {
+		if (name == null) {
+			throw new IllegalArgumentException("null parameter name");
+		}
+		if (parameters.get(name) != null) {
 			throw new IllegalStateException();
 		}
+		parameters.put(name, parm);
 	}
 
 	public static void replaceParameter (ParameterInterface parm) {
@@ -40,6 +44,10 @@ public final class ParameterServer {
 	
 	// synchronized so that you see a stable set of parameters
 	private synchronized void replaceParameterI (ParameterInterface parm) {
+		String name = parm.getName();
+		if (name == null) {
+			throw new IllegalArgumentException("null parameter name");
+		}
 		parameters.put(parm.getName(), parm);
 	}
 
@@ -80,6 +88,21 @@ public final class ParameterServer {
 	// synchronized so that you see a stable set of parameters
 	private synchronized ParameterInterface maybeGetParameterI(String key) {
 		return parameters.get(key);
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static void print () {
+		HashMap<String, ParameterInterface> parmMap = instance.parameters;
+		System.out.println("Parameters:");
+		if (parmMap != null) {
+			for (Map.Entry<String, ParameterInterface> entry : parmMap.entrySet()) {
+				System.out.println("\"" + entry.getKey() + "\" -> " + MiscUtilities.bestObjectName(entry.getValue()));
+			}
+		}
+		else {
+			System.out.println("currently there are no parameters");
+		}
 	}
 	
 	// --------------------------------------------------------------------------------

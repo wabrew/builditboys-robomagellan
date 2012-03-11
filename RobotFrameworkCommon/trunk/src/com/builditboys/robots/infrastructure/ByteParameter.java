@@ -1,10 +1,8 @@
 package com.builditboys.robots.infrastructure;
 
-public class ByteParameter  implements ParameterInterface {
+public class ByteParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
-	
-	Byte value;
+	Byte value = 0;
 	
 	//--------------------------------------------------------------------------------
 
@@ -19,16 +17,17 @@ public class ByteParameter  implements ParameterInterface {
 
 	//--------------------------------------------------------------------------------
 
-	public String getName () {
-		return name;
-	}
-	
 	public synchronized Byte getValue() {
 		return value;
 	}
 
 	public synchronized void setValue(Byte value) {
 		this.value = value;
+	}
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Byte parm: " + value;
 	}
 
 }

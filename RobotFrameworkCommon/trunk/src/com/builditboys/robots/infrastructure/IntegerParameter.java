@@ -1,35 +1,34 @@
 package com.builditboys.robots.infrastructure;
 
-public class IntegerParameter implements ParameterInterface {
-		
-		String name;
-		
-		Integer value;
-		
-		//--------------------------------------------------------------------------------
+public class IntegerParameter extends AbstractParameter implements ParameterInterface {
 
-		public IntegerParameter (String nm) {
-			name = nm;
-		}
-		
-		public IntegerParameter (String nm, Integer val) {
-			name = nm;
-			value = val;
-		}
-		
-		//--------------------------------------------------------------------------------
+	Integer value = 0;
 
-		public String getName () {
-			return name;
-		}
-		
-		public synchronized Integer getValue() {
-			return value;
-		}
+	// --------------------------------------------------------------------------------
 
-		public synchronized void setValue(Integer value) {
-			this.value = value;
-		}
-		
-		
+	public IntegerParameter(String nm) {
+		name = nm;
+	}
+
+	public IntegerParameter(String nm, Integer val) {
+		name = nm;
+		value = val;
+	}
+
+	// --------------------------------------------------------------------------------
+
+	public synchronized Integer getValue() {
+		return value;
+	}
+
+	public synchronized void setValue(Integer value) {
+		this.value = value;
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Integer parm: " + value;
+	}
+
 }

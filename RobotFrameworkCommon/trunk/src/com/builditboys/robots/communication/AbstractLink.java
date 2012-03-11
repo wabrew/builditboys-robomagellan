@@ -58,6 +58,10 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		return name;
 	}
 	
+	public String toString () {
+		return "Link: \"" + name + "\"";
+	}
+	
 	// --------------------------------------------------------------------------------
 	// Starting things up
 

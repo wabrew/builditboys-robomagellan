@@ -1,10 +1,8 @@
 package com.builditboys.robots.infrastructure;
 
-public class ObjectParameter  implements ParameterInterface {
+public class ObjectParameter extends AbstractParameter implements ParameterInterface {
 	
-	String name;
-	
-	Object value;
+	Object value = null;
 	
 	//--------------------------------------------------------------------------------
 
@@ -19,10 +17,6 @@ public class ObjectParameter  implements ParameterInterface {
 
 	//--------------------------------------------------------------------------------
 
-	public String getName () {
-		return name;
-	}
-	
 	public synchronized Object getValue() {
 		return value;
 	}
@@ -30,5 +24,12 @@ public class ObjectParameter  implements ParameterInterface {
 	public synchronized void setValue(Object value) {
 		this.value = value;
 	}
+	
+	// --------------------------------------------------------------------------------
+
+	public String toString() {
+		return "Object parm: " + value;
+	}
+
 
 }

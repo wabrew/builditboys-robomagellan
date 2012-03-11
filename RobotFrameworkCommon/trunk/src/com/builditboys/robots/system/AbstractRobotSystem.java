@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
 import com.builditboys.robots.infrastructure.DistributionList;
+import com.builditboys.robots.infrastructure.ObjectParameter;
 import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.infrastructure.StringParameter;
@@ -31,21 +32,24 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	// --------------------------------------------------------------------------------
 
-	static AbstractRobotSystem getIntance() {
+/*
+	static AbstractRobotSystem getInstance() {
 		if (instance != null) {
 			return instance;
 		} else {
 			throw new IllegalStateException("Instance not setup by child class");
 		}
 	}
-
+*/
+	
 	public synchronized void startRobotSystem() throws InterruptedException, IOException {
-		ParameterServer.addParameter(this);
+		ObjectParameter robotSystemParameter = new ObjectParameter("ROBOT_SYSTEM", this);
 		StringParameter robotNameParameter = (StringParameter) ParameterServer.getParameter("ROBOT_NAME");
 
 		robotName = robotNameParameter.getValue();
-		
-		masterLink = new MasterLink("Robot Link", linkPort);
+		ParameterServer.addParameter(robotSystemParameter);
+	
+		masterLink = new MasterLink("ROBOT_LINK", linkPort);
 		ParameterServer.addParameter(masterLink);
 		masterLink.startLink();
 		System.out.println("Link started");
@@ -83,6 +87,10 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	public String getName () {
 		return robotName;
+	}
+	
+	public String toString () {
+		return "Robot System: \"" + robotName + "\"";
 	}
 	
 

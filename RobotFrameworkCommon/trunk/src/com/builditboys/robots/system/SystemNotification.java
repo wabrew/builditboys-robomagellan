@@ -15,7 +15,7 @@ public class SystemNotification extends AbstractNotification {
 
 	private SystemActionEnum systemAction;
 	
-	private static DistributionList distributionList = DistributionList.addDistributionListNamed("system distribution list");
+	private static DistributionList distributionList = DistributionList.addDistributionListNamed("SYSTEM_DISTRIBUTION_LIST");
 
 	//--------------------------------------------------------------------------------
 
@@ -61,5 +61,11 @@ public class SystemNotification extends AbstractNotification {
 	
 	public void publishSelf( SubscriberInterface subscriber) {
 		((SystemNotificationSubscriberInterface) subscriber).receiveNotification(this);
+	}
+	
+	//--------------------------------------------------------------------------------
+
+	public String toString () {
+		return "System Action: " + systemAction.toString();
 	}
 }
