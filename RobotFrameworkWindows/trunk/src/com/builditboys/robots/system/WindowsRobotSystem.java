@@ -22,8 +22,8 @@ public class WindowsRobotSystem extends AbstractRobotSystem {
 	// --------------------------------------------------------------------------------
 
 	public void startRobotSystem() throws InterruptedException, IOException {
-		StringParameter commPortNameParameter = (StringParameter) ParameterServer.getInstance().getParameter("COMM_PORT");
-		IntegerParameter baudRateParameter = (IntegerParameter) ParameterServer.getInstance().getParameter("COMM_PORT_BAUD_RATE");
+		StringParameter commPortNameParameter = (StringParameter) ParameterServer.getParameter("COMM_PORT");
+		IntegerParameter baudRateParameter = (IntegerParameter) ParameterServer.getParameter("COMM_PORT_BAUD_RATE");
 		
 		// windows specific stuff here
 		linkPort = new WindowsLinkPort(commPortNameParameter.getValue(),
