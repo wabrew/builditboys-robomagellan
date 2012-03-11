@@ -1,5 +1,10 @@
 package com.builditboys.robots.infrastructure;
 
+//See also DistributionList
+//         NotificationInterface
+//         AbstractNotification
+//         SubscriberInterface
+
 public interface NotificationInterface {
 
 	// the simplest way to implement this interface is to extend AbstractNotification

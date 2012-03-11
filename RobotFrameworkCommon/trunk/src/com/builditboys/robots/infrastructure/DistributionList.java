@@ -2,6 +2,11 @@ package com.builditboys.robots.infrastructure;
 
 import java.util.ArrayList;
 
+// See also DistributionList
+//          NotificationInterface
+//          AbstractNotification
+//          SubscriberInterface
+
 import com.builditboys.robots.utilities.MiscUtilities;
 
 public class DistributionList implements ParameterInterface {
@@ -26,6 +31,7 @@ public class DistributionList implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 	// Adding/removing dispatch receivers
 	
+	// synchronize so that subscriber list is stable 
 	public synchronized void subscribe (SubscriberInterface subscriber) {
 		subscribers.add(subscriber);
 	}
@@ -37,6 +43,7 @@ public class DistributionList implements ParameterInterface {
 
 	//--------------------------------------------------------------------------------
 
+	// synchronize so that the subscriber list is stable
 	public synchronized void publish (AbstractNotification notice) {
 		notePublication(notice);
 		for (SubscriberInterface subscriber: subscribers) {
@@ -60,13 +67,16 @@ public class DistributionList implements ParameterInterface {
 	}
 
 	//--------------------------------------------------------------------------------
-		
+	// Parameter server interaction
+	
+	// Make a new distribution list and put it in the parameter server
 	public static DistributionList addDistributionListNamed (String name) {
 		DistributionList distList = new DistributionList(name);
 		ParameterServer.addParameter(distList);
 		return distList;
 	}
 	
+	// Get a distribution list from the parameter server
 	public static DistributionList getDistributionListNamed (String name) {
 		return (DistributionList) ParameterServer.getParameter(name);
 	}
