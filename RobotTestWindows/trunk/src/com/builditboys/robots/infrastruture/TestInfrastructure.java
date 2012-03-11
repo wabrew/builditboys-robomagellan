@@ -1,10 +1,9 @@
 package com.builditboys.robots.infrastruture;
 
+import com.builditboys.robots.infrastructure.DistributionList;
 import com.builditboys.robots.infrastructure.ParameterServer;
 
 public class TestInfrastructure {
-	
-	private ParameterServer parmServer = ParameterServer.getInstance();
 	
 	private ExampleParameter parm = new ExampleParameter("Example Parameter");
 	private ExampleParameter getParm;
@@ -14,10 +13,12 @@ public class TestInfrastructure {
 	private ExampleSubscriber1 subscriber1 = new ExampleSubscriber1();
 	private ExampleSubscriber2 subscriber2 = new ExampleSubscriber2();
 	
+	private DistributionList distList = new DistributionList("test list");
+	
 	public void test () {
 		// parameter server
-		parmServer.addParameter(parm);
-		getParm = (ExampleParameter) parmServer.getParameter("Example Parameter");
+		ParameterServer.addParameter(parm);
+		getParm = (ExampleParameter) ParameterServer.getParameter("Example Parameter");
 		if (getParm == null) {
 			System.out.println("could not find parameter");
 		}
@@ -29,9 +30,9 @@ public class TestInfrastructure {
 
 		
 		// publish/subscribe
-		ExampleNotification.subscribe(subscriber1);
-		ExampleNotification.subscribe(subscriber2);
-		notice.publish(this);
+		distList.subscribe(subscriber1);
+		distList.subscribe(subscriber2);
+		notice.publish(this, distList);
 			
 	}
 
