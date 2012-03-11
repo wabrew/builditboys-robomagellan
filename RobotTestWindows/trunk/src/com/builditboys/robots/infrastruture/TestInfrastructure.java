@@ -12,6 +12,7 @@ public class TestInfrastructure {
 	
 	private ExampleSubscriber1 subscriber1 = new ExampleSubscriber1();
 	private ExampleSubscriber2 subscriber2 = new ExampleSubscriber2();
+	private NonExampleSubscriber nonSubscriber1 = new NonExampleSubscriber();
 	
 	private DistributionList distList = new DistributionList("test list");
 	
@@ -32,6 +33,9 @@ public class TestInfrastructure {
 		// publish/subscribe
 		distList.subscribe(subscriber1);
 		distList.subscribe(subscriber2);
+		
+// causes a cast exception (its supposed to)
+//		distList.subscribe(nonSubscriber1);
 		notice.publish(this, distList);
 			
 	}
