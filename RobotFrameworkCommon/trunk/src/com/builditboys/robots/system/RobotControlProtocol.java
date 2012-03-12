@@ -19,8 +19,6 @@ public class RobotControlProtocol extends AbstractProtocol {
 	
 	private static int myChannelNumber = ROBOT_CONTROL_CHANNEL_NUMBER;
 	
-	public DistributionList robotControlDistList = DistributionList.addDistributionListNamed("robot control distribution list");
-
 	// --------------------------------------------------------------------------------
 	// Constructors
 
@@ -97,6 +95,18 @@ public class RobotControlProtocol extends AbstractProtocol {
 		sendMessage(mObject, doWait);
 	}
 
+	// master to slave
+//	public static final int MS_DO_ESTOP         = 1; // tell the robot to estop
+//	public static final int MS_CLEAR_ESTOP      = 2; // clear an estop situation
+//	public static final int MS_DO_RESET         = 3; // tell the robot to reset
+//	public static final int MS_DO_DUMP_STATE    = 4; // tell the robot to dump its state
+//	public static final int MS_IM_ALIVE         = 5; // tell the robot the master is alive
+
+	// slave to master
+//	public static final int SM_DID_ESTOP        = 6; // tell the master that an estop occured
+//	public static final int SM_IM_ALIVE         = 7; // tell the master that the robot is alive
+//	public static final int SM_HERE_IS_MY_STATE = 8; // the robots state
+
 	//--------------------------------------------------------------------------------
 	// Receiving messages
 
@@ -123,12 +133,12 @@ public class RobotControlProtocol extends AbstractProtocol {
 		
 		case SM_DID_ESTOP:
 			notice = RobotControlNotification.newEstopNotice();
-			notice.publish(this, robotControlDistList);
+			notice.publish(this);
 			break;
 			
 		case SM_IM_ALIVE:
 			notice = RobotControlNotification.newIsAliveNotice();
-			notice.publish(this, robotControlDistList);
+			notice.publish(this);
 			break;
 
 			
@@ -138,7 +148,7 @@ public class RobotControlProtocol extends AbstractProtocol {
 			// could also just update the existing state object
 			ParameterServer.replaceParameter(messageObject2);
 			notice = RobotControlNotification.newRobotStateNotice();
-			notice.publish(this, robotControlDistList);
+			notice.publish(this);
 			break;
 			
 		default:

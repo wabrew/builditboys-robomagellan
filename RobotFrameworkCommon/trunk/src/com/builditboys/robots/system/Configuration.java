@@ -9,7 +9,7 @@ public class Configuration {
 	public static void loadConfiguration (String configFileName) {
 		// should read from a config file, this is a temporary hack
 		
-		StringParameter robotNameParameter = new StringParameter("ROBOT_NAME", "ROBOMAGELLAN");
+		StringParameter robotNameParameter = new StringParameter("ROBOT_NAME", "RoboMagellan");
 		StringParameter commPortNameParameter = new StringParameter("COMM_PORT", "COM10");
 		IntegerParameter baudRateParameter = new IntegerParameter("COMM_PORT_BAUD_RATE", 115200);
 
