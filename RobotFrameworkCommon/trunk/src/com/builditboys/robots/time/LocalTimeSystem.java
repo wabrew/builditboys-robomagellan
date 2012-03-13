@@ -30,7 +30,7 @@ public class LocalTimeSystem extends AbstractTimeSystem {
 		instance.correspondNow(ltime);
 	}
 	
-	public static int currentLocalTime () {
+	public static int currentTime () {
 		return instance.currentTimeInt();
 	}
 

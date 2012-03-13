@@ -5,6 +5,10 @@ import java.lang.reflect.Method;
 
 public class MiscUtilities {
 	
+	public static int booleanToInt (boolean val) {
+		return val ? 1 : 0;
+	}
+	
 	public static String shortObjectName (Object obj) {
 		return obj.getClass().getSimpleName() + '@' + Integer.toHexString(obj.hashCode());
 	}

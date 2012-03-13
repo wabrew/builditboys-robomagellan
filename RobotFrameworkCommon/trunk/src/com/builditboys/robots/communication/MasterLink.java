@@ -2,7 +2,7 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
-import com.builditboys.robots.time.*;
+import com.builditboys.robots.time.SystemTimeSystem;
 
 public class MasterLink extends AbstractLink {
 
@@ -96,7 +96,7 @@ public class MasterLink extends AbstractLink {
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedDidProceedState) {
 				setLinkState(LinkStateEnum.LinkReadyState);
-				lastKeepAliveReceivedTime = InternalTimeSystem.currentInternalTime();
+				lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message
@@ -106,7 +106,7 @@ public class MasterLink extends AbstractLink {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
 							oprotocol.sendKeepAlive();
-							lastKeepAliveSentTime = InternalTimeSystem.currentInternalTime();
+							lastKeepAliveSentTime = SystemTimeSystem.currentTime();
 						}
 						else {
 							linkWait(timeToNextSend);
@@ -196,7 +196,7 @@ public class MasterLink extends AbstractLink {
 			notify();
 			break;
 		}
-		lastKeepAliveReceivedTime = InternalTimeSystem.currentInternalTime();
+		lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
 	}
 	
 	// --------------------------------------------------------------------------------

@@ -11,6 +11,7 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE
 import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
 
 import com.builditboys.robots.time.InternalTimeSystem;
+import com.builditboys.robots.time.LocalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class Receiver extends AbstractSenderReceiver {
@@ -25,7 +26,7 @@ public class Receiver extends AbstractSenderReceiver {
 	private LinkMessage receivedMessage;
 	private AbstractChannel receivedChannel;
 	private AbstractProtocol receivedProtocol;
-	private long receivedTime;
+	private long receivedTime;   // in internal time
 	private boolean receivedOk;
 
 	private byte lastSyncByte;
@@ -114,10 +115,10 @@ public class Receiver extends AbstractSenderReceiver {
 		}
 
 		if (receivedOk) {
-			receivedTime = InternalTimeSystem.currentInternalTime();
+			receivedTime = InternalTimeSystem.currentTime();
 
 			synchronized (System.out) {
-				System.out.print(InternalTimeSystem.currentInternalTime());
+				System.out.print(LocalTimeSystem.currentTime());
 				System.out.print(" : " + link.getRole() + " Received: ");
 				printRaw();
 				System.out.println();
@@ -249,7 +250,7 @@ public class Receiver extends AbstractSenderReceiver {
 
 	private void handleReceiveException(ReceiveException e) {
 		AbstractLink link = inputChannels.getLink();
-		receivedTime = InternalTimeSystem.currentInternalTime();
+		receivedTime = InternalTimeSystem.currentTime();
 		link.receiveReceiverException(e);
 	}
 

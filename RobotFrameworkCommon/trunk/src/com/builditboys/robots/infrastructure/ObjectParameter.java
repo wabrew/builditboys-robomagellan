@@ -1,5 +1,7 @@
 package com.builditboys.robots.infrastructure;
 
+import com.builditboys.robots.utilities.MiscUtilities;
+
 public class ObjectParameter extends AbstractParameter implements ParameterInterface {
 	
 	Object value = null;
@@ -28,7 +30,7 @@ public class ObjectParameter extends AbstractParameter implements ParameterInter
 	// --------------------------------------------------------------------------------
 
 	public String toString() {
-		return "Object parm: " + value;
+		return "Object parm: " + MiscUtilities.bestObjectName(value);
 	}
 
 

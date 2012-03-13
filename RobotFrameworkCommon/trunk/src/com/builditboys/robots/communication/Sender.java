@@ -12,6 +12,7 @@ import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE
 import java.io.IOException;
 
 import com.builditboys.robots.time.InternalTimeSystem;
+import com.builditboys.robots.time.LocalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class Sender extends AbstractSenderReceiver {
@@ -26,7 +27,7 @@ public class Sender extends AbstractSenderReceiver {
 	private int sentCRC1;
 	private int sentCRC2;
 	private LinkMessage sentMessage;
-	long sentTime;
+	long sentTime;  // in internal time
 
 	private FillableBuffer preambleBuffer;
 	private FillableBuffer postambleBuffer;
@@ -112,10 +113,10 @@ public class Sender extends AbstractSenderReceiver {
 		sendPostamble();
 		sendPostSync();
 
-		sentTime = InternalTimeSystem.currentInternalTime();
+		sentTime = InternalTimeSystem.currentTime();
 
 		synchronized (System.out){
-			System.out.print(InternalTimeSystem.currentInternalTime());
+			System.out.print(LocalTimeSystem.currentTime());
 			System.out.print(" : " + link.getRole() + " Sent    : ");
 			printRaw();
 			System.out.println();

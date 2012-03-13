@@ -1,6 +1,5 @@
 package com.builditboys.robots.communication;
 
-import com.builditboys.robots.infrastructure.AbstractNotification;
 import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class LinkControlProtocol extends AbstractProtocol {
@@ -15,8 +14,8 @@ public class LinkControlProtocol extends AbstractProtocol {
 	private LinkControlProtocol() {
 	}
 
-	public LinkControlProtocol(ProtocolRoleEnum rol) {
-		role = rol;
+	public LinkControlProtocol(ProtocolRoleEnum role) {
+		protocolRole = role;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -41,7 +40,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// --------------------------------------------------------------------------------
 	// Link Control Messages - keep in sync with the PSoC
 	
-	public static final int COMM_CONTROL_MESSAGE_LENGTH = 1;
+	public static final int LINK_CONTROL_MESSAGE_LENGTH = 1;
 	
 	public static final int MS_DO_PREPARE      = 0;
 	public static final int MS_DO_PROCEED      = 1;
@@ -52,11 +51,52 @@ public class LinkControlProtocol extends AbstractProtocol {
 
 	public static final int IM_ALIVE           = 5;
 
+	public enum LinkControlMessageEnum {
+		MASTER_DO_PREPARE(MS_DO_PREPARE),
+		MASTER_DO_PROCEED(MS_DO_PROCEED),
+		
+		SLAVE_NEED_DO_PREPARE(SM_NEED_DO_PREPARE),
+		SLAVE_DID_PREPARE(SM_DID_PREPARE),
+		SLAVE_DID_PROCEED(SM_DID_PROCEED),
+		
+		MASTER_SLAVE_IM_ALIVE(IM_ALIVE);
+		
+		private int messageNum;
+		
+		private LinkControlMessageEnum (int num) {
+			messageNum = num;
+			add(messageNum, this);
+		}
+		
+		private static void add (int num, LinkControlMessageEnum it) {
+			numToEnum[num] = it;
+		}
+		
+		private static int largestNum = IM_ALIVE;
+			private static LinkControlMessageEnum numToEnum[] = new LinkControlMessageEnum[largestNum];
+
+		// use this to get the mode number for an enum
+		public int getMessageNum() {
+			return messageNum;
+		}
+
+		// use this to map a mode number to its enum
+		public static LinkControlMessageEnum numToEnum(int num) {
+			if ((num > numToEnum.length) || (num < 0)) {
+				throw new IndexOutOfBoundsException("num out of range");
+			}
+			return numToEnum[num];
+		}
+	}
+	
 	// --------------------------------------------------------------------------------
 	// Sending messages - Master to Slave messages
 
 	public void sendDoPrepare(boolean doWait) throws InterruptedException {
-		LinkMessage message = new LinkMessage(channelNumber, COMM_CONTROL_MESSAGE_LENGTH, doWait);
+		if (protocolRole != ProtocolRoleEnum.MASTER) {
+			throw new IllegalStateException();
+		}	
+		LinkMessage message = new LinkMessage(channelNumber, LINK_CONTROL_MESSAGE_LENGTH, doWait);
 		message.addByte((byte) MS_DO_PREPARE);
 		channel.addMessage(message);
 		if (doWait) {
@@ -65,6 +105,9 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	public void sendDoProceed(boolean doWait) throws InterruptedException {
+		if (protocolRole != ProtocolRoleEnum.MASTER) {
+			throw new IllegalStateException();
+		}	
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) MS_DO_PROCEED);
 		channel.addMessage(message);
@@ -77,6 +120,9 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// Sending messages - Slave to Master messages
 
 	public void sendNeedDoPrepare(boolean doWait) throws InterruptedException {
+		if (protocolRole != ProtocolRoleEnum.SLAVE) {
+			throw new IllegalStateException();
+		}	
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_NEED_DO_PREPARE);
 		channel.addMessage(message);
@@ -86,6 +132,9 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	public void sendDidPrepare(boolean doWait) throws InterruptedException {
+		if (protocolRole != ProtocolRoleEnum.SLAVE) {
+			throw new IllegalStateException();
+		}	
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_DID_PREPARE);
 		channel.addMessage(message);
@@ -95,6 +144,9 @@ public class LinkControlProtocol extends AbstractProtocol {
 	}
 
 	public void sendDidProceed(boolean doWait) throws InterruptedException {
+		if (protocolRole != ProtocolRoleEnum.SLAVE) {
+			throw new IllegalStateException();
+		}	
 		LinkMessage message = new LinkMessage(channelNumber, doWait);
 		message.addByte((byte) SM_DID_PROCEED);
 		channel.addMessage(message);

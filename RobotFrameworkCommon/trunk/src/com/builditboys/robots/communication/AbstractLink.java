@@ -37,8 +37,8 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	protected LinkControlProtocol iprotocol;
 	protected LinkControlProtocol oprotocol;
 
-	protected long lastKeepAliveSentTime = 0;
-	protected long lastKeepAliveReceivedTime = 0;
+	protected long lastKeepAliveSentTime = 0;       // system time
+	protected long lastKeepAliveReceivedTime = 0;   // system time
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -254,11 +254,11 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	// --------------------------------------------------------------------------------
 
 	protected boolean keepAliveOk() {
-		return ((InternalTimeSystem.currentInternalTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
+		return ((SystemTimeSystem.currentTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
 	}
 
 	protected long timeToNextKeepAlive() {
-		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - InternalTimeSystem.currentInternalTime());
+		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - SystemTimeSystem.currentTime());
 	}
 
 	// --------------------------------------------------------------------------------

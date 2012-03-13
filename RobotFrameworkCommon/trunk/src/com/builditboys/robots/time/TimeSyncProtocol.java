@@ -26,7 +26,6 @@ package com.builditboys.robots.time;
 
 */
 
-import static com.builditboys.robots.communication.LinkParameters.ROBOT_CONTROL_CHANNEL_NUMBER;
 import static com.builditboys.robots.communication.LinkParameters.TIME_SYNC_CHANNEL_NUMBER;
 
 import com.builditboys.robots.communication.AbstractLink;
@@ -35,7 +34,6 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
-import com.builditboys.robots.infrastructure.AbstractNotification;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class TimeSyncProtocol extends AbstractProtocol {
@@ -51,7 +49,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	}
 
 	public TimeSyncProtocol(ProtocolRoleEnum rol) {
-		role = rol;
+		protocolRole = rol;
 	}
 
 	//--------------------------------------------------------------------------------
@@ -85,55 +83,81 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	// Time Sync Messages - keep in sync with the PSoC
 
 	public static final int MS_SET_CLOCK        = 0; // master forcing a slave clock value
-	public static final int MS_CORRESPOND_CLOCK = 1; // make a correspondence between the masters local time and the slaves internal time
+	public static final int MS_CORRESPOND_TIME = 1; // make a correspondence between the masters local time and the slaves internal time
 	
 	public static final int SM_START_SYNC       = 2; // slave initiating a clock sync transaction
 	public static final int MS_REPLY_SYNC       = 3; // master replying to a slave sync request
+	
+	public enum TimeSyncMessageEnum {
+		MASTER_SET_CLOCK(MS_SET_CLOCK),
+		MASTER_CORRESPOND_TIME(MS_CORRESPOND_TIME),
+		
+		SLAVE_START_SYNC(SM_START_SYNC),
+		MASTER_REPLY_SYNC(MS_REPLY_SYNC);
+		
+		private int messageNum;
+		
+		private TimeSyncMessageEnum (int num) {
+			messageNum = num;
+			add(messageNum, this);
+		}
+		
+		private static void add (int num, TimeSyncMessageEnum it) {
+			numToEnum[num] = it;
+		}
+		
+		private static int largestNum = MS_REPLY_SYNC;
+			private static TimeSyncMessageEnum numToEnum[] = new TimeSyncMessageEnum[largestNum];
+
+		// use this to get the mode number for an enum
+		public int getMessageNum() {
+			return messageNum;
+		}
+
+		// use this to map a mode number to its enum
+		public static TimeSyncMessageEnum numToEnum(int num) {
+			if ((num > numToEnum.length) || (num < 0)) {
+				throw new IndexOutOfBoundsException("num out of range");
+			}
+			return numToEnum[num];
+		}
+	}
 	
 	// --------------------------------------------------------------------------------(non-Javadoc)
  	// Sending Messages -- Master to Slave
 	
 	public void sendSetClock (boolean doWait) throws InterruptedException {
-		if (role != ProtocolRoleEnum.MASTER) {
-			throw new IllegalStateException();
-		}
-		TimeSyncMessage mObject = new TimeSyncMessage(MS_SET_CLOCK,
-													  LocalTimeSystem.currentLocalTime());
-		sendMessage(mObject, doWait);
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new TimeSyncMessage(MS_SET_CLOCK,
+											LocalTimeSystem.currentTime()),
+						doWait);
 	}
 	
 	public void sendCorrespondClock (boolean doWait) throws InterruptedException {
-		if (role != ProtocolRoleEnum.MASTER) {
-			throw new IllegalStateException();
-		}
-		TimeSyncMessage mObject = new TimeSyncMessage(MS_CORRESPOND_CLOCK,
-													  LocalTimeSystem.currentLocalTime());
-		sendMessage(mObject, doWait);
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new TimeSyncMessage(MS_CORRESPOND_TIME,
+											LocalTimeSystem.currentTime()),
+						doWait);
 	}
 
 	public void sendReplySync (TimeSyncMessage receivedMessage, boolean doWait) throws InterruptedException {
-		if (role != ProtocolRoleEnum.MASTER) {
-			throw new IllegalStateException();
-		}
-		TimeSyncMessage mObject = new TimeSyncMessage(MS_REPLY_SYNC,
-													  receivedMessage.time1,
-													  receivedMessage.time2,
-													  LocalTimeSystem.currentLocalTime(),
-													  0);
-		sendMessage(mObject, doWait);
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+				     	new TimeSyncMessage(MS_REPLY_SYNC,
+											receivedMessage.time1,
+											receivedMessage.time2,
+											LocalTimeSystem.currentTime(),
+											0),
+						doWait);
 	}
 
 	// --------------------------------------------------------------------------------
 	// Sending Messages -- Slave to Master
 	
 	public void sendStartSync (boolean doWait) throws InterruptedException {
-		if (role != ProtocolRoleEnum.SLAVE) {
-			throw new IllegalStateException();
-		}
-		TimeSyncMessage mObject = new TimeSyncMessage(SM_START_SYNC,
-													  LocalTimeSystem.currentLocalTime());
-		sendMessage(mObject, doWait);
-		LinkMessage message = new LinkMessage(channelNumber, mObject.getLength(), doWait);
+		sendRoleMessage(ProtocolRoleEnum.SLAVE,
+					    new TimeSyncMessage(SM_START_SYNC,
+					    				 	LocalTimeSystem.currentTime()),
+					    doWait);
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -142,7 +166,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	public void receiveMessage (LinkMessage message) throws InterruptedException {
 		TimeSyncMessage mObject = new TimeSyncMessage();
 		mObject.reConstruct(message);
-		switch (role) {	
+		switch (protocolRole) {	
 		case MASTER:
 			receiveMasterMessage(mObject);
 			break;		
@@ -162,7 +186,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		
 		// got a sync request, reply to it
 		case SM_START_SYNC:
-			messageObject.time2 = LocalTimeSystem.currentLocalTime();
+			messageObject.time2 = LocalTimeSystem.currentTime();
 			sendReplySync(messageObject, false);
 			break;
 			
@@ -182,7 +206,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 			break;
 		
 		// setup up the correspondence between the masters local time and our local time
-		case MS_CORRESPOND_CLOCK:
+		case MS_CORRESPOND_TIME:
 			LocalTimeSystem.correspondLocalTime(messageObject.time1);
 			
 		// slave side is not implemented in Java yet, only the PSOC acts as a slave	

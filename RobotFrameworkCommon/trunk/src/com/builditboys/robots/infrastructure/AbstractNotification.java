@@ -1,6 +1,6 @@
 package com.builditboys.robots.infrastructure;
 
-import com.builditboys.robots.time.LocalTimeSystem;
+import com.builditboys.robots.time.InternalTimeSystem;
 
 //See also DistributionList
 //         NotificationInterface
@@ -58,7 +58,7 @@ public abstract class AbstractNotification implements NotificationInterface {
 	// Synchronize so that the notice is stable for all subscribers
 	public synchronized void publish (Object publishedBy, DistributionList distList) {
 		publisher = publishedBy;
-		publicationTime = LocalTimeSystem.currentLocalTime();				
+		publicationTime = InternalTimeSystem.currentTime();				
 		distList.publish(this);
 	}
 		

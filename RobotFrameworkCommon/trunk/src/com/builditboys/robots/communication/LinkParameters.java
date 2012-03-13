@@ -89,7 +89,7 @@ public class LinkParameters {
 	public static final int TIME_SYNC_CHANNEL_NUMBER = 10;
 	public static final int SENSOR_CHANNEL_NUMBER = 11;
 	public static final int ROBOT_CONTROL_CHANNEL_NUMBER = 12;
-	public static final int DRIVER_CHANNEL_NUMBER = 13;
+	public static final int ROBOT_DRIVER_CHANNEL_NUMBER = 13;
 
 
 	//--------------------------------------------------------------------------------

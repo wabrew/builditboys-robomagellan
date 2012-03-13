@@ -6,10 +6,8 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
-import com.builditboys.robots.infrastructure.AbstractNotification;
-import com.builditboys.robots.infrastructure.DistributionList;
-import com.builditboys.robots.infrastructure.ParameterInterface;
-import com.builditboys.robots.infrastructure.ParameterServer;
+import com.builditboys.robots.system.RobotState.EStopIndicatorEnum;
+import com.builditboys.robots.time.LocalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 import static com.builditboys.robots.communication.LinkParameters.*;
 
@@ -19,6 +17,8 @@ public class RobotControlProtocol extends AbstractProtocol {
 	
 	private static int myChannelNumber = ROBOT_CONTROL_CHANNEL_NUMBER;
 	
+	RobotStateMessage robotStateMessage = new RobotStateMessage();
+	
 	// --------------------------------------------------------------------------------
 	// Constructors
 
@@ -26,7 +26,7 @@ public class RobotControlProtocol extends AbstractProtocol {
 	}
 
 	public RobotControlProtocol (ProtocolRoleEnum rol) {
-		role = rol;
+		protocolRole = rol;
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -67,51 +67,110 @@ public class RobotControlProtocol extends AbstractProtocol {
 	public static final int MS_IM_ALIVE         = 5; // tell the robot the master is alive
 	
 	public static final int SM_DID_ESTOP        = 6; // tell the master that an estop occured
-	public static final int SM_IM_ALIVE         = 7; // tell the master that the robot is alive
-	public static final int SM_HERE_IS_MY_STATE = 8; // the robots state
+	public static final int SM_HERE_IS_MY_STATE = 7; // the robots state
+	public static final int SM_IM_ALIVE         = 8; // tell the master that the robot is alive
 	
-	
-	
-	public static final int ROBOT_MODE__SAFE   = 0; // safe mode
-	public static final int ROBOT_MODE__RC     = 1; // R/C mode
-	public static final int ROBOT_MODE__AUTO   = 2; // autonomous mode
-	
-	public static final int ROBOT_HARD_ESTOP     = 0;
-	public static final int ROBOT_SOFT_ESTOP     = 1;
-	public static final int ROBOT_PULSE_ESTOP    = 2;
-	public static final int ROBOT_TIMEOUT1_ESTOP = 3;
-	public static final int ROBOT_TIMEOUT2_ESTOP = 4;
-	
-
-	//--------------------------------------------------------------------------------
-	// Sending messages
-	
-	// fix this
-	public void sendSetMode (boolean doWait) throws InterruptedException {
-		if (role != ProtocolRoleEnum.MASTER) {
-			throw new IllegalStateException();
+	public enum RobotControlMessageEnum {
+		MASTER_SET_MODE(MS_SET_MODE),
+		MASTER_DO_ESTOP(MS_DO_ESTOP),
+		MASTER_CLEAR_ESTOP(MS_CLEAR_ESTOP),
+		MASTER_DO_RESET(MS_DO_RESET),
+		MASTER_DO_DUMP_STATE(MS_DO_DUMP_STATE),
+		MASTER_IM_ALIVE(MS_IM_ALIVE),
+		
+		SLAVE_DID_ESTOP(SM_DID_ESTOP),
+		SLAVE_HERE_IS_MY_STATE(SM_HERE_IS_MY_STATE),
+		SLAVE_IM_ALIVE(SM_IM_ALIVE);
+		
+		private int messageNum;
+		
+		private RobotControlMessageEnum (int num) {
+			messageNum = num;
+			add(messageNum, this);
 		}
-		RobotControlMessage mObject = new RobotControlMessage(MS_SET_MODE);
-		sendMessage(mObject, doWait);
+		
+		private static void add (int num, RobotControlMessageEnum it) {
+			numToEnum[num] = it;
+		}
+		
+		private static int largestNum = SM_HERE_IS_MY_STATE;
+			private static RobotControlMessageEnum numToEnum[] = new RobotControlMessageEnum[largestNum];
+
+		// use this to get the mode number for an enum
+		public int getModeNum() {
+			return messageNum;
+		}
+
+		// use this to map a mode number to its enum
+		public static RobotControlMessageEnum numToEnum(int num) {
+			if ((num > numToEnum.length) || (num < 0)) {
+				throw new IndexOutOfBoundsException("num out of range");
+			}
+			return numToEnum[num];
+		}
+	}
+	
+	//--------------------------------------------------------------------------------
+	// Sending messages -- master to slave
+	
+	public void sendSetMode (RobotControlMessageEnum mode, boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new RobotControlMessage(MS_SET_MODE,
+												mode.getModeNum()),
+						doWait);
+	}
+	
+	public void sendClearEstop (EStopIndicatorEnum indicator, boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new RobotControlMessage(MS_CLEAR_ESTOP,
+												indicator.getIndicatorNum()),
+						doWait);
 	}
 
-	// master to slave
-//	public static final int MS_DO_ESTOP         = 1; // tell the robot to estop
-//	public static final int MS_CLEAR_ESTOP      = 2; // clear an estop situation
-//	public static final int MS_DO_RESET         = 3; // tell the robot to reset
-//	public static final int MS_DO_DUMP_STATE    = 4; // tell the robot to dump its state
-//	public static final int MS_IM_ALIVE         = 5; // tell the robot the master is alive
+	public void sendDoRest (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new RobotControlMessage(MS_DO_RESET),
+						doWait);
+	}
+	
+	public void sendDoDumpState (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new RobotControlMessage(MS_DO_DUMP_STATE),
+						doWait);
+	}
+	
+	public void sendMasterIsAlive (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new RobotControlMessage(MS_IM_ALIVE),
+						doWait);
+	}
+	
+	//--------------------------------------------------------------------------------
+	// Sending messages -- slave to master
 
-	// slave to master
-//	public static final int SM_DID_ESTOP        = 6; // tell the master that an estop occured
-//	public static final int SM_IM_ALIVE         = 7; // tell the master that the robot is alive
-//	public static final int SM_HERE_IS_MY_STATE = 8; // the robots state
+	public void sendDidEstop (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.SLAVE,
+						new RobotControlMessage(SM_DID_ESTOP),
+						doWait);
+	}
+	
+	public void sendHereIsMyState (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.SLAVE,
+						new RobotStateMessage(SM_HERE_IS_MY_STATE),
+						doWait);
+	}
+
+	public void sendSlaveIsAlive (boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.SLAVE,
+						new RobotControlMessage(SM_IM_ALIVE),
+						doWait);
+	}
 
 	//--------------------------------------------------------------------------------
 	// Receiving messages
 
 	public void receiveMessage (LinkMessage message) throws InterruptedException {
-		switch (role) {
+		switch (protocolRole) {
 		case MASTER:
 			receiveMasterMessage(message);
 			break;			
@@ -125,28 +184,31 @@ public class RobotControlProtocol extends AbstractProtocol {
 	
 	//--------------------------------------------------------------------------------
 	// Receiving messages - Master
-
+	
 	public void receiveMasterMessage (LinkMessage message) throws InterruptedException {
 		int indicator = message.peekByte();
 		RobotControlNotification notice;
 		switch (indicator) {
 		
 		case SM_DID_ESTOP:
+			// just publish the event
 			notice = RobotControlNotification.newEstopNotice();
 			notice.publish(this);
 			break;
 			
 		case SM_IM_ALIVE:
+			// just publish the event
 			notice = RobotControlNotification.newIsAliveNotice();
 			notice.publish(this);
 			break;
 
 			
 		case SM_HERE_IS_MY_STATE:
-			RobotStateMessage messageObject2 = new RobotStateMessage();
-			messageObject2.reConstruct(message);
-			// could also just update the existing state object
-			ParameterServer.replaceParameter(messageObject2);
+			// update the state and publish event
+			robotStateMessage.reConstruct(message);
+			RobotState.getInstance().updateState(robotStateMessage.time,
+												 robotStateMessage.mode,
+												 robotStateMessage.estop);
 			notice = RobotControlNotification.newRobotStateNotice();
 			notice.publish(this);
 			break;
@@ -182,16 +244,16 @@ public class RobotControlProtocol extends AbstractProtocol {
 		int arguement = 0;
 		
 		// used to create an empty message to read into
-		RobotControlMessage () {
+		protected RobotControlMessage () {
 			super(1 + 1);
 		}
 
-		RobotControlMessage (int ind) {
+		protected RobotControlMessage (int ind) {
 			super(1 + 1);
 			indicator = ind;
 		}
 		
-		RobotControlMessage (int ind, int arg) {
+		protected RobotControlMessage (int ind, int arg) {
 			super(1 + 1);
 			indicator = ind;
 			arguement = arg;
@@ -211,26 +273,24 @@ public class RobotControlProtocol extends AbstractProtocol {
 	//--------------------------------------------------------------------------------
 	// A class that models a robot control message
 	
-	public class RobotStateMessage extends AbstractProtocolMessage
-								   implements ParameterInterface {
+	public class RobotStateMessage extends AbstractProtocolMessage {
 		int indicator = 0;
 		int time = 0;
 		int mode = 0;
 		int estop = 0;
-		int speedControl = 0;
 		
 		// used to create an empty message to read into
-		RobotStateMessage () {
+		protected RobotStateMessage () {
 			super(1 + 1);
 		}
 
-		RobotStateMessage (int ind, int tim, int amode, int aestop, int aspeedControl) {
+		protected RobotStateMessage (int ind) {
 			super(1 + 1);
 			indicator = ind;
-			time = tim;
-			mode = amode;
-			estop = aestop;
-			speedControl = aspeedControl;
+			time = LocalTimeSystem.currentTime();
+			mode = 0;
+			estop = 0;
+			throw new IllegalStateException("java cannot do robot state");
 		}
 				
 		protected void deConstruct (FillableBuffer buff) {
@@ -238,7 +298,6 @@ public class RobotControlProtocol extends AbstractProtocol {
 			buff.deConstructBytes4(time);
 			buff.deConstructBytes1(mode);
 			buff.deConstructBytes1(estop);
-			buff.deConstructBytes1(speedControl);
 		}
 		
 		protected void reConstruct (FillableBuffer buff) {
@@ -246,13 +305,8 @@ public class RobotControlProtocol extends AbstractProtocol {
 			time = buff.reConstructBytes4();
 			mode = buff.reConstructBytes1();
 			estop = buff.reConstructBytes1();
-			speedControl = buff.reConstructBytes1();
 		}
-		
-		public String getName () {
-			return "Robot State";
-		}
-		
+				
 	}
 	
 }
