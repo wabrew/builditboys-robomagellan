@@ -17,6 +17,7 @@ public class TestCommunications {
 
 	public static void main(String args[]) throws NoSuchPortException, PortInUseException, IOException, UnsupportedCommOperationException {
 //		xxtestLinkThreadsComm();
+		System.out.println("Broken, needs to be updated to use system, dies because system intance is not setup");
 		try {
 			testLinkThreadsComm();
 		} catch (InterruptedException e) {
