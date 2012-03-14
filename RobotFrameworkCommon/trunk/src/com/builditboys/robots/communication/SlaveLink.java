@@ -2,6 +2,7 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
 import com.builditboys.robots.time.SystemTimeSystem;
 
 public class SlaveLink extends AbstractLink implements Runnable {
@@ -31,19 +32,15 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 	public SlaveLink (String nm, LinkPortInterface port) {
 		super(nm, port);
-		setLinkState(LinkStateEnum.LinkInitState, "constructor");
+		setLinkState(LinkStateEnum.LinkInitState);
 		
-		// the protocol's channel will be set when the protocol is associated with a channel
-		iprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.SLAVE);
-		oprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.SLAVE);
-	
-		controlChannelIn = iprotocol.getInputChannel();
-		controlChannelOut = oprotocol.getOutputChannel();
+		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.SLAVE);
+		
+		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getIndicator());
+		linkInputControlProtocol = (LinkControlProtocol) controlChannelIn.getProtocol();
 
-		AbstractChannel.pairChannels(controlChannelIn, controlChannelOut);
-
-		inputChannels.addChannel(controlChannelIn);
-		outputChannels.addChannel(controlChannelOut);
+		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getIndicator());
+		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -73,7 +70,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 	public synchronized void doWork () throws InterruptedException {
 		while (true) {
-			setLinkState(LinkStateEnum.LinkInitState, "one");
+			setLinkState(LinkStateEnum.LinkInitState);
 			
 			// --------------------
 			// wait a little to give the master a chance to start things
@@ -85,8 +82,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// remind the master to do so by sending a NEED_DO_PREPARE
 			// if the master did start things already, just fall through
 			if (linkState != LinkStateEnum.LinkReceivedDoPrepareState) {
-				oprotocol.sendNeedDoPrepare(false);
-				setLinkState(LinkStateEnum.LinkSentNeedDoPrepareState, "two");
+				linkOutputControlProtocol.sendNeedDoPrepare(false);
+				setLinkState(LinkStateEnum.LinkSentNeedDoPrepareState);
 				linkWait(NEED_PREPARE_TIMEOUT);
 			}
 
@@ -94,8 +91,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// if we got a DO_PREPARE, then send DID_PREPARE
 			if (linkState == LinkStateEnum.LinkReceivedDoPrepareState) {
 				// master told us to reset, so we do
-				oprotocol.sendDidPrepare(false);
-				setLinkState(LinkStateEnum.LinkSentDidPrepareState, "three");
+				linkOutputControlProtocol.sendDidPrepare(false);
+				setLinkState(LinkStateEnum.LinkSentDidPrepareState);
 				linkWait(DO_PROCEED_TIMEOUT);
 			}
 			else {
@@ -106,8 +103,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// --------------------
 			// if we got a DO_PROCEED, then send a DID_PROCEED
 			if (linkState == LinkStateEnum.LinkReceivedDoProceedState) {
-				oprotocol.sendDidProceed(false);
-				setLinkState(LinkStateEnum.LinkSentDidProceedState, "four");
+				linkOutputControlProtocol.sendDidProceed(false);
+				setLinkState(LinkStateEnum.LinkSentDidProceedState);
 				linkWait(IM_ALIVE_TIMEOUT);
 			}
 			else {
@@ -119,7 +116,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// if we got an IM_ALIVE, then the link is happy
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
-				setLinkState(LinkStateEnum.LinkReadyState, "five");
+				setLinkState(LinkStateEnum.LinkReadyState);
 				lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
@@ -129,7 +126,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 					if (keepAliveOk()) {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
-							oprotocol.sendKeepAlive();
+							linkOutputControlProtocol.sendKeepAlive();
 							lastKeepAliveSentTime = SystemTimeSystem.currentTime();
 						}
 						else {
@@ -161,12 +158,12 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		// its satisfied here
 		case LinkInitState:
 		case LinkSentNeedDoPrepareState:
-			setLinkState(LinkStateEnum.LinkReceivedDoPrepareState, "six");
+			setLinkState(LinkStateEnum.LinkReceivedDoPrepareState);
 			notify();
 			break;
 		// otherwise, out of sync
 		default:
-			setLinkState(LinkStateEnum.LinkInitState, "seven");
+			setLinkState(LinkStateEnum.LinkInitState);
 			notify();
 			break;
 		}		
@@ -179,12 +176,12 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		case LinkSentNeedDoPrepareState:
 			break;
 		case LinkSentDidPrepareState:
-			setLinkState(LinkStateEnum.LinkReceivedDoProceedState, "eight");
+			setLinkState(LinkStateEnum.LinkReceivedDoProceedState);
 			notify();
 			break;
 		// otherwise, out of sync
 		default:
-			setLinkState(LinkStateEnum.LinkInitState, "nine");
+			setLinkState(LinkStateEnum.LinkInitState);
 			notify();
 			break;
 		}		
@@ -198,7 +195,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			break;
 		// honor the request, go active
 		case LinkSentDidProceedState:
-			setLinkState(LinkStateEnum.LinkReceivedImAliveState, "ten");
+			setLinkState(LinkStateEnum.LinkReceivedImAliveState);
 			notify();
 			break;
 		// stay active
@@ -207,7 +204,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			break;
 		// otherwise, out of sync
 		default:
-			setLinkState(LinkStateEnum.LinkInitState, "eleven");
+			setLinkState(LinkStateEnum.LinkInitState);
 			notify();
 			break;
 		}
@@ -219,33 +216,21 @@ public class SlaveLink extends AbstractLink implements Runnable {
 	
 	protected synchronized void receiveReceiverException (Exception e) {
 		System.out.println("Slave Link Receive Exception");
-		setLinkState(LinkStateEnum.LinkInitState, "twelve");
+		setLinkState(LinkStateEnum.LinkInitState);
 		notify();
 	}
 	
 	// --------------------------------------------------------------------------------
 	// Interaction with the sender and receiver
-	
+		
 	public synchronized boolean isSendableChannel (AbstractChannel channel) {
-//		synchronized (System.out){
-//			System.out.println("slave is sendable");
-//			System.out.println(controlChannelOut);
-//			System.out.println(controlChannelIn);
-//			System.out.println(channel);
-//		}
 		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
-//		synchronized (System.out){
-//			System.out.println("slave is receivable");
-//			System.out.println(controlChannelOut);
-//			System.out.println(controlChannelIn);
-//			System.out.println(channel);
-//		}
 		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
-	}
-	
+	}	
+
 	public synchronized boolean isForceInitialSequenceNumbers () {
 		switch (linkState) {
 		case LinkInitState:
@@ -256,7 +241,6 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		}
 	}
 
-
 	// --------------------------------------------------------------------------------
 
 	public String getRole () {
@@ -265,8 +249,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 
-	private void setLinkState (LinkStateEnum state, String where) {
-//		System.out.println("Slave  -> " + state.toString() + " in " + where);
+	private void setLinkState (LinkStateEnum state) {
+//		System.out.println("Slave  -> " + state.toString());
 		linkState = state;
 	}
 

@@ -2,6 +2,9 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
+import com.builditboys.robots.system.RobotControlProtocol;
+
 public class LinkControlProtocol extends AbstractProtocol {
 
 	public static AbstractProtocol indicator = new LinkControlProtocol();
@@ -14,7 +17,7 @@ public class LinkControlProtocol extends AbstractProtocol {
 	private LinkControlProtocol() {
 	}
 
-	public LinkControlProtocol(ProtocolRoleEnum role) {
+	private LinkControlProtocol(ProtocolRoleEnum role) {
 		protocolRole = role;
 	}
 
@@ -33,10 +36,22 @@ public class LinkControlProtocol extends AbstractProtocol {
 	
 	// --------------------------------------------------------------------------------
 
-	public AbstractProtocol getIndicator() {
+	public static AbstractProtocol getIndicator() {
+		return indicator;
+	}
+	
+	public AbstractProtocol getInstanceIndicator() {
 		return indicator;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static void addProtocolToLink (AbstractLink link, ProtocolRoleEnum rol) {
+		LinkControlProtocol iproto = new LinkControlProtocol(rol);
+		LinkControlProtocol oproto = new LinkControlProtocol(rol);
+		link.addProtocol(iproto, oproto);
+	}
+	
 	// --------------------------------------------------------------------------------
 	// Link Control Messages - keep in sync with the PSoC
 	

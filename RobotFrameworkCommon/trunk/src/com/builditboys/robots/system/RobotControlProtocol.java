@@ -25,7 +25,7 @@ public class RobotControlProtocol extends AbstractProtocol {
 	private RobotControlProtocol() {
 	}
 
-	public RobotControlProtocol (ProtocolRoleEnum rol) {
+	private RobotControlProtocol (ProtocolRoleEnum rol) {
 		protocolRole = rol;
 	}
 	
@@ -44,7 +44,11 @@ public class RobotControlProtocol extends AbstractProtocol {
 	
 	// --------------------------------------------------------------------------------
 
-	public AbstractProtocol getIndicator() {
+	public static AbstractProtocol getIndicator() {
+		return indicator;
+	}
+	
+	public AbstractProtocol getInstanceIndicator() {
 		return indicator;
 	}
 

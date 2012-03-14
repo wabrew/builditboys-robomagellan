@@ -43,22 +43,23 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 */
 	
 	public synchronized void startRobotSystem() throws InterruptedException, IOException {
-		ObjectParameter robotSystemParameter = new ObjectParameter("ROBOT_SYSTEM", this);
 		StringParameter robotNameParameter = (StringParameter) ParameterServer.getParameter("ROBOT_NAME");
 
 		robotName = robotNameParameter.getValue();
-		ParameterServer.addParameter(robotSystemParameter);
-	
-		masterLink = new MasterLink("ROBOT_LINK", linkPort);
-		ParameterServer.addParameter(masterLink);
-		masterLink.startLink();
-		System.out.println("Link started");
-
+		ParameterServer.addParameter(this);
+		
 		LocalTimeSystem.startLocalTimeNow();
 		System.out.println("Local time initialized");
 
 		start1Notice.publish(this);
 		wait(ROBOT_SYSTEM_PHASE_WAIT);
+
+		masterLink = new MasterLink("ROBOT_LINK", linkPort);
+		ParameterServer.addParameter(masterLink);
+		masterLink.startLink();
+		System.out.println("Link started");
+		
+		
 
 		start2Notice.publish(this);
 		wait(ROBOT_SYSTEM_PHASE_WAIT);
@@ -86,7 +87,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	// --------------------------------------------------------------------------------
 
 	public String getName () {
-		return robotName;
+		return "ROBOT_SYSTEM";
 	}
 	
 	public String toString () {

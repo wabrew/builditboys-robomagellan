@@ -2,6 +2,7 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
 import com.builditboys.robots.time.SystemTimeSystem;
 
 public class MasterLink extends AbstractLink {
@@ -29,17 +30,13 @@ public class MasterLink extends AbstractLink {
 		super(nm, port);
 		setLinkState(LinkStateEnum.LinkInitState);
 		
-		// the protocol's channel will be set when the protocol is associated with a channel
-		iprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.MASTER);
-		oprotocol = new LinkControlProtocol(LinkControlProtocol.ProtocolRoleEnum.MASTER);
+		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.MASTER);
+		
+		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getIndicator());
+		linkInputControlProtocol = (LinkControlProtocol) controlChannelIn.getProtocol();
 
-		controlChannelIn = iprotocol.getInputChannel();
-		controlChannelOut = oprotocol.getOutputChannel();
-
-		AbstractChannel.pairChannels(controlChannelIn, controlChannelOut);
-
-		inputChannels.addChannel(controlChannelIn);
-		outputChannels.addChannel(controlChannelOut);
+		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getIndicator());
+		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -74,7 +71,7 @@ public class MasterLink extends AbstractLink {
 			
 			// --------------------
 			// start off by sending a DO_PREPARE
-			oprotocol.sendDoPrepare(false);
+			linkOutputControlProtocol.sendDoPrepare(false);
 			setLinkState(LinkStateEnum.LinkSentDoPrepareState);
 			linkWait(DID_PREPARE_TIMEOUT);
 
@@ -82,7 +79,7 @@ public class MasterLink extends AbstractLink {
 			// --------------------
 			// if we got a DID_PREPARE, then send a DO_PROCEED
 			if (linkState == LinkStateEnum.LinkReceivedDidPrepareState) {
-				oprotocol.sendDoProceed(false);
+				linkOutputControlProtocol.sendDoProceed(false);
 				setLinkState(LinkStateEnum.LinkSentDoProceedState);
 				linkWait(DID_PROCEED_TIMEOUT);
 			}
@@ -105,7 +102,7 @@ public class MasterLink extends AbstractLink {
 					if (keepAliveOk()) {
 						long timeToNextSend = timeToNextKeepAlive();
 						if (timeToNextSend <= 0) {
-							oprotocol.sendKeepAlive();
+							linkOutputControlProtocol.sendKeepAlive();
 							lastKeepAliveSentTime = SystemTimeSystem.currentTime();
 						}
 						else {
@@ -210,27 +207,15 @@ public class MasterLink extends AbstractLink {
 	
 	// --------------------------------------------------------------------------------
 	// Interaction with the sender and receiver
-
+	
 	public synchronized boolean isSendableChannel (AbstractChannel channel) {
-//		synchronized (System.out){
-//			System.out.println("master is sendable");
-//			System.out.println(controlChannelOut);
-//			System.out.println(controlChannelIn);
-//			System.out.println(channel);
-//		}
 		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
 	}
 	
 	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
-//		synchronized (System.out){
-//			System.out.println("master is receivable");
-//			System.out.println(controlChannelOut);
-//			System.out.println(controlChannelIn);
-//			System.out.println(channel);
-//		}
 		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
-	}
-	
+	}	
+
 	public synchronized boolean isForceInitialSequenceNumbers () {
 		switch (linkState) {
 		case LinkInitState:

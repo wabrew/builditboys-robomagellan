@@ -8,7 +8,7 @@ import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.system.AbstractRobotSystem;
 import com.builditboys.robots.time.*;
 
-// a comm link hold together all the pieces
+// a comm link holds together all the pieces
 // the port
 // the send and receive threads
 // the input and output channel collections
@@ -34,8 +34,8 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	protected InputChannel controlChannelIn;
 	protected OutputChannel controlChannelOut;
 
-	protected LinkControlProtocol iprotocol;
-	protected LinkControlProtocol oprotocol;
+	protected LinkControlProtocol linkInputControlProtocol;
+	protected LinkControlProtocol linkOutputControlProtocol;
 
 	protected long lastKeepAliveSentTime = 0;       // system time
 	protected long lastKeepAliveReceivedTime = 0;   // system time
@@ -86,20 +86,20 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	// --------------------------------------------------------------------------------
 	// Finding channels
 
-	public AbstractChannel getInputChannelN(int channelNumber) {
-		return inputChannels.getChannelByNumber(channelNumber);
+	public InputChannel getInputChannelN(int channelNumber) {
+		return (InputChannel) inputChannels.getChannelByNumber(channelNumber);
 	}
 
-	public AbstractChannel getOutputChannelN(int channelNumber) {
-		return outputChannels.getChannelByNumber(channelNumber);
+	public OutputChannel getOutputChannelN(int channelNumber) {
+		return (OutputChannel) outputChannels.getChannelByNumber(channelNumber);
 	}
 
-	public AbstractChannel getInputChannelByProtocol(AbstractProtocol protocol) {
-		return inputChannels.getChannelByProtocol(protocol);
+	public InputChannel getInputChannelByProtocol(AbstractProtocol protocol) {
+		return (InputChannel) inputChannels.getChannelByProtocol(protocol);
 	}
 
-	public AbstractChannel getOutputChannelByProtocol(AbstractProtocol protocol) {
-		return outputChannels.getChannelByProtocol(protocol);
+	public OutputChannel getOutputChannelByProtocol(AbstractProtocol protocol) {
+		return (OutputChannel) outputChannels.getChannelByProtocol(protocol);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -301,12 +301,15 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	protected abstract void receiveReceiverException(Exception e);
 
 	// --------------------------------------------------------------------------------
+	// Interaction with the sender and receiver
 
-	public abstract boolean isSendableChannel(AbstractChannel channel);
-
-	public abstract boolean isReceivableChannel(AbstractChannel channel);
-
+	public abstract boolean isSendableChannel (AbstractChannel channel);
+	
+	public abstract boolean isReceivableChannel (AbstractChannel channel);
+	
 	public abstract boolean isForceInitialSequenceNumbers();
+
+	// --------------------------------------------------------------------------------
 
 	protected void linkWait(long timeout) throws InterruptedException {
 		// System.out.println(getRole() + " start wait");

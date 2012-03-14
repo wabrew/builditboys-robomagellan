@@ -29,9 +29,11 @@ public abstract class AbstractProtocol {
 	protected abstract OutputChannel getOutputChannel ();
 	
 
-	//--------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------
 
-	protected abstract AbstractProtocol getIndicator();
+	public abstract AbstractProtocol getInstanceIndicator();
+
+	// --------------------------------------------------------------------------------
 	
 	protected void setChannel (AbstractChannel chanl) {
 		channel = chanl;

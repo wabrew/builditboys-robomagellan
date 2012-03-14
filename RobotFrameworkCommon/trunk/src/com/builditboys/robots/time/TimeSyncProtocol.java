@@ -48,7 +48,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	private TimeSyncProtocol() {
 	}
 
-	public TimeSyncProtocol(ProtocolRoleEnum rol) {
+	private TimeSyncProtocol(ProtocolRoleEnum rol) {
 		protocolRole = rol;
 	}
 
@@ -67,12 +67,17 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	
 	// --------------------------------------------------------------------------------
 
-	public AbstractProtocol getIndicator() {
+	public static AbstractProtocol getIndicator() {
+		return indicator;
+	}
+
+	public AbstractProtocol getInstanceIndicator() {
 		return indicator;
 	}
 
 	// --------------------------------------------------------------------------------
 
+	// call this after the link is setup
 	public static void addProtocolToLink (AbstractLink link, ProtocolRoleEnum rol) {
 		TimeSyncProtocol iproto = new TimeSyncProtocol(rol);
 		TimeSyncProtocol oproto = new TimeSyncProtocol(rol);
