@@ -6,28 +6,12 @@ import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
 import com.builditboys.robots.time.SystemTimeSystem;
 
 public class MasterLink extends AbstractLink {
-
-	private enum LinkStateEnum {
-		LinkInitState,
-		
-		LinkSentDoPrepareState,
-		LinkReceivedDidPrepareState,
-		
-		LinkSentDoProceedState,
-		LinkReceivedDidProceedState,
-		
-		LinkReadyState,
-		
-		LinkActiveState;
-	}
-
-	protected LinkStateEnum linkState;
 	
 	//--------------------------------------------------------------------------------
 	// Constructors
 
 	public MasterLink (String nm, LinkPortInterface port) {
-		super(nm, port);
+		super("Master", nm, port);
 		setLinkState(LinkStateEnum.LinkInitState);
 		
 		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.MASTER);
@@ -39,26 +23,6 @@ public class MasterLink extends AbstractLink {
 		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
 	}
 	
-	// --------------------------------------------------------------------------------
-	
-	public void enable() {
-		if (linkState == LinkStateEnum.LinkReadyState) {
-			linkState = LinkStateEnum.LinkActiveState;
-		}
-		else {
-			throw new IllegalStateException();
-		}
-	}
-	
-	public void disable() {
-		if (linkState == LinkStateEnum.LinkActiveState) {
-			linkState = LinkStateEnum.LinkReadyState;
-		}
-		// for any other states, just do nothing since you are already
-		// effectively disabled
-	}
-
-
 	// --------------------------------------------------------------------------------
 	// Do some work, the top level, gets called in a loop
 	
@@ -125,7 +89,7 @@ public class MasterLink extends AbstractLink {
 	}
 	
 	// --------------------------------------------------------------------------------
-	// The receiver link control protocol calls this when it gets a link control message
+	// Master message receivers
 	
 	protected synchronized void receivedNeedDoPrepare (AbstractChannel channel, LinkMessage message) {
 		switch (linkState) {
@@ -197,24 +161,7 @@ public class MasterLink extends AbstractLink {
 	}
 	
 	// --------------------------------------------------------------------------------
-	// The receiver calls this when it detects an error
-	
-	protected synchronized void receiveReceiverException (Exception e) {
-		System.out.println("Master Link Receive Exception");
-		setLinkState(LinkStateEnum.LinkInitState);
-		notify();
-	}
-	
-	// --------------------------------------------------------------------------------
 	// Interaction with the sender and receiver
-	
-	public synchronized boolean isSendableChannel (AbstractChannel channel) {
-		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
-	}
-	
-	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
-		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
-	}	
 
 	public synchronized boolean isForceInitialSequenceNumbers () {
 		switch (linkState) {
@@ -225,19 +172,5 @@ public class MasterLink extends AbstractLink {
 			return false;
 		}
 	}
-
-	// --------------------------------------------------------------------------------
-
-	public String getRole () {
-		return "Master";
-	}
-	
-	// --------------------------------------------------------------------------------
-
-	private void setLinkState (LinkStateEnum state) {
-//		System.out.println("Master -> " + state.toString());
-		linkState = state;
-	}
-
 
 }

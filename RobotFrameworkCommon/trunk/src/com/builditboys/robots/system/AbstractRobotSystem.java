@@ -31,44 +31,69 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	protected DistributionList systemDistList = SystemNotification.getDistributionList();
 
 	// --------------------------------------------------------------------------------
-
-/*
-	static AbstractRobotSystem getInstance() {
-		if (instance != null) {
-			return instance;
-		} else {
-			throw new IllegalStateException("Instance not setup by child class");
-		}
-	}
-*/
 	
 	public synchronized void startRobotSystem() throws InterruptedException, IOException {
+		startRobotSystemPhase1();
+		startRobotSystemPhase2();
+		startRobotSystemPhase3();
+		
+		System.out.println("**Basic setup complete");
+		ParameterServer.print();
+		System.out.println();
+	}
+	
+	private void startRobotSystemPhase1 () throws InterruptedException {
+		System.out.println("**Starting phase 1 setup");
 		StringParameter robotNameParameter = (StringParameter) ParameterServer.getParameter("ROBOT_NAME");
 
 		robotName = robotNameParameter.getValue();
 		ParameterServer.addParameter(this);
 		
+		// set up local time first, many things depend on it including notifications
 		LocalTimeSystem.startLocalTimeNow();
 		System.out.println("Local time initialized");
 
+		// send out the first start phase notification
 		start1Notice.publish(this);
-		wait(ROBOT_SYSTEM_PHASE_WAIT);
+		System.out.println("Phase 1 notification sent");
+		wait(ROBOT_SYSTEM_PHASE_WAIT);		
+	}
+	
+	private void startRobotSystemPhase2 () throws InterruptedException, IOException {
+		System.out.println("**Starting phase 2 setup");
 
+		// get the link to the robot set up
 		masterLink = new MasterLink("ROBOT_LINK", linkPort);
 		ParameterServer.addParameter(masterLink);
+
+// starting the link should probably happen by listening to a start notice
 		masterLink.startLink();
 		System.out.println("Link started");
 		
 		
-
+		// other stuff goes here
+		
 		start2Notice.publish(this);
-		wait(ROBOT_SYSTEM_PHASE_WAIT);
+		System.out.println("Phase 2 notification sent");
+		wait(ROBOT_SYSTEM_PHASE_WAIT);		
 	}
 
+	private void startRobotSystemPhase3 () {
+		System.out.println("**Starting phase 3 setup");
+		
+	}
+
+
+	// --------------------------------------------------------------------------------
+
 	public synchronized void stopRobotSystem() throws InterruptedException, IOException {
+		System.out.println();
+		System.out.println("Shutting down");
 		stopNotice.publish(this);
+		System.out.println("Stop notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);
 
+// should really just listen for the stop notice
 		masterLink.stopLink();
 	}
 

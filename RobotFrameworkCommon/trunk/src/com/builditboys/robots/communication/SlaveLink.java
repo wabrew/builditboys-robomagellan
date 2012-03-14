@@ -7,31 +7,11 @@ import com.builditboys.robots.time.SystemTimeSystem;
 
 public class SlaveLink extends AbstractLink implements Runnable {
 	
-	private enum LinkStateEnum {	
-		LinkInitState,
-		
-		LinkSentNeedDoPrepareState,
-		
-		LinkReceivedDoPrepareState,
-		LinkSentDidPrepareState,
-		
-		LinkReceivedDoProceedState,
-		LinkSentDidProceedState,
-		
-		LinkReceivedImAliveState,
-		
-		LinkReadyState,
-		
-		LinkActiveState;
-	}
-
-	protected LinkStateEnum linkState;
-	
 	//--------------------------------------------------------------------------------
 	// Constructors
 
 	public SlaveLink (String nm, LinkPortInterface port) {
-		super(nm, port);
+		super("Slave", nm, port);
 		setLinkState(LinkStateEnum.LinkInitState);
 		
 		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.SLAVE);
@@ -41,25 +21,6 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getIndicator());
 		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
-	}
-
-	// --------------------------------------------------------------------------------
-	
-	public void enable() {
-		if (linkState == LinkStateEnum.LinkReadyState) {
-			linkState = LinkStateEnum.LinkActiveState;
-		}
-		else {
-			throw new IllegalStateException();
-		}
-	}
-	
-	public void disable() {
-		if (linkState == LinkStateEnum.LinkActiveState) {
-			linkState = LinkStateEnum.LinkReadyState;
-		}
-		// for any other states, just do nothing since you are already
-		// effectively disabled
 	}
 
 	// --------------------------------------------------------------------------------
@@ -150,7 +111,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 
 	// --------------------------------------------------------------------------------
-	// The receiver link control protocol calls this when it gets a link control message
+	// Slave message receivers
 	
 	protected synchronized void receivedDoPrepare (AbstractChannel channel, LinkMessage message) {
 		switch (linkState) {
@@ -187,7 +148,6 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		}		
 	}
 		
-	
 	protected synchronized void receivedImAlive (AbstractChannel channel, LinkMessage message) {
 		switch (linkState) {
 		// need prepare state discards everything but a do prepare
@@ -212,25 +172,8 @@ public class SlaveLink extends AbstractLink implements Runnable {
 	}
 		
 	// --------------------------------------------------------------------------------
-	// The receiver calls this when it detects an error
-	
-	protected synchronized void receiveReceiverException (Exception e) {
-		System.out.println("Slave Link Receive Exception");
-		setLinkState(LinkStateEnum.LinkInitState);
-		notify();
-	}
-	
-	// --------------------------------------------------------------------------------
 	// Interaction with the sender and receiver
 		
-	public synchronized boolean isSendableChannel (AbstractChannel channel) {
-		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
-	}
-	
-	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
-		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
-	}	
-
 	public synchronized boolean isForceInitialSequenceNumbers () {
 		switch (linkState) {
 		case LinkInitState:
@@ -240,18 +183,5 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			return false;
 		}
 	}
-
-	// --------------------------------------------------------------------------------
-
-	public String getRole () {
-		return "Slave ";
-	}
 	
-	// --------------------------------------------------------------------------------
-
-	private void setLinkState (LinkStateEnum state) {
-//		System.out.println("Slave  -> " + state.toString());
-		linkState = state;
-	}
-
 }

@@ -130,6 +130,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	protected synchronized void resetSequenceNumber () {
 		sequenceNumber = SEQUENCE_NUM_MIN - 1;
 	}
+	
 	protected synchronized int bestSequenceNumber() {
 		if (link.isForceInitialSequenceNumbers()) {
 			sequenceNumber = SEQUENCE_NUM_MIN;

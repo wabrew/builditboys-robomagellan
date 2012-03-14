@@ -8,14 +8,47 @@ import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.system.AbstractRobotSystem;
 import com.builditboys.robots.time.*;
 
-// a comm link holds together all the pieces
+// a link holds together all the pieces for communicating with a peripheral
 // the port
 // the send and receive threads
 // the input and output channel collections
 
 public abstract class AbstractLink implements ParameterInterface, Runnable {
 
+	protected enum LinkStateEnum {
+		// --------------------
+		// Shared states
+		LinkInitState,
+		LinkReadyState,
+		LinkActiveState,
+		
+		
+		// --------------------
+		// Master states
+		LinkSentDoPrepareState,
+		LinkReceivedDidPrepareState,
+		
+		LinkSentDoProceedState,
+		LinkReceivedDidProceedState,
+		
+		// --------------------
+		// Slave states
+		LinkSentNeedDoPrepareState,
+		
+		LinkReceivedDoPrepareState,
+		LinkSentDidPrepareState,
+		
+		LinkReceivedDoProceedState,
+		LinkSentDidProceedState,
+		
+		LinkReceivedImAliveState;	
+	}
+
+	protected LinkStateEnum linkState;
+	
+
 	protected String name;
+	protected String role;
 	
 	protected Sender sender;
 	protected Receiver receiver;
@@ -43,13 +76,48 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	// --------------------------------------------------------------------------------
 	// Constructors
 
-	protected AbstractLink(String nm, LinkPortInterface port) {
+	protected AbstractLink(String rol, String nm, LinkPortInterface port) {
 		name = nm;
+		role = rol;
 		commPort = port;
 		inputChannels = new InputChannelCollection(this);
 		outputChannels = new OutputChannelCollection(this);
 		sender = new Sender(this, commPort);
 		receiver = new Receiver(this, commPort);
+	}
+
+	// --------------------------------------------------------------------------------
+	// Once the link has been established (the master and slave have done
+	// their handshake), you enable it and that lets normal traffic proceed
+	
+	public void enable() {
+		if (linkState == LinkStateEnum.LinkReadyState) {
+			linkState = LinkStateEnum.LinkActiveState;
+		}
+		else {
+			throw new IllegalStateException();
+		}
+	}
+	
+	public void disable() {
+		if (linkState == LinkStateEnum.LinkActiveState) {
+			linkState = LinkStateEnum.LinkReadyState;
+		}
+		// for any other states, just do nothing since you are already
+		// effectively disabled
+	}
+	
+	// --------------------------------------------------------------------------------
+	// Adding a protocol
+
+	public void addProtocol(AbstractProtocol iproto, AbstractProtocol oproto) {
+		InputChannel channelIn = iproto.getInputChannel();
+		OutputChannel channelOut = oproto.getOutputChannel();
+
+		AbstractChannel.pairChannels(channelIn, channelOut);
+
+		inputChannels.addChannel(channelIn);
+		outputChannels.addChannel(channelOut);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -62,15 +130,9 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		return "Link: \"" + name + "\"";
 	}
 	
-	// --------------------------------------------------------------------------------
-	// Starting things up
-
-	// see startThreads below
-
-	// enable and disable let you turn on and off normal message processing
-	public abstract void enable();
-
-	public abstract void disable();
+	public String getRole () {
+		return role;
+	}
 
 	// --------------------------------------------------------------------------------
 	// Channel collections
@@ -103,19 +165,6 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Adding a protocol
-
-	public void addProtocol(AbstractProtocol iproto, AbstractProtocol oproto) {
-		InputChannel channelIn = iproto.getInputChannel();
-		OutputChannel channelOut = oproto.getOutputChannel();
-
-		AbstractChannel.pairChannels(channelIn, channelOut);
-
-		inputChannels.addChannel(channelIn);
-		outputChannels.addChannel(channelOut);
-	}
-
-	// --------------------------------------------------------------------------------
 	// Run
 
 	public void run() {
@@ -144,6 +193,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		System.out.println(threadName + ": thread exiting");
 	}
 
+	// a subclass defines this, it is were all the real work happens
 	public abstract void doWork() throws InterruptedException;
 
 	private void handleThreadException (Exception e) {
@@ -184,12 +234,6 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		sender.threadJoin();
 		receiver.threadJoin();
 		threadJoin();
-	}
-
-	// --------------------------------------------------------------------------------
-
-	public void threadJoin() throws InterruptedException {
-		thread.join();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -250,6 +294,10 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 			// loop to avoid spurious awakenings
 		} while (threadControl == ThreadControlEnum.SUSPEND);
 	}
+	
+	public void threadJoin() throws InterruptedException {
+		thread.join();
+	}
 
 	// --------------------------------------------------------------------------------
 
@@ -262,9 +310,35 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
+	// The receiver calls this when it detects an error
+	
+	protected synchronized void receiveReceiverException (Exception e) {
+		System.out.println(role + "Link Receive Exception");
+		setLinkState(LinkStateEnum.LinkInitState);
+		notify();
+	}
+		
+	// --------------------------------------------------------------------------------
+	// Interaction with the sender and receiver
+	
+	public synchronized boolean isSendableChannel (AbstractChannel channel) {
+		return (channel == controlChannelOut) || (linkState == LinkStateEnum.LinkActiveState);
+	}
+	
+	public synchronized boolean isReceivableChannel (AbstractChannel channel) {
+		return (channel == controlChannelIn) || (linkState == LinkStateEnum.LinkActiveState);
+	}	
+
+	// subclasses must define this
+	public abstract boolean isForceInitialSequenceNumbers ();
+	
+	// --------------------------------------------------------------------------------
 	// These methods are used for the receive side to communicate to the
 	// link important information about how the link is working
+	// These are dummy implementations so that you only have to override
+	// the ones that you actually need.
 
+	// --------------------
 	// slave to master
 	protected void receivedNeedDoPrepare(AbstractChannel rchannel,
 			LinkMessage message) {
@@ -281,6 +355,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		throw new IllegalStateException();
 	}
 
+	// --------------------
 	// master to slave
 	protected void receivedDoPrepare(AbstractChannel rchannel,
 			LinkMessage message) {
@@ -292,22 +367,11 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		throw new IllegalStateException();
 	}
 
+	// --------------------
 	// both directions
 	protected void receivedImAlive(AbstractChannel rchannel, LinkMessage message) {
 		throw new IllegalStateException();
 	}
-
-	// if receive problems
-	protected abstract void receiveReceiverException(Exception e);
-
-	// --------------------------------------------------------------------------------
-	// Interaction with the sender and receiver
-
-	public abstract boolean isSendableChannel (AbstractChannel channel);
-	
-	public abstract boolean isReceivableChannel (AbstractChannel channel);
-	
-	public abstract boolean isForceInitialSequenceNumbers();
 
 	// --------------------------------------------------------------------------------
 
@@ -319,6 +383,9 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 
 	// --------------------------------------------------------------------------------
 
-	public abstract String getRole();
+	protected void setLinkState (LinkStateEnum state) {
+//		System.out.println("Master -> " + state.toString());
+		linkState = state;
+	}
 
 }
