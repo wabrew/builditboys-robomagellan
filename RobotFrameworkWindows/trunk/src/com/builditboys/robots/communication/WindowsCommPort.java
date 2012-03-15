@@ -240,11 +240,11 @@ public class WindowsCommPort {
 
 	// --------------------------------------------------------------------------------
 
-	private static final int bauds[] = { 2400, 4800, 9600, 19200, 38400, 57600,
+	private static final int BAUDS[] = { 2400, 4800, 9600, 19200, 38400, 57600,
 			115200 };
 
 	private boolean isLegalBaudRate(int brate) {
-		for (int legalBaud : bauds) {
+		for (int legalBaud : BAUDS) {
 			if (brate == legalBaud) {
 				return true;
 			}
