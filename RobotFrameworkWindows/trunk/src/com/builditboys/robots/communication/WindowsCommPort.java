@@ -292,7 +292,7 @@ public class WindowsCommPort {
 	}
 	
 	private void handleThreadException (Exception e) {
-		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
+		AbstractRobotSystem.acknowledgeRobotSystemError(threadName, e);
 	}
 
 }
