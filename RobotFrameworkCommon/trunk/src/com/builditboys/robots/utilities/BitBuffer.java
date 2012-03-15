@@ -5,7 +5,7 @@ public class BitBuffer {
 	private int buffer;
 	private int size;
 	
-	private static final int bufferSize = Integer.SIZE;
+	private static final int BUFFER_SIZE = Integer.SIZE;
 
 	//--------------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ public class BitBuffer {
 		validateIndices(from, to);
 		int mask = 1;
 		int val = buffer;
-		for (int i = 0; i < bufferSize; i++) {
+		for (int i = 0; i < BUFFER_SIZE; i++) {
 			if ((i < from) || (i > to)) {
 				buffer &= mask;
 			}
@@ -200,7 +200,7 @@ public class BitBuffer {
 	//--------------------------------------------------------------------------------
 
 	private void clearExcess () {
-		clearFromTo(size, bufferSize);
+		clearFromTo(size, BUFFER_SIZE);
 	}
 	
 	private void validateIndices (int from, int to) {

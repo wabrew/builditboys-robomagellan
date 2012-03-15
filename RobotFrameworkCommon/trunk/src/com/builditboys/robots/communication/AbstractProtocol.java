@@ -31,7 +31,7 @@ public abstract class AbstractProtocol {
 
 	// --------------------------------------------------------------------------------
 
-	public abstract AbstractProtocol getInstanceIndicator();
+	public abstract AbstractProtocol getInstanceRepresentative();
 
 	// --------------------------------------------------------------------------------
 	

@@ -8,11 +8,11 @@ public class TimeUnit extends AbstractUnit {
 	public static final TimeUnit ABSOLUTES =    new TimeUnit("absolutes", 1.0E3);
 	public static final TimeUnit LOCALS =       new TimeUnit("locals", 1.0E3);
 
-	public static final TimeUnit baseUnit = MILLISECONDS;
+	public static final TimeUnit BASE_UNIT = MILLISECONDS;
 	
 	
-	private static TimeUnit defaultUnit = baseUnit;
-	protected static boolean defaultUnitLocked = false;
+	private static TimeUnit defaultUnit = BASE_UNIT;
+	private static boolean defaultUnitLocked = false;
 	
 	//--------------------------------------------------------------------------------
     // Constructor

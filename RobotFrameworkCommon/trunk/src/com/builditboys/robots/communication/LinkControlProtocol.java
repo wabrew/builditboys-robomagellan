@@ -7,9 +7,9 @@ import com.builditboys.robots.system.RobotControlProtocol;
 
 public class LinkControlProtocol extends AbstractProtocol {
 
-	public static AbstractProtocol indicator = new LinkControlProtocol();
+	public static final AbstractProtocol REPRESENTATIVE = new LinkControlProtocol();
 
-	private static int myChannelNumber = LINK_CONTROL_CHANNEL_NUMBER;
+	private static final int MY_CHANNEL_NUMBER = LINK_CONTROL_CHANNEL_NUMBER;
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -25,23 +25,23 @@ public class LinkControlProtocol extends AbstractProtocol {
 	// Channel factories
 	
 	public InputChannel getInputChannel () {
-		channel = new InputChannel(this, myChannelNumber);
+		channel = new InputChannel(this, MY_CHANNEL_NUMBER);
 		return (InputChannel) channel;
 	}
 	
 	public OutputChannel getOutputChannel () {
-		channel = new OutputChannel(this, myChannelNumber);
+		channel = new OutputChannel(this, MY_CHANNEL_NUMBER);
 		return (OutputChannel) channel;
 	}
 	
 	// --------------------------------------------------------------------------------
 
-	public static AbstractProtocol getIndicator() {
-		return indicator;
+	public static AbstractProtocol getRepresentative() {
+		return REPRESENTATIVE;
 	}
 	
-	public AbstractProtocol getInstanceIndicator() {
-		return indicator;
+	public AbstractProtocol getInstanceRepresentative() {
+		return REPRESENTATIVE;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -80,15 +80,15 @@ public class LinkControlProtocol extends AbstractProtocol {
 		
 		private LinkControlMessageEnum (int num) {
 			messageNum = num;
-			add(messageNum, this);
+			associateInverse(messageNum, this);
 		}
 		
-		private static void add (int num, LinkControlMessageEnum it) {
-			numToEnum[num] = it;
+		private static void associateInverse (int num, LinkControlMessageEnum it) {
+			NUM_TO_ENUM[num] = it;
 		}
 		
-		private static int largestNum = IM_ALIVE;
-			private static LinkControlMessageEnum numToEnum[] = new LinkControlMessageEnum[largestNum];
+		private static final int LARGEST_NUM = IM_ALIVE;
+		private static final LinkControlMessageEnum NUM_TO_ENUM[] = new LinkControlMessageEnum[LARGEST_NUM];
 
 		// use this to get the mode number for an enum
 		public int getMessageNum() {
@@ -97,10 +97,10 @@ public class LinkControlProtocol extends AbstractProtocol {
 
 		// use this to map a mode number to its enum
 		public static LinkControlMessageEnum numToEnum(int num) {
-			if ((num > numToEnum.length) || (num < 0)) {
+			if ((num > NUM_TO_ENUM.length) || (num < 0)) {
 				throw new IndexOutOfBoundsException("num out of range");
 			}
-			return numToEnum[num];
+			return NUM_TO_ENUM[num];
 		}
 	}
 	

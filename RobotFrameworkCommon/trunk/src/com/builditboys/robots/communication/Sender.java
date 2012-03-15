@@ -1,13 +1,6 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.LinkParameters.SEND_ESCAPE_BYTE;
-import static com.builditboys.robots.communication.LinkParameters.SEND_INDICATE_ESCAPE;
-import static com.builditboys.robots.communication.LinkParameters.SEND_INDICATE_SYNC_1;
-import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.SEND_POST_SYNC_PAD;
-import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_1_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.SEND_SYNC_BYTE_1;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 import java.io.IOException;
 

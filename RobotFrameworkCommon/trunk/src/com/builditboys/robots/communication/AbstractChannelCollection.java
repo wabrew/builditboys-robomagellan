@@ -62,7 +62,7 @@ public abstract class AbstractChannelCollection {
 //			System.out.println(channel.getProtocol());
 //			System.out.println(channel.getProtocol().getIndicator());			
 			if (channel != null) {
-				if (channel.getProtocol().getInstanceIndicator() == protocol) {
+				if (channel.getProtocol().getInstanceRepresentative() == protocol) {
 					return channel;
 				}
 			}

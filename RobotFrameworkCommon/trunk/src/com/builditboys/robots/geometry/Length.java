@@ -11,7 +11,7 @@ public class Length {
 	// The length's value, and units
 	private double lengthValue;
 	
-	private static final LengthUnit nativeUnits = METERS;
+	private static final LengthUnit NATIVE_UNITS = METERS;
 	
 	private boolean isLocked;
 	
@@ -35,32 +35,32 @@ public class Length {
 	}
   
 	public static Length newLength (double val, LengthUnit units) {
-		return new Length(convert(val, units, nativeUnits));
+		return new Length(convert(val, units, NATIVE_UNITS));
 	}
    
 	//--------------------------------------------------------------------------------
 	// Basic Accessors
 	
 	public LengthUnit getNativeUnits() {
-		return nativeUnits;
+		return NATIVE_UNITS;
 	}
 	
 	public double getInUnits(LengthUnit units) {
-		if (units == nativeUnits) {
+		if (units == NATIVE_UNITS) {
 			return lengthValue;
 		}
 		else {
-			return convert(lengthValue, nativeUnits, units);
+			return convert(lengthValue, NATIVE_UNITS, units);
 		}
 	}
 	
 	public void setInUnits(double val, LengthUnit units) {
 		if (!isLocked) {
-			if (units == nativeUnits) {
+			if (units == NATIVE_UNITS) {
 				lengthValue = val;
 			}
 			else {
-				lengthValue = convert(val, units, nativeUnits);
+				lengthValue = convert(val, units, NATIVE_UNITS);
 			}
 		}
 		else {

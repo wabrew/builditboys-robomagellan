@@ -16,7 +16,7 @@ public class CoordinateSystem {
 	private Length absoluteYSize;
 	private Angle absoluteTheta;
 	
-//	public static final CoordinateSystem baseCoordinateSystem; //= new CoordinateSystem();
+//	public static final CoordinateSystem BASE_COORDINATE_SYSTEM; //= new CoordinateSystem();
 
 	//--------------------------------------------------------------------------------
 	// Constructors

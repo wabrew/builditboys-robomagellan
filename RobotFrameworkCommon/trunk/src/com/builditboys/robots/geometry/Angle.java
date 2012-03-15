@@ -12,7 +12,7 @@ public final class Angle {
 	// The angle value and units
 	private double angleValue;
 
-	private static final AngleUnit nativeUnits = RADIANS;
+	private static final AngleUnit NATIVE_UNITS = RADIANS;
 
 	private boolean isLocked;
 
@@ -43,7 +43,7 @@ public final class Angle {
 	}
 
 	public static Angle newAngle(double val, AngleUnit units) {
-		return new Angle(convert(val, units, nativeUnits));
+		return new Angle(convert(val, units, NATIVE_UNITS));
 	}
 
 	public static Angle newAngleSin(double sin) {
@@ -66,7 +66,7 @@ public final class Angle {
 	// Basic Accessors
 
 	public AngleUnit getNativeUnits() {
-		return nativeUnits;
+		return NATIVE_UNITS;
 	}
 
 	public double getInRadians() {
@@ -76,14 +76,14 @@ public final class Angle {
 	}
 
 	public double getInDegrees() {
-		return convert(angleValue, nativeUnits, DEGREES);
+		return convert(angleValue, NATIVE_UNITS, DEGREES);
 	}
 
 	public double getInUnits(AngleUnit units) {
-		if (units == nativeUnits) {
+		if (units == NATIVE_UNITS) {
 			return angleValue;
 		} else {
-			return convert(angleValue, nativeUnits, units);
+			return convert(angleValue, NATIVE_UNITS, units);
 		}
 	}
 
@@ -99,7 +99,7 @@ public final class Angle {
 
 	public void setInDegrees(double val) {
 		if (!isLocked) {
-			angleValue = convert(val, DEGREES, nativeUnits);
+			angleValue = convert(val, DEGREES, NATIVE_UNITS);
 			decache();
 		} else {
 			throw new IllegalStateException();
@@ -108,7 +108,7 @@ public final class Angle {
 
 	public void setInUnits(double val, AngleUnit units) {
 		if (!isLocked) {
-			if (units == nativeUnits) {
+			if (units == NATIVE_UNITS) {
 				angleValue = val;
 			} else {
 				setInRadians(convert(val, units, RADIANS));
@@ -221,8 +221,8 @@ public final class Angle {
 
 	public String getDescription() {
 		return String.format("Angle: %.2f radians (%.2f degrees)",
-							 convert(angleValue, nativeUnits, RADIANS),
-							 convert(angleValue, nativeUnits, DEGREES));
+							 convert(angleValue, NATIVE_UNITS, RADIANS),
+							 convert(angleValue, NATIVE_UNITS, DEGREES));
 	}
 
 	public void describe() {

@@ -6,7 +6,9 @@ import com.builditboys.robots.infrastructure.StringParameter;
 
 public class Configuration {
 	
-	public static void loadConfiguration (String configFileName) {
+	public static void loadConfigurationFile (String configFileName) {
+		System.out.println("Loading configuration file " + configFileName);
+		
 		// should read from a config file, this is a temporary hack
 		
 		StringParameter robotNameParameter = new StringParameter("ROBOT_NAME", "RoboMagellan");

@@ -22,6 +22,13 @@ public class DistributionList implements ParameterInterface {
 		name = nm;
 	}
 	
+	public DistributionList (String nm, boolean addParameter) {
+		name = nm;
+		if (addParameter) {
+			ParameterServer.addParameter(this);
+		}
+	}
+	
 	//--------------------------------------------------------------------------------
 	
 	public String getName () {
@@ -69,19 +76,14 @@ public class DistributionList implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 	// Parameter server interaction
 	
-	// Make a new distribution list and put it in the parameter server
-	public static DistributionList addDistributionListNamed (String name) {
-		DistributionList distList = new DistributionList(name);
-		ParameterServer.addParameter(distList);
-		return distList;
+	public static DistributionList getParameter (String key) {
+		return (DistributionList) ParameterServer.getParameter(key);
 	}
 	
-	// Get a distribution list from the parameter server
-	public static DistributionList getDistributionListNamed (String name) {
-		return (DistributionList) ParameterServer.getParameter(name);
+	public static DistributionList maybeGetParameter (String key) {
+		return (DistributionList) ParameterServer.getParameter(key);
 	}
-	
-	
+		
 	//--------------------------------------------------------------------------------
 
 	public String toString () {

@@ -15,6 +15,16 @@ public class ShortParameter extends AbstractParameter implements ParameterInterf
 		value = val;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static ShortParameter getParameter (String key) {
+		return (ShortParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static ShortParameter maybeGetParameter (String key) {
+		return (ShortParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized Short getValue() {

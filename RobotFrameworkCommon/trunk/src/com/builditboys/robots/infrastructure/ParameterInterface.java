@@ -11,7 +11,11 @@ public interface ParameterInterface {
 
 	public abstract String getName();
 	
-	// do NOT have a setName, a parameters name should be assigned in the 
-	// constructor
+	// Do NOT have a setName, a parameters name should be assigned in the 
+	// constructor.
+	
+	// You should also impliment static methods for getParameter and
+	// maybeGetParameter that get the parameter and then cast to the correct
+	// kind of object
 
 }

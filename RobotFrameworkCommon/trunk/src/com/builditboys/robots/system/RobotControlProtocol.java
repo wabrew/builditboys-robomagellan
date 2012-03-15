@@ -13,9 +13,9 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class RobotControlProtocol extends AbstractProtocol {
 
-	public static AbstractProtocol indicator = new RobotControlProtocol();
+	public static final AbstractProtocol REPRESENTATIVE = new RobotControlProtocol();
 	
-	private static int myChannelNumber = ROBOT_CONTROL_CHANNEL_NUMBER;
+	private static final int MY_CHANNEL_NUMBER = ROBOT_CONTROL_CHANNEL_NUMBER;
 	
 	RobotStateMessage robotStateMessage = new RobotStateMessage();
 	
@@ -33,23 +33,23 @@ public class RobotControlProtocol extends AbstractProtocol {
 	// Channel factories
 	
 	public InputChannel getInputChannel () {
-		channel = new InputChannel(this, myChannelNumber);
+		channel = new InputChannel(this, MY_CHANNEL_NUMBER);
 		return (InputChannel) channel;
 	}
 	
 	public OutputChannel getOutputChannel () {
-		channel = new OutputChannel(this, myChannelNumber);
+		channel = new OutputChannel(this, MY_CHANNEL_NUMBER);
 		return (OutputChannel) channel;
 	}
 	
 	// --------------------------------------------------------------------------------
 
-	public static AbstractProtocol getIndicator() {
-		return indicator;
+	public static AbstractProtocol getRepresentative() {
+		return REPRESENTATIVE;
 	}
 	
-	public AbstractProtocol getInstanceIndicator() {
-		return indicator;
+	public AbstractProtocol getInstanceRepresentative() {
+		return REPRESENTATIVE;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -90,15 +90,15 @@ public class RobotControlProtocol extends AbstractProtocol {
 		
 		private RobotControlMessageEnum (int num) {
 			messageNum = num;
-			add(messageNum, this);
+			associateInverse(messageNum, this);
 		}
 		
-		private static void add (int num, RobotControlMessageEnum it) {
-			numToEnum[num] = it;
+		private static void associateInverse (int num, RobotControlMessageEnum it) {
+			NUM_TO_ENUM[num] = it;
 		}
 		
-		private static int largestNum = SM_HERE_IS_MY_STATE;
-			private static RobotControlMessageEnum numToEnum[] = new RobotControlMessageEnum[largestNum];
+		private static final int LARGEST_NUM = SM_HERE_IS_MY_STATE;
+		private static final RobotControlMessageEnum NUM_TO_ENUM[] = new RobotControlMessageEnum[LARGEST_NUM];
 
 		// use this to get the mode number for an enum
 		public int getModeNum() {
@@ -107,10 +107,10 @@ public class RobotControlProtocol extends AbstractProtocol {
 
 		// use this to map a mode number to its enum
 		public static RobotControlMessageEnum numToEnum(int num) {
-			if ((num > numToEnum.length) || (num < 0)) {
+			if ((num > NUM_TO_ENUM.length) || (num < 0)) {
 				throw new IndexOutOfBoundsException("num out of range");
 			}
-			return numToEnum[num];
+			return NUM_TO_ENUM[num];
 		}
 	}
 	

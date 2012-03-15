@@ -17,6 +17,16 @@ public class ObjectParameter extends AbstractParameter implements ParameterInter
 		value = val;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static ObjectParameter getParameter (String key) {
+		return (ObjectParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static ObjectParameter maybeGetParameter (String key) {
+		return (ObjectParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized Object getValue() {

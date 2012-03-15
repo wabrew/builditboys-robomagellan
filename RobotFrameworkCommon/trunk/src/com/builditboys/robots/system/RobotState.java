@@ -21,15 +21,15 @@ public class RobotState implements ParameterInterface {
 		
 		private RobotModeEnum (int num) {
 			modeNum = num;
-			add(modeNum, this);
+			associateInverse(modeNum, this);
 		}
 		
-		private static void add (int num, RobotModeEnum it) {
-			numToEnum[num] = it;
+		private static void associateInverse (int num, RobotModeEnum it) {
+			NUM_TO_ENUM[num] = it;
 		}
 		
-		private static int largestNum = ROBOT_MODE__AUTO;
-		private static RobotModeEnum numToEnum[] = new RobotModeEnum[largestNum];
+		private static final int LARGEST_NUM = ROBOT_MODE__AUTO;
+		private static final RobotModeEnum NUM_TO_ENUM[] = new RobotModeEnum[LARGEST_NUM];
 
 		// use this to get the mode number for an enum
 		public int getModeNum() {
@@ -38,10 +38,10 @@ public class RobotState implements ParameterInterface {
 
 		// use this to map a mode number to its enum
 		public static RobotModeEnum numToEnum(int num) {
-			if ((num > numToEnum.length) || (num < 0)) {
+			if ((num > NUM_TO_ENUM.length) || (num < 0)) {
 				throw new IndexOutOfBoundsException("num out of range");
 			}
-			return numToEnum[num];
+			return NUM_TO_ENUM[num];
 		}
 	}
 	
@@ -87,15 +87,15 @@ public class RobotState implements ParameterInterface {
 		
 		private  EStopIndicatorEnum (int num) {
 			indicatorNum = num;
-			add(indicatorNum, this);
+			associateInverse(indicatorNum, this);
 		}
 		
-		private static void add (int num, EStopIndicatorEnum it) {
-			numToEnum[num] = it;
+		private static void associateInverse (int num, EStopIndicatorEnum it) {
+			NUM_TO_ENUM[num] = it;
 		}
 		
-		private static int largestNum = DEAD_MAN_ESTOP_INDICATOR;
-		private static EStopIndicatorEnum numToEnum[] = new EStopIndicatorEnum[largestNum];
+		private static final int LARGEST_NUM = DEAD_MAN_ESTOP_INDICATOR;
+		private static final EStopIndicatorEnum NUM_TO_ENUM[] = new EStopIndicatorEnum[LARGEST_NUM];
 
 		// use this to get the mode number for an enum
 		public int getIndicatorNum() {
@@ -104,10 +104,10 @@ public class RobotState implements ParameterInterface {
 
 		// use this to map a mode number to its enum
 		public static EStopIndicatorEnum numToEnum(int num) {
-			if ((num > numToEnum.length) || (num < 0)) {
+			if ((num > NUM_TO_ENUM.length) || (num < 0)) {
 				throw new IndexOutOfBoundsException("num out of range");
 			}
-			return numToEnum[num];
+			return NUM_TO_ENUM[num];
 		}
 	}
 	
@@ -119,13 +119,13 @@ public class RobotState implements ParameterInterface {
 	RobotModeEnum mode = RobotModeEnum.SAFE_MODE;
 	EStopBits eStopByte = new EStopBits((byte) 0);
 	
-	private static final RobotState instance;
+	private static final RobotState INSTANCE;
 	
 	// create the singleton and add it to the parameter server
 	static {
 		RobotState state = new RobotState();
 		ParameterServer.addParameter(state);
-		instance = state;
+		INSTANCE = state;
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -136,13 +136,23 @@ public class RobotState implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 
 	public static RobotState getInstance () {
-		return instance;
+		return INSTANCE;
 	}
 	
 	//--------------------------------------------------------------------------------
 	
 	public String getName () {
 		return "ROBOT_STATE";
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static RobotState getParameter (String key) {
+		return (RobotState) ParameterServer.getParameter(key);
+	}
+	
+	public static RobotState maybeGetParameter (String key) {
+		return (RobotState) ParameterServer.getParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

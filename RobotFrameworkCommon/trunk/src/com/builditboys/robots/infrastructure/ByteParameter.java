@@ -15,6 +15,16 @@ public class ByteParameter extends AbstractParameter implements ParameterInterfa
 		value = val;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static ByteParameter getParameter (String key) {
+		return (ByteParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static ByteParameter maybeGetParameter (String key) {
+		return (ByteParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized Byte getValue() {

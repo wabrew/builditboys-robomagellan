@@ -5,7 +5,6 @@ import java.io.IOException;
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
 import com.builditboys.robots.infrastructure.DistributionList;
-import com.builditboys.robots.infrastructure.ObjectParameter;
 import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.infrastructure.StringParameter;
@@ -15,14 +14,13 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	public static AbstractRobotSystem instance;
 
-	private static final SystemNotification start1Notice = SystemNotification.newStart1Notification();
-	private static final SystemNotification start2Notice = SystemNotification.newStart2Notification();
-	private static final SystemNotification eStopNotice = SystemNotification.newEstopNotification();
-	private static final SystemNotification stopNotice = SystemNotification.newStopNotification();
+	private static final SystemNotification START1_NOTICE = SystemNotification.newStart1Notification();
+	private static final SystemNotification START2_NOTICE = SystemNotification.newStart2Notification();
+	private static final SystemNotification ESTOP_NOTICE = SystemNotification.newEstopNotification();
+	private static final SystemNotification STOP_NOTICE = SystemNotification.newStopNotification();
 
 	private static final int ROBOT_SYSTEM_PHASE_WAIT = 200;
 
-	protected String configFileName;
 	protected String robotName;
 	
 	protected LinkPortInterface linkPort;
@@ -32,7 +30,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	// --------------------------------------------------------------------------------
 	
-	public synchronized void startRobotSystem() throws InterruptedException, IOException {
+	public synchronized void startBasicRobotSystem() throws InterruptedException, IOException {
 		startRobotSystemPhase1();
 		startRobotSystemPhase2();
 		startRobotSystemPhase3();
@@ -44,7 +42,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	
 	private void startRobotSystemPhase1 () throws InterruptedException {
 		System.out.println("**Starting phase 1 setup");
-		StringParameter robotNameParameter = (StringParameter) ParameterServer.getParameter("ROBOT_NAME");
+		StringParameter robotNameParameter = StringParameter.getParameter("ROBOT_NAME");
 
 		robotName = robotNameParameter.getValue();
 		ParameterServer.addParameter(this);
@@ -54,7 +52,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		System.out.println("Local time initialized");
 
 		// send out the first start phase notification
-		start1Notice.publish(this);
+		START1_NOTICE.publish(this);
 		System.out.println("Phase 1 notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);		
 	}
@@ -73,7 +71,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		
 		// other stuff goes here
 		
-		start2Notice.publish(this);
+		START2_NOTICE.publish(this);
 		System.out.println("Phase 2 notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);		
 	}
@@ -83,13 +81,12 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		
 	}
 
-
 	// --------------------------------------------------------------------------------
 
-	public synchronized void stopRobotSystem() throws InterruptedException, IOException {
+	public synchronized void stopBasicRobotSystem() throws InterruptedException, IOException {
 		System.out.println();
 		System.out.println("Shutting down");
-		stopNotice.publish(this);
+		STOP_NOTICE.publish(this);
 		System.out.println("Stop notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);
 
@@ -106,7 +103,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	public void notifyRobotSystemErrorI (String threadName, Exception e) {
 		System.out.println("Exception in thread " + threadName + ": " + e);
 		e.printStackTrace();
-		eStopNotice.publish(instance, systemDistList);
+		ESTOP_NOTICE.publish(instance, systemDistList);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -117,6 +114,16 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	
 	public String toString () {
 		return "Robot System: \"" + robotName + "\"";
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static AbstractRobotSystem getParameter (String key) {
+		return (AbstractRobotSystem) ParameterServer.getParameter(key);
+	}
+	
+	public static AbstractRobotSystem maybeGetParameter (String key) {
+		return (AbstractRobotSystem) ParameterServer.getParameter(key);
 	}
 	
 

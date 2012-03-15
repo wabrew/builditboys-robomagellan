@@ -15,12 +15,18 @@ public class RobotControlNotification  extends AbstractNotification {
 
 	private RobotControlActionEnum controlAction;
 	
-	private static DistributionList distributionList = DistributionList.addDistributionListNamed("ROBOT_CONTROL_DISTRIBUTION_LIST");
-
 	//--------------------------------------------------------------------------------
 
 	private RobotControlNotification (RobotControlActionEnum action) {
 		controlAction = action;
+	}
+	
+	//--------------------------------------------------------------------------------
+
+	private static final DistributionList DISTRIBUTION_LIST = new DistributionList("ROBOT_CONTROL_DISTRIBUTION_LIST", true);
+
+	public static DistributionList getDistributionList () {
+		return DISTRIBUTION_LIST;
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -36,13 +42,7 @@ public class RobotControlNotification  extends AbstractNotification {
 	public static RobotControlNotification newRobotStateNotice () {
 		return new RobotControlNotification(RobotControlActionEnum.RECEIVED_ROBOT_STATE);
 	}
-	
-	//--------------------------------------------------------------------------------
-
-	public static DistributionList getDistributionList () {
-		return distributionList;
-	}
-	
+		
 	//--------------------------------------------------------------------------------
 
 	public RobotControlActionEnum getRobotControlAction() {
@@ -52,7 +52,7 @@ public class RobotControlNotification  extends AbstractNotification {
 	//--------------------------------------------------------------------------------
 
 	public void publish (Object publishedBy) {
-		publish(publishedBy, distributionList);
+		publish(publishedBy, DISTRIBUTION_LIST);
 	}
 	
 	public void publishSelf(SubscriberInterface subscriber) {

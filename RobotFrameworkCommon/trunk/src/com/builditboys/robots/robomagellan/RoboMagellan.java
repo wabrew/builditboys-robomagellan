@@ -2,13 +2,13 @@ package com.builditboys.robots.robomagellan;
 
 public class RoboMagellan {
 	
-	private static RoboMagellanCourse course;
-	private static RoboMagellanConfiguration config;
+	private RoboMagellanCourse course;
+	private RoboMagellanConfiguration config;
 	
-	public static void startRoboMagellan () {
+	public void startRoboMagellan () {
 	}
 	
-	public static void stopRoboMagellan () {
+	public void stopRoboMagellan () {
 		
 	}
 	

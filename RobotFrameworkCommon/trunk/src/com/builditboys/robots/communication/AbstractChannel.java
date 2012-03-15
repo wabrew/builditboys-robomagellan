@@ -105,7 +105,7 @@ public abstract class AbstractChannel {
 	
 	//--------------------------------------------------------------------------------
 
-	static public boolean isLegalChannelNumber (int channelNumber) {
+	public static boolean isLegalChannelNumber (int channelNumber) {
 		return ((channelNumber >= CHANNEL_NUMBER_MIN) 
 				&& (channelNumber <= CHANNEL_NUMBER_MAX));
 	}

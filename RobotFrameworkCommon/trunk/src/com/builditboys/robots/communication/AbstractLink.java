@@ -5,6 +5,7 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 import java.io.IOException;
 
 import com.builditboys.robots.infrastructure.ParameterInterface;
+import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.system.AbstractRobotSystem;
 import com.builditboys.robots.time.*;
 
@@ -134,6 +135,16 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		return role;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static AbstractLink getParameter (String key) {
+		return (AbstractLink) ParameterServer.getParameter(key);
+	}
+	
+	public static AbstractLink maybeGetParameter (String key) {
+		return (AbstractLink) ParameterServer.getParameter(key);
+	}
+	
 	// --------------------------------------------------------------------------------
 	// Channel collections
 

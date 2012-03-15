@@ -15,6 +15,16 @@ public class StringParameter extends AbstractParameter implements ParameterInter
 		value = val;
 	}
 	
+	// --------------------------------------------------------------------------------
+
+	public static StringParameter getParameter (String key) {
+		return (StringParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static StringParameter maybeGetParameter (String key) {
+		return (StringParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized String getValue() {

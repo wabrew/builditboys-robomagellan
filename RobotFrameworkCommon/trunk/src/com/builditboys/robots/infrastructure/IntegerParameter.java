@@ -17,6 +17,16 @@ public class IntegerParameter extends AbstractParameter implements ParameterInte
 
 	// --------------------------------------------------------------------------------
 
+	public static IntegerParameter getParameter (String key) {
+		return (IntegerParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static IntegerParameter maybeGetParameter (String key) {
+		return (IntegerParameter) ParameterServer.getParameter(key);
+	}
+	
+	// --------------------------------------------------------------------------------
+
 	public synchronized Integer getValue() {
 		return value;
 	}

@@ -2,7 +2,7 @@ package com.builditboys.robots.time;
 
 public class SystemTimeSystem extends AbstractTimeSystem {
 
-	private static final SystemTimeSystem instance = new SystemTimeSystem("system");
+	private static final SystemTimeSystem INSTANCE = new SystemTimeSystem("system");
 	
 	//--------------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ public class SystemTimeSystem extends AbstractTimeSystem {
 	//--------------------------------------------------------------------------------
 		
 	public static long currentTime () {
-		return instance.currentTimeLong();
+		return INSTANCE.currentTimeLong();
 	}
 
 }

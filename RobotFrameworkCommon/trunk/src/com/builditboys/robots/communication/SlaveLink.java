@@ -16,10 +16,10 @@ public class SlaveLink extends AbstractLink implements Runnable {
 		
 		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.SLAVE);
 		
-		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getIndicator());
+		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getRepresentative());
 		linkInputControlProtocol = (LinkControlProtocol) controlChannelIn.getProtocol();
 
-		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getIndicator());
+		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getRepresentative());
 		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
 	}
 

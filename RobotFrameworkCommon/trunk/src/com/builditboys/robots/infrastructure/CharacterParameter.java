@@ -15,6 +15,16 @@ public class CharacterParameter extends AbstractParameter implements ParameterIn
 		value = val;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static CharacterParameter getParameter (String key) {
+		return (CharacterParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static CharacterParameter maybeGetParameter (String key) {
+		return (CharacterParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized Character getValue() {

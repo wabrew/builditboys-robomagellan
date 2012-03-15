@@ -1,14 +1,6 @@
 package com.builditboys.robots.communication;
 
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_ESCAPE_BYTE;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_INDICATE_ESCAPE;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_INDICATE_SYNC_1;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_PREAMBLE_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_1_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.RECEIVE_SYNC_BYTE_1;
-import static com.builditboys.robots.communication.LinkParameters.SEND_POSTAMBLE_LENGTH;
-import static com.builditboys.robots.communication.LinkParameters.SEND_PREAMBLE_LENGTH;
+import static com.builditboys.robots.communication.LinkParameters.*;
 
 import com.builditboys.robots.time.InternalTimeSystem;
 import com.builditboys.robots.time.LocalTimeSystem;

@@ -10,7 +10,7 @@ package com.builditboys.robots.time;
 
 public class LocalTimeSystem extends AbstractTimeSystem {
 	
-	private static final LocalTimeSystem instance = new LocalTimeSystem("local");
+	private static final LocalTimeSystem INSTANCE = new LocalTimeSystem("local");
 	
 	//--------------------------------------------------------------------------------
 
@@ -21,17 +21,17 @@ public class LocalTimeSystem extends AbstractTimeSystem {
 	//--------------------------------------------------------------------------------
 		
 	public static void startLocalTimeNow() {
-		instance.startNow();
+		INSTANCE.startNow();
 	}
 
 	// adjusts local time so that it is now ltime
 	// generally happens on the PSoC side when Java sends its local time
 	public static void correspondLocalTime (int ltime) {
-		instance.correspondNow(ltime);
+		INSTANCE.correspondNow(ltime);
 	}
 	
 	public static int currentTime () {
-		return instance.currentTimeInt();
+		return INSTANCE.currentTimeInt();
 	}
 
 }

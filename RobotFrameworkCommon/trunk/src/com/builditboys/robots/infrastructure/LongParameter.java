@@ -15,6 +15,16 @@ public class LongParameter extends AbstractParameter implements ParameterInterfa
 		value = val;
 	}
 
+	// --------------------------------------------------------------------------------
+
+	public static LongParameter getParameter (String key) {
+		return (LongParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static LongParameter maybeGetParameter (String key) {
+		return (LongParameter) ParameterServer.getParameter(key);
+	}
+	
 	//--------------------------------------------------------------------------------
 
 	public synchronized Long getValue() {

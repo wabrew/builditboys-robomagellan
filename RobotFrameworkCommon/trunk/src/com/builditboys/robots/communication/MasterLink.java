@@ -16,10 +16,10 @@ public class MasterLink extends AbstractLink {
 		
 		LinkControlProtocol.addProtocolToLink(this, ProtocolRoleEnum.MASTER);
 		
-		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getIndicator());
+		controlChannelIn = getInputChannelByProtocol(LinkControlProtocol.getRepresentative());
 		linkInputControlProtocol = (LinkControlProtocol) controlChannelIn.getProtocol();
 
-		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getIndicator());
+		controlChannelOut = getOutputChannelByProtocol(LinkControlProtocol.getRepresentative());
 		linkOutputControlProtocol = (LinkControlProtocol) controlChannelOut.getProtocol();
 	}
 	

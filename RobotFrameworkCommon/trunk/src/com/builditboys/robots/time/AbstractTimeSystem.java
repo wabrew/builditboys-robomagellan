@@ -7,7 +7,7 @@ public abstract class AbstractTimeSystem {
 	
 	// currently, all time systems are lock to this unit
 	// to change this requires making the time system converter smarter
-	protected static final TimeUnit units = MILLISECONDS;
+	protected static final TimeUnit UNITS = MILLISECONDS;
 
 	private long absoluteOffset = 0;
 	
@@ -32,10 +32,10 @@ public abstract class AbstractTimeSystem {
 	//--------------------------------------------------------------------------------
 
 	protected long readClock () {
-		if (units == MILLISECONDS) {
+		if (UNITS == MILLISECONDS) {
 			return System.currentTimeMillis();
 		}	
-		else if (units == NANOSECONDS) {
+		else if (UNITS == NANOSECONDS) {
 			return System.nanoTime();
 		}
 		else {
@@ -50,15 +50,15 @@ public abstract class AbstractTimeSystem {
 	}
 
 	public void correspondNow (double time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, units);
+		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
 	}
 
 	public void correspondNow (long time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, units);
+		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
 	}
 
 	public void correspondNow (int time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, units);
+		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
 	}
 
 	
@@ -79,15 +79,15 @@ public abstract class AbstractTimeSystem {
 	// put a method in your subclass that calls one of these
 	
 	public double currentTimeDouble () {
-		return TimeUnit.convert((double) (readClock() - absoluteOffset), units, TimeUnit.getDefaultUnit());
+		return TimeUnit.convert((double) (readClock() - absoluteOffset), UNITS, TimeUnit.getDefaultUnit());
 	}
 	
 	public long currentTimeLong () {
-		return TimeUnit.convert((long) (readClock() - absoluteOffset), units, TimeUnit.getDefaultUnit());
+		return TimeUnit.convert((long) (readClock() - absoluteOffset), UNITS, TimeUnit.getDefaultUnit());
 	}
 
 	public int currentTimeInt () {
-		long time = TimeUnit.convert(readClock() - absoluteOffset, units, TimeUnit.getDefaultUnit());
+		long time = TimeUnit.convert(readClock() - absoluteOffset, UNITS, TimeUnit.getDefaultUnit());
 		if ((time > Integer.MAX_VALUE) || (time < Integer.MIN_VALUE)) {
 			throw new IllegalArgumentException("Time overflow");
 		}

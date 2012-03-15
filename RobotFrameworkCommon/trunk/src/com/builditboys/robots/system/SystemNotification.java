@@ -15,12 +15,18 @@ public class SystemNotification extends AbstractNotification {
 
 	private SystemActionEnum systemAction;
 	
-	private static DistributionList distributionList = DistributionList.addDistributionListNamed("SYSTEM_DISTRIBUTION_LIST");
-
 	//--------------------------------------------------------------------------------
 
 	private SystemNotification (SystemActionEnum action) {
 		systemAction = action;
+	}
+	
+	//--------------------------------------------------------------------------------
+	
+	private static final DistributionList DISTRIBUTION_LIST = new DistributionList("SYSTEM_DISTRIBUTION_LIST", true);
+
+	public static DistributionList getDistributionList () {
+		return DISTRIBUTION_LIST;
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -43,12 +49,6 @@ public class SystemNotification extends AbstractNotification {
 
 	//--------------------------------------------------------------------------------
 
-	public static DistributionList getDistributionList () {
-		return distributionList;
-	}
-	
-	//--------------------------------------------------------------------------------
-
 	public SystemActionEnum getSystemAction() {
 		return systemAction;
 	}
@@ -56,7 +56,7 @@ public class SystemNotification extends AbstractNotification {
 	//--------------------------------------------------------------------------------
 
 	public void publish (Object publishedBy) {
-		publish(publishedBy, distributionList);
+		publish(publishedBy, DISTRIBUTION_LIST);
 	}
 	
 	public void publishSelf( SubscriberInterface subscriber) {
