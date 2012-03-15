@@ -9,7 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import static com.builditboys.robots.system.WindowsRobotSystem.*;
+import static com.builditboys.robots.system.TestWindowsRobotSystem.*;
+import static com.builditboys.robots.system.AbstractRobotSystem.*;
 
 public class SimpleGUI extends JFrame {
 	private boolean robotStarted = false;
@@ -35,7 +36,7 @@ public class SimpleGUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				if (!robotStarted) {
 					System.out.println("Starting robot");
-					launchWindowsRobotSystemRunnable();
+					launchTestWindowsRobotSystemRunnable();
 					robotStarted = true;
 				}
 				else {
@@ -52,7 +53,7 @@ public class SimpleGUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				if (robotStarted) {
 					System.out.println("Stopping the robot");
-					stopWindowsRobotSystemRunnable();
+					stopTheRobotSystemRunnable();
 				}
 				else {
 					System.out.println("The robot has not been stared; can't stop");
@@ -68,7 +69,7 @@ public class SimpleGUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				if (robotStarted) {
 					System.out.println("Stopping the robot");
-					stopWindowsRobotSystemRunnable();					
+					stopTheRobotSystemRunnable();					
 				}
 				System.out.println("Exiting the robot controller");
 				System.exit(0);
