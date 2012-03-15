@@ -12,6 +12,9 @@ public class LengthUnit extends AbstractUnit {
 	public static final LengthUnit FEET =        new LengthUnit("feet", UnitConstants.INCHES_PER_FOOT/UnitConstants.INCHES_PER_METER * 1000000.0);
 	public static final LengthUnit COUNTS =      new LengthUnit("feet", 500.0);
 	
+	
+	// not a final but pretty close, you can set the base unit but you
+	// should then lock it
 	private static LengthUnit defaultUnit = BASE_UNIT;
 	private static boolean defaultUnitLocked = false;
 

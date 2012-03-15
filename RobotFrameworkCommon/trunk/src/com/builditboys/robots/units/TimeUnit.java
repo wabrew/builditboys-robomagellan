@@ -11,6 +11,8 @@ public class TimeUnit extends AbstractUnit {
 	public static final TimeUnit BASE_UNIT = MILLISECONDS;
 	
 	
+	// not a final but pretty close, you can set the base unit but you
+	// should then lock it
 	private static TimeUnit defaultUnit = BASE_UNIT;
 	private static boolean defaultUnitLocked = false;
 	

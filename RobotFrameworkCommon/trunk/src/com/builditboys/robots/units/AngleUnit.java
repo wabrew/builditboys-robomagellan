@@ -8,6 +8,9 @@ public class AngleUnit extends AbstractUnit {
 	public static final AngleUnit RADIANS = new AngleUnit("radians", 1000.0);
 	public static final AngleUnit DEGREES = new AngleUnit("degrees", (Math.PI/180.0) * 1000);
 	
+	
+	// not a final but pretty close, you can set the base unit but you
+	// should then lock it
 	private static AngleUnit defaultUnit = BASE_UNIT;
 	private static boolean defaultUnitLocked = false;
 

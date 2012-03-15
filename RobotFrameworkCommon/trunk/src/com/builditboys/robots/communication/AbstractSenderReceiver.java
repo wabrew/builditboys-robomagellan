@@ -53,7 +53,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 	}
 	
 	private void handleThreadException (Exception e) {
-		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
+		AbstractRobotSystem.acknowledgeRobotSystemError(threadName, e);
 		threadControl = ThreadControlEnum.STOP;
 	}
 

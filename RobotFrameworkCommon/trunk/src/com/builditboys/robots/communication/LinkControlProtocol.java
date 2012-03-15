@@ -2,9 +2,6 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
-import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
-import com.builditboys.robots.system.RobotControlProtocol;
-
 public class LinkControlProtocol extends AbstractProtocol {
 
 	public static final AbstractProtocol REPRESENTATIVE = new LinkControlProtocol();

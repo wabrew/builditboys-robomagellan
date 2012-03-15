@@ -10,9 +10,34 @@ import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.infrastructure.StringParameter;
 import com.builditboys.robots.time.LocalTimeSystem;
 
+/*
+The concept.
+
+The robot system is responsible for getting things started up and shut down. 
+AbstractRobotSystem takes care of most of the basic setup and shut down.  You
+make subclasses that do more specific setup and shut down.  You can have several
+layers in the hierarchy.  For example, the class WindowsRobotSystem does windows
+specific setup and shutdown but thats about it.  For your specific robot, you
+probably need to extend WindowsRobotSystem to actually do something by creating
+a thread that embodies the robot's mission or top-level.
+
+Each layer in the hierarchy has responsibilities.  A leaf layer creates an
+instance of itself, stuffs it in INSTANCE and then calls its own copy of 
+startRobotSystem.  This method does some specific setup and then calls
+super.startRobotSystem.
+
+Similar situation exists with stopRobotSystem.
+
+*/
+
+
 public abstract class AbstractRobotSystem implements ParameterInterface {
 
-	public static AbstractRobotSystem instance;
+	// Holds the single robot system instance.
+	// Not a final but pretty close, gets set in when a subclass is created
+	// and cannot be set again.
+	private static AbstractRobotSystem INSTANCE;
+	
 
 	private static final SystemNotification START1_NOTICE = SystemNotification.newStart1Notification();
 	private static final SystemNotification START2_NOTICE = SystemNotification.newStart2Notification();
@@ -21,8 +46,6 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	private static final int ROBOT_SYSTEM_PHASE_WAIT = 200;
 
-	protected String robotName;
-	
 	protected LinkPortInterface linkPort;
 	protected MasterLink masterLink;
 	
@@ -30,7 +53,22 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	// --------------------------------------------------------------------------------
 	
-	public synchronized void startBasicRobotSystem() throws InterruptedException, IOException {
+	public static AbstractRobotSystem getInstance() {
+		return INSTANCE;
+	}
+
+	public static void setInstance(AbstractRobotSystem instance) {
+		if (INSTANCE == null) {
+			INSTANCE = instance;
+		}
+		else {
+			throw new IllegalStateException("Robot system instance is already set");
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	protected synchronized void startRobotSystem() throws InterruptedException, IOException {
 		startRobotSystemPhase1();
 		startRobotSystemPhase2();
 		startRobotSystemPhase3();
@@ -44,7 +82,6 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		System.out.println("**Starting phase 1 setup");
 		StringParameter robotNameParameter = StringParameter.getParameter("ROBOT_NAME");
 
-		robotName = robotNameParameter.getValue();
 		ParameterServer.addParameter(this);
 		
 		// set up local time first, many things depend on it including notifications
@@ -83,7 +120,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	// --------------------------------------------------------------------------------
 
-	public synchronized void stopBasicRobotSystem() throws InterruptedException, IOException {
+	protected synchronized void stopRobotSystem() throws InterruptedException, IOException {
 		System.out.println();
 		System.out.println("Shutting down");
 		STOP_NOTICE.publish(this);
@@ -96,24 +133,51 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	// --------------------------------------------------------------------------------
 
-	public static void notifyRobotSystemError (String threadName, Exception e) {
-		instance.notifyRobotSystemErrorI(threadName, e);
+
+	public static void stopTheRobotSystem () throws InterruptedException, IOException {
+		AbstractRobotSystem.getInstance().stopRobotSystem();
 	}
 	
-	public void notifyRobotSystemErrorI (String threadName, Exception e) {
+	public static void safeStopTheRobotSystem () {
+		try {
+			stopTheRobotSystem();
+		} catch (Exception e) {
+			System.out.println("Stop Exception");
+			e.printStackTrace();
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+
+	public static void stopTheRobotSystemRunnable () {
+		TheRobotSystemStopper stopper = new TheRobotSystemStopper();
+		Thread thread = new Thread(stopper, "Robot Stopper");
+		System.out.println("Starting " + "Abstract Robot Stopper" + " thread");
+		thread.start();
+	}
+	
+	private static class TheRobotSystemStopper implements Runnable {
+		public void run() {
+			safeStopTheRobotSystem();
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static void acknowledgeRobotSystemError (String threadName, Exception e) {
+		INSTANCE.acknowledgeRobotSystemErrorI(threadName, e);
+	}
+	
+	public void acknowledgeRobotSystemErrorI(String threadName, Exception e) {
 		System.out.println("Exception in thread " + threadName + ": " + e);
 		e.printStackTrace();
-		ESTOP_NOTICE.publish(instance, systemDistList);
+		ESTOP_NOTICE.publish(INSTANCE, systemDistList);
 	}
 	
 	// --------------------------------------------------------------------------------
 
 	public String getName () {
 		return "ROBOT_SYSTEM";
-	}
-	
-	public String toString () {
-		return "Robot System: \"" + robotName + "\"";
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -125,7 +189,6 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	public static AbstractRobotSystem maybeGetParameter (String key) {
 		return (AbstractRobotSystem) ParameterServer.getParameter(key);
 	}
-	
-
+		
 
 }

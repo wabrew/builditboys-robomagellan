@@ -208,7 +208,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	public abstract void doWork() throws InterruptedException;
 
 	private void handleThreadException (Exception e) {
-		AbstractRobotSystem.notifyRobotSystemError(threadName, e);
+		AbstractRobotSystem.acknowledgeRobotSystemError(threadName, e);
 		threadControl = ThreadControlEnum.STOP;
 	}
 
