@@ -36,22 +36,22 @@ public class TestCommunications {
 		MasterLink masterLink = new MasterLink("Test Master Link", port1);
 		SlaveLink slaveLink = new SlaveLink("Test Slave Link", port2);
 		
-		AbstractChannel masterOut = masterLink.getOutputChannelByProtocol(LinkControlProtocol.indicator);
+		AbstractChannel masterOut = masterLink.getOutputChannelByProtocol(LinkControlProtocol.REPRESENTATIVE);
 		LinkControlProtocol masterOutProto = (LinkControlProtocol) masterOut.getProtocol();
 //		System.out.println(masterOut);
 //		System.out.println(masterOutProto);
 
-		AbstractChannel masterIn = masterLink.getInputChannelByProtocol(LinkControlProtocol.indicator);
+		AbstractChannel masterIn = masterLink.getInputChannelByProtocol(LinkControlProtocol.REPRESENTATIVE);
 		LinkControlProtocol masterInProto = (LinkControlProtocol) masterIn.getProtocol();
 //		System.out.println(masterIn);
 //		System.out.println(masterInProto);
 
-		AbstractChannel slaveOut = slaveLink.getOutputChannelByProtocol(LinkControlProtocol.indicator);
+		AbstractChannel slaveOut = slaveLink.getOutputChannelByProtocol(LinkControlProtocol.REPRESENTATIVE);
 		LinkControlProtocol slaveOutProto = (LinkControlProtocol) slaveOut.getProtocol();
 //		System.out.println(slaveOut);
 //		System.out.println(slaveOutProto);
 
-		AbstractChannel slaveIn = slaveLink.getInputChannelByProtocol(LinkControlProtocol.indicator);
+		AbstractChannel slaveIn = slaveLink.getInputChannelByProtocol(LinkControlProtocol.REPRESENTATIVE);
 		LinkControlProtocol slaveInProto = (LinkControlProtocol) slaveIn.getProtocol();
 //		System.out.println(slaveIn);
 //		System.out.println(slaveInProto);

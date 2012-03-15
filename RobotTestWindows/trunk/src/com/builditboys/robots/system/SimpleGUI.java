@@ -35,7 +35,7 @@ public class SimpleGUI extends JFrame {
 			public void actionPerformed(ActionEvent event) {
 				if (!robotStarted) {
 					System.out.println("Starting robot");
-					launchWindowsRobotSystemRunnable("foo");
+					launchWindowsRobotSystemRunnable();
 					robotStarted = true;
 				}
 				else {

@@ -9,8 +9,10 @@ import com.builditboys.robots.system.WindowsRobotSystem;
 public class TestSystem {
 	
 	public static void main (String args[]) {
-		System.out.println("Main thread starting");		
-	
+		System.out.println("Main thread starting");	
+		
+		Configuration.loadConfigurationFile("foo");
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				SimpleGUI gui = new SimpleGUI();
@@ -24,7 +26,7 @@ public class TestSystem {
 	//--------------------------------------------------------------------------------
 
 /*
-	static WindowsRobotSystem robosys;
+	static final WindowsRobotSystem ROBO_SYS;
 	
 	private static void startRobot () {
 		try {

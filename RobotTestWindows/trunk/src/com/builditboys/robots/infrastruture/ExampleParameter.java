@@ -1,6 +1,7 @@
 package com.builditboys.robots.infrastruture;
 
 import com.builditboys.robots.infrastructure.ParameterInterface;
+import com.builditboys.robots.infrastructure.ParameterServer;
 
 public class ExampleParameter implements ParameterInterface {
 	
@@ -17,6 +18,18 @@ public class ExampleParameter implements ParameterInterface {
 		return name;
 	}
 	
+
+	// --------------------------------------------------------------------------------
+
+	public static ExampleParameter getParameter (String key) {
+		return (ExampleParameter) ParameterServer.getParameter(key);
+	}
+	
+	public static ExampleParameter maybeGetParameter (String key) {
+		return (ExampleParameter) ParameterServer.getParameter(key);
+	}
+	
+	// --------------------------------------------------------------------------------
 
 	ExampleParameter (String name) {
 		this.name = name;
