@@ -2,6 +2,8 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
+import com.builditboys.robots.system.RobotState.RobotModeEnum;
+
 public class LinkControlProtocol extends AbstractProtocol {
 
 	public static final AbstractProtocol REPRESENTATIVE = new LinkControlProtocol();
@@ -77,7 +79,6 @@ public class LinkControlProtocol extends AbstractProtocol {
 		
 		private LinkControlMessageEnum (int num) {
 			messageNum = num;
-			associateInverse(messageNum, this);
 		}
 		
 		private static void associateInverse (int num, LinkControlMessageEnum it) {
@@ -85,7 +86,13 @@ public class LinkControlProtocol extends AbstractProtocol {
 		}
 		
 		private static final int LARGEST_NUM = IM_ALIVE;
-		private static final LinkControlMessageEnum NUM_TO_ENUM[] = new LinkControlMessageEnum[LARGEST_NUM];
+		private static final LinkControlMessageEnum NUM_TO_ENUM[] = new LinkControlMessageEnum[LARGEST_NUM + 1];
+
+		static {
+			for (LinkControlMessageEnum num: values()) {
+				associateInverse(num.messageNum, num);
+			}
+		}
 
 		// use this to get the mode number for an enum
 		public int getMessageNum() {

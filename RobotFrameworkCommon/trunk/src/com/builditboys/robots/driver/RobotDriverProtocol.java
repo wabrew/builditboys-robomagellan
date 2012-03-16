@@ -6,6 +6,7 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
+import com.builditboys.robots.communication.LinkControlProtocol.LinkControlMessageEnum;
 import com.builditboys.robots.utilities.FillableBuffer;
 import com.builditboys.robots.utilities.MiscUtilities;
 
@@ -82,7 +83,6 @@ public class RobotDriverProtocol extends AbstractProtocol {
 		
 		private RobotDriverMessageEnum (int num) {
 			messageNum = num;
-			associateInverse(messageNum, this);
 		}
 		
 		private static void associateInverse (int num, RobotDriverMessageEnum it) {
@@ -90,7 +90,13 @@ public class RobotDriverProtocol extends AbstractProtocol {
 		}
 		
 		private static final int LARGEST_NUM = MS_SET_RANGING_MODE;
-		private static final RobotDriverMessageEnum NUM_TO_ENUM[] = new RobotDriverMessageEnum[LARGEST_NUM];
+		private static final RobotDriverMessageEnum NUM_TO_ENUM[] = new RobotDriverMessageEnum[LARGEST_NUM + 1];
+
+		static {
+			for (RobotDriverMessageEnum num: values()) {
+				associateInverse(num.messageNum, num);
+			}
+		}
 
 		// use this to get the mode number for an enum
 		public int getModeNum() {

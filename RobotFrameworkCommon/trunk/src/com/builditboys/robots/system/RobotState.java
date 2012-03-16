@@ -8,29 +8,36 @@ public class RobotState implements ParameterInterface {
 	
 	//--------------------------------------------------------------------------------
 	
-	public static final int ROBOT_MODE__SAFE   = 0; // safe mode
-	public static final int ROBOT_MODE__RC     = 1; // R/C mode
-	public static final int ROBOT_MODE__AUTO   = 2; // autonomous mode
+	public static final int ROBOT_MODE__SAFE    = 0; // safe mode
+	public static final int ROBOT_MODE__RC      = 1; // R/C mode
+	public static final int ROBOT_MODE__AUTO    = 2; // autonomous mode
+	public static final int ROBOT_MODE__UNKNOWN = 3; // unknown mode
 	
 	public enum RobotModeEnum {
 		SAFE_MODE(ROBOT_MODE__SAFE),
 		RC_MODE(ROBOT_MODE__RC),
-		AUTONOMOUS_MODE(ROBOT_MODE__AUTO);
+		AUTONOMOUS_MODE(ROBOT_MODE__AUTO),
+		UNKNOWN(ROBOT_MODE__UNKNOWN);
 		
 		private int modeNum;
 		
 		private RobotModeEnum (int num) {
 			modeNum = num;
-			associateInverse(modeNum, this);
 		}
 		
 		private static void associateInverse (int num, RobotModeEnum it) {
 			NUM_TO_ENUM[num] = it;
 		}
 		
-		private static final int LARGEST_NUM = ROBOT_MODE__AUTO;
-		private static final RobotModeEnum NUM_TO_ENUM[] = new RobotModeEnum[LARGEST_NUM];
+		private static final int LARGEST_NUM = ROBOT_MODE__UNKNOWN;
+		private static final RobotModeEnum NUM_TO_ENUM[] = new RobotModeEnum[LARGEST_NUM + 1];
 
+		static {
+			for (RobotModeEnum mode: values()) {
+				associateInverse(mode.modeNum, mode);
+			}
+		}
+		
 		// use this to get the mode number for an enum
 		public int getModeNum() {
 			return modeNum;
@@ -54,24 +61,88 @@ public class RobotState implements ParameterInterface {
 		}
 	
 		// keep these in sync with the PSoC
-		public static final int ESTOP                 = 0;
+		public static final int ESTOP_BIT                 = 0;
 
-		public static final int SOFT_ESTOP            = 1;
+		public static final int SOFT_ESTOP_BIT            = 1;
 
-		public static final int HARD_ESTOP_ACTIVE     = 2;
-		public static final int HARD_ESTOP_LATCH      = 3;
+		public static final int HARD_ESTOP_ACTIVE_BIT     = 2;
+		public static final int HARD_ESTOP_LATCH_BIT      = 3;
 
-		public static final int PULSE_ESTOP_ACTIVE    = 4;
-		public static final int PULSE_ESTOP_LATCH     = 5;
+		public static final int PULSE_ESTOP_ACTIVE_BIT    = 4;
+		public static final int PULSE_ESTOP_LATCH_BIT     = 5;
 
-		public static final int DEAD_MAN_ESTOP_ACTIVE = 6;	
-		public static final int DEAD_MAN_ESTOP_LATCH  = 7;	
+		public static final int DEAD_MAN_ESTOP_ACTIVE_BIT = 6;	
+		public static final int DEAD_MAN_ESTOP_LATCH_BIT  = 7;	
 		
 	}
 	
-	//--------------------------------------------------------------------------------
+	public enum EStopBitsEnum {
+		ESTOP(EStopBits.ESTOP_BIT),
+		SOFT_ESTOP(EStopBits.SOFT_ESTOP_BIT),
+		HARD_ESTOP_ACTIVE(EStopBits.HARD_ESTOP_ACTIVE_BIT),
+		HARD_EDTOP_LATCH(EStopBits.HARD_ESTOP_LATCH_BIT),
+		PULSE_ESTOP_ACTIVE(EStopBits.PULSE_ESTOP_ACTIVE_BIT),
+		PULSE_ESTOP_LATCH(EStopBits.PULSE_ESTOP_LATCH_BIT),
+		DEAD_MAN_ESTOP_ACTIVE(EStopBits.DEAD_MAN_ESTOP_ACTIVE_BIT),
+		DEAD_MAN_ESTOP_LATCH(EStopBits.DEAD_MAN_ESTOP_LATCH_BIT);
+		
+		private int bitNum;
+		
+		private  EStopBitsEnum (int num) {
+			bitNum = num;
+		}
+		
+		private static void associateInverse (int num, EStopBitsEnum it) {
+			NUM_TO_ENUM[num] = it;
+		}
+		
+		private static final int LARGEST_NUM = EStopBits.DEAD_MAN_ESTOP_LATCH_BIT;
+		private static final EStopBitsEnum NUM_TO_ENUM[] = new EStopBitsEnum[LARGEST_NUM + 1];
+
+		static {
+			for (EStopBitsEnum bnum: values()) {
+				associateInverse(bnum.bitNum, bnum);
+			}
+		}
+
+		// use this to get the mode number for an enum
+		public int getIndicatorNum() {
+			return bitNum;
+		}
+
+		// use this to map a mode number to its enum
+		public static EStopBitsEnum numToEnum(int num) {
+			if ((num > NUM_TO_ENUM.length) || (num < 0)) {
+				throw new IndexOutOfBoundsException("num out of range");
+			}
+			return NUM_TO_ENUM[num];
+		}
+		
+		public boolean testBit(EStopBits bits) {
+			return bits.testBit(bitNum);
+		}
+		
+		public void setBit(EStopBits bits) {
+			bits.setBit(bitNum);
+		}
+		
+		public void clearBit(EStopBits bits) {
+			bits.clearBit(bitNum);
+		}
+		
+		public static void printBits (EStopBits bits) {
+			for (EStopBitsEnum bit: values()) {
+				if (bit.testBit(bits)) {
+					System.out.print(bit + " ");
+				}
+			}
+		}
+
+	}
 
 	
+	//--------------------------------------------------------------------------------
+
 	public static final int SOFT_ESTOP_INDICATOR     = 0;
 	public static final int HARD_ESTOP_INDICATOR     = 1;	
 	public static final int PULSE_ESTOP_INDICATOR    = 2;
@@ -87,7 +158,6 @@ public class RobotState implements ParameterInterface {
 		
 		private  EStopIndicatorEnum (int num) {
 			indicatorNum = num;
-			associateInverse(indicatorNum, this);
 		}
 		
 		private static void associateInverse (int num, EStopIndicatorEnum it) {
@@ -95,7 +165,13 @@ public class RobotState implements ParameterInterface {
 		}
 		
 		private static final int LARGEST_NUM = DEAD_MAN_ESTOP_INDICATOR;
-		private static final EStopIndicatorEnum NUM_TO_ENUM[] = new EStopIndicatorEnum[LARGEST_NUM];
+		private static final EStopIndicatorEnum NUM_TO_ENUM[] = new EStopIndicatorEnum[LARGEST_NUM + 1];
+
+		static {
+			for (EStopIndicatorEnum indicator: values()) {
+				associateInverse(indicator.indicatorNum, indicator);
+			}
+		}
 
 		// use this to get the mode number for an enum
 		public int getIndicatorNum() {
@@ -115,8 +191,8 @@ public class RobotState implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 	// State variables
 	
-	int updateTime = 0;   // local time
-	RobotModeEnum mode = RobotModeEnum.SAFE_MODE;
+	int captureTime = 0;   // local time
+	RobotModeEnum mode = RobotModeEnum.UNKNOWN;
 	EStopBits eStopByte = new EStopBits((byte) 0);
 	
 	private static final RobotState INSTANCE;
@@ -158,11 +234,21 @@ public class RobotState implements ParameterInterface {
 	//--------------------------------------------------------------------------------
 
 	public synchronized void updateState (int time, int modeNum, int eStop) {
-		updateTime = time;
+		captureTime = time;
 		mode = RobotModeEnum.numToEnum(modeNum);
 		eStopByte.setValue(eStop);
 	}
 	
+	//--------------------------------------------------------------------------------
+	
+	public static void print () {
+		System.out.println("Robot State:");
+		System.out.println("  Time: " + INSTANCE.captureTime);
+		System.out.println("  Mode: " + INSTANCE.mode);
+		System.out.print("  Estop: ");
+		EStopBitsEnum.printBits(INSTANCE.eStopByte);
+		System.out.println();
+	}
 	
 	//--------------------------------------------------------------------------------
 

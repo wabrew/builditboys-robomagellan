@@ -90,6 +90,10 @@ public class BitBuffer {
 	
 	public void clearFromTo (int from, int to) {
 		validateIndices(from, to);
+		clearFromToUnchecked(from, to);
+	}
+	
+	public void clearFromToUnchecked (int from, int to) {
 		int mask = ~(1 << from);
 		for (int i = from; i <= to; i++) {
 			buffer &= mask;
@@ -200,7 +204,7 @@ public class BitBuffer {
 	//--------------------------------------------------------------------------------
 
 	private void clearExcess () {
-		clearFromTo(size, BUFFER_SIZE);
+		clearFromToUnchecked(size, BUFFER_SIZE);
 	}
 	
 	private void validateIndices (int from, int to) {
@@ -211,7 +215,7 @@ public class BitBuffer {
 		}
 	}
 	private void validateIndex (int index) {
-		if (index <= 0) {
+		if (index < 0) {
 			throw new IndexOutOfBoundsException("index out of range" + " " + index);
 		}
 		if (index > size) {

@@ -34,6 +34,7 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
+import com.builditboys.robots.driver.RobotDriverProtocol.RobotDriverMessageEnum;
 import com.builditboys.robots.utilities.FillableBuffer;
 
 public class TimeSyncProtocol extends AbstractProtocol {
@@ -104,7 +105,6 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		
 		private TimeSyncMessageEnum (int num) {
 			messageNum = num;
-			associateInverse(messageNum, this);
 		}
 		
 		private static void associateInverse (int num, TimeSyncMessageEnum it) {
@@ -112,7 +112,13 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		}
 		
 		private static final int LARGEST_NUM = MS_REPLY_SYNC;
-		private static final TimeSyncMessageEnum NUM_TO_ENUM[] = new TimeSyncMessageEnum[LARGEST_NUM];
+		private static final TimeSyncMessageEnum NUM_TO_ENUM[] = new TimeSyncMessageEnum[LARGEST_NUM + 1];
+
+		static {
+			for (TimeSyncMessageEnum num: values()) {
+				associateInverse(num.messageNum, num);
+			}
+		}
 
 		// use this to get the mode number for an enum
 		public int getMessageNum() {

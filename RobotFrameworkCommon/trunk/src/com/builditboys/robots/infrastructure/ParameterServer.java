@@ -120,11 +120,11 @@ public final class ParameterServer {
 			}
 			Arrays.sort(keys, java.text.Collator.getInstance());
 			for (String key: keys) {
-				System.out.println("\"" + key + "\" -> " + MiscUtilities.bestObjectName(parmMap.get(key)));				
+				System.out.println("  \"" + key + "\" -> " + MiscUtilities.bestObjectName(parmMap.get(key)));				
 			}		
 		}
 		else {
-			System.out.println("currently there are no parameters");
+			System.out.println(" currently there are no parameters");
 		}
 	}
 
