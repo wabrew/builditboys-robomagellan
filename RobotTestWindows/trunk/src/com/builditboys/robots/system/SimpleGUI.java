@@ -10,7 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.builditboys.robots.communication.AbstractLink;
+import com.builditboys.robots.communication.AbstractProtocol;
 import com.builditboys.robots.infrastructure.ParameterServer;
+import com.builditboys.robots.system.RobotState.RobotModeEnum;
+import com.builditboys.robots.time.TimeSyncProtocol;
 
 import static com.builditboys.robots.system.TestWindowsRobotSystem.*;
 import static com.builditboys.robots.system.AbstractRobotSystem.*;
@@ -40,6 +44,9 @@ public class SimpleGUI extends JFrame {
 		addExitButton();
 		addShowParametersButton();
 		addShowRobotStateButton();
+		addSetClockButton();
+		addCorrespondTimeButton();
+		addSetModeButton();
 		addExampleButton();
 		
 		setTitle("Robot Controller");
@@ -134,7 +141,67 @@ public class SimpleGUI extends JFrame {
 		panel.add(button);
 	}
 
-
+	private void addSetClockButton () {
+		JButton button = new JButton("Reset Slave Clock");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Reset the slave's clock to 0");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				AbstractLink link = AbstractLink.getParameter("ROBOT_LINK");
+				TimeSyncProtocol proto = TimeSyncProtocol.getLinkOutputProtocol(link);
+				try {
+					proto.sendSetClock(false);
+				} catch (InterruptedException e) {
+					System.out.println("Clock set interrupted");
+					e.printStackTrace();
+				}
+			}
+		});
+		panel.add(button);
+	}
+	
+	private void addCorrespondTimeButton () {
+		JButton button = new JButton("Corrspond Times");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Correspond the slaves local time to master's");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				AbstractLink link = AbstractLink.getParameter("ROBOT_LINK");
+				TimeSyncProtocol proto = TimeSyncProtocol.getLinkOutputProtocol(link);
+				try {
+					proto.sendCorrespondTime(false);
+				} catch (InterruptedException e) {
+					System.out.println("Correspond time interrupted");
+					e.printStackTrace();
+				}
+			}
+		});
+		panel.add(button);
+	}
+	
+	private void addSetModeButton () {
+		JButton button = new JButton("Set Safe Mode");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Set the robot to safe mode");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				AbstractLink link = AbstractLink.getParameter("ROBOT_LINK");
+				RobotControlProtocol proto = RobotControlProtocol.getLinkOutputProtocol(link);
+				try {
+					proto.sendSetMode(RobotModeEnum.SAFE_MODE, false);
+				} catch (InterruptedException e) {
+					System.out.println("Set safe mode interrupted");
+					e.printStackTrace();
+				}
+			}
+		});
+		panel.add(button);
+	}
+	
+	
+	
+	
+	
 	private void addExampleButton () {
 		JButton button = new JButton("Example");
 		button.setBounds(100, 60, 100, 30);
