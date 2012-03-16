@@ -1,6 +1,7 @@
 package com.builditboys.robots.system;
 
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -9,11 +10,16 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.builditboys.robots.infrastructure.ParameterServer;
+
 import static com.builditboys.robots.system.TestWindowsRobotSystem.*;
 import static com.builditboys.robots.system.AbstractRobotSystem.*;
 
 public class SimpleGUI extends JFrame {
+	private JPanel panel;
+	
 	private boolean robotStarted = false;
+	String message1 = "";
 	
 	public SimpleGUI() {
 		initUI();
@@ -21,18 +27,40 @@ public class SimpleGUI extends JFrame {
 
 	//--------------------------------------------------------------------------------
 
-	public final void initUI() {
+	private final void initUI() {
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		getContentPane().add(panel);
 
 		panel.setLayout(new FlowLayout());
 //		panel.setToolTipText("A Panel container");
 
-		JButton startButton = new JButton("Start");
-		startButton.setBounds(100, 60, 100, 30);
-		startButton.setToolTipText("Start the robot");
-		startButton.addActionListener(new ActionListener() {
+		addStartButton();
+		addStopButton();
+		addExitButton();
+		addShowParametersButton();
+		addShowRobotStateButton();
+		addExampleButton();
+		
+		setTitle("Robot Controller");
+		setSize(300, 200);
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+	}
+	
+	//--------------------------------------------------------------------------------
+
+	public void paint (Graphics g) {
+		g.drawString(message1, 6, 80);
+	}
+
+	//--------------------------------------------------------------------------------
+
+	private void addStartButton () {
+		JButton button = new JButton("Start");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Start the robot");
+		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if (!robotStarted) {
 					System.out.println("Starting robot");
@@ -44,12 +72,14 @@ public class SimpleGUI extends JFrame {
 				}
 			}
 		});
-		panel.add(startButton);
-		
-		JButton stopButton = new JButton("Stop");
-		stopButton.setBounds(100, 60, 100, 30);
-		stopButton.setToolTipText("Stop the robot");
-		stopButton.addActionListener(new ActionListener() {
+		panel.add(button);	
+	}
+	
+	private void addStopButton () {
+		JButton button = new JButton("Stop");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Stop the robot");
+		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if (robotStarted) {
 					System.out.println("Stopping the robot");
@@ -60,12 +90,14 @@ public class SimpleGUI extends JFrame {
 				}
 			}
 		});
-		panel.add(stopButton);
-		
-		JButton quitButton = new JButton("Exit");
-		quitButton.setBounds(100, 60, 100, 30);
-		quitButton.setToolTipText("Exit the robot controller");
-		quitButton.addActionListener(new ActionListener() {
+		panel.add(button);
+	}
+	
+	private void addExitButton () {
+		JButton button = new JButton("Exit");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Exit the robot controller");
+		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if (robotStarted) {
 					System.out.println("Stopping the robot");
@@ -75,12 +107,48 @@ public class SimpleGUI extends JFrame {
 				System.exit(0);
 			}
 		});
-		panel.add(quitButton);
-
-		setTitle("Robot Controller");
-		setSize(300, 200);
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		panel.add(button);
 	}
+	
+	private void addShowParametersButton () {
+		JButton button = new JButton("Parameters");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Show the parameter server parameters");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				ParameterServer.print();
+			}
+		});
+		panel.add(button);
+	}
+	
+	private void addShowRobotStateButton () {
+		JButton button = new JButton("Robot State");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Show the robot state");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				RobotState.print();
+			}
+		});
+		panel.add(button);
+	}
+
+
+	private void addExampleButton () {
+		JButton button = new JButton("Example");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Example");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				message1 = "foo";
+				repaint();
+			}
+		});
+		panel.add(button);
+	}
+	
+	//--------------------------------------------------------------------------------
+
 
 }
