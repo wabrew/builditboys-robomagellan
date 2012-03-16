@@ -157,7 +157,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	}
 
 	// --------------------------------------------------------------------------------
-	// Finding channels
+	// Finding channels by number
 
 	public InputChannel getInputChannelN(int channelNumber) {
 		return (InputChannel) inputChannels.getChannelByNumber(channelNumber);
@@ -167,12 +167,31 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		return (OutputChannel) outputChannels.getChannelByNumber(channelNumber);
 	}
 
-	public InputChannel getInputChannelByProtocol(AbstractProtocol protocol) {
-		return (InputChannel) inputChannels.getChannelByProtocol(protocol);
+	// --------------------------------------------------------------------------------
+	// Finding channels and protocols by protocol indicator
+
+	public InputChannel getInputChannelByProtocol(AbstractProtocol representative) {
+		return (InputChannel) inputChannels.getChannelByProtocol(representative);
+	}
+	
+	public AbstractProtocol getInputProtocol (AbstractProtocol representative) {
+		InputChannel channel = getInputChannelByProtocol(representative);
+		if (channel != null) {
+			return channel.getProtocol();
+		}
+		return null;
 	}
 
 	public OutputChannel getOutputChannelByProtocol(AbstractProtocol protocol) {
 		return (OutputChannel) outputChannels.getChannelByProtocol(protocol);
+	}
+
+	public AbstractProtocol getOutputProtocol (AbstractProtocol representative) {
+		OutputChannel channel = getOutputChannelByProtocol(representative);
+		if (channel != null) {
+			return channel.getProtocol();
+		}
+		return null;
 	}
 
 	// --------------------------------------------------------------------------------

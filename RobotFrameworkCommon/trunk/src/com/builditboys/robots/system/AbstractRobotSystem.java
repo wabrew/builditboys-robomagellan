@@ -2,13 +2,17 @@ package com.builditboys.robots.system;
 
 import java.io.IOException;
 
+import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
+import com.builditboys.robots.communication.AbstractProtocol;
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
+import com.builditboys.robots.driver.RobotDriverProtocol;
 import com.builditboys.robots.infrastructure.DistributionList;
 import com.builditboys.robots.infrastructure.ParameterInterface;
 import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.infrastructure.StringParameter;
 import com.builditboys.robots.time.LocalTimeSystem;
+import com.builditboys.robots.time.TimeSyncProtocol;
 
 /*
 The concept.
@@ -41,6 +45,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	private static final SystemNotification START1_NOTICE = SystemNotification.newStart1Notification();
 	private static final SystemNotification START2_NOTICE = SystemNotification.newStart2Notification();
+	private static final SystemNotification START3_NOTICE = SystemNotification.newStart3Notification();
 	private static final SystemNotification ESTOP_NOTICE = SystemNotification.newEstopNotification();
 	private static final SystemNotification STOP_NOTICE = SystemNotification.newStopNotification();
 
@@ -75,20 +80,21 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		
 		System.out.println("**Basic setup complete");
 		ParameterServer.print();
+		RobotState.print();
 		System.out.println();
 	}
 	
 	private void startRobotSystemPhase1 () throws InterruptedException {
 		System.out.println("**Starting phase 1 setup");
-		StringParameter robotNameParameter = StringParameter.getParameter("ROBOT_NAME");
 
 		ParameterServer.addParameter(this);
 		
 		// set up local time first, many things depend on it including notifications
 		LocalTimeSystem.startLocalTimeNow();
 		System.out.println("Local time initialized");
+		
+		// other stuff here
 
-		// send out the first start phase notification
 		START1_NOTICE.publish(this);
 		System.out.println("Phase 1 notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);		
@@ -100,22 +106,26 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		// get the link to the robot set up
 		masterLink = new MasterLink("ROBOT_LINK", linkPort);
 		ParameterServer.addParameter(masterLink);
-
-// starting the link should probably happen by listening to a start notice
+		
+		TimeSyncProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
+		RobotControlProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
+		RobotDriverProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
 		masterLink.startLink();
 		System.out.println("Link started");
-		
-		
-		// other stuff goes here
 		
 		START2_NOTICE.publish(this);
 		System.out.println("Phase 2 notification sent");
 		wait(ROBOT_SYSTEM_PHASE_WAIT);		
 	}
 
-	private void startRobotSystemPhase3 () {
+	private void startRobotSystemPhase3 () throws InterruptedException {
 		System.out.println("**Starting phase 3 setup");
 		
+		// other stuff here
+		
+		START3_NOTICE.publish(this);
+		System.out.println("Phase 3 notification sent");
+		wait(ROBOT_SYSTEM_PHASE_WAIT);				
 	}
 
 	// --------------------------------------------------------------------------------
@@ -190,5 +200,16 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		return (AbstractRobotSystem) ParameterServer.getParameter(key);
 	}
 		
+	// --------------------------------------------------------------------------------
+
+	public static AbstractProtocol getRobotInputProtocol (AbstractProtocol representative) {
+		return INSTANCE.masterLink.getInputProtocol(representative);
+	}
+	
+	public static AbstractProtocol getRobotOutputProtocol (AbstractProtocol representative) {
+		return INSTANCE.masterLink.getOutputProtocol(representative);
+	}
+	
+	// --------------------------------------------------------------------------------
 
 }

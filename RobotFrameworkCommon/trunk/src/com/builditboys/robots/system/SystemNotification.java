@@ -9,6 +9,7 @@ public class SystemNotification extends AbstractNotification {
 	public enum SystemActionEnum {
 		START1,
 		START2,
+		START3,
 		ESTOP,
 		NORMAL_STOP;
 	}
@@ -36,6 +37,10 @@ public class SystemNotification extends AbstractNotification {
 	}
 	
 	public static SystemNotification newStart2Notification () {
+		return new SystemNotification(SystemActionEnum.START2);
+	}
+	
+	public static SystemNotification newStart3Notification () {
 		return new SystemNotification(SystemActionEnum.START2);
 	}
 	

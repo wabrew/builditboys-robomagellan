@@ -6,15 +6,15 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
-import com.builditboys.robots.driver.RobotDriverProtocol.RobotDriverMessageEnum;
 import com.builditboys.robots.system.RobotState.EStopIndicatorEnum;
+import com.builditboys.robots.system.RobotState.RobotModeEnum;
 import com.builditboys.robots.time.LocalTimeSystem;
 import com.builditboys.robots.utilities.FillableBuffer;
 import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class RobotControlProtocol extends AbstractProtocol {
 
-	public static final AbstractProtocol REPRESENTATIVE = new RobotControlProtocol();
+	private static final AbstractProtocol REPRESENTATIVE = new RobotControlProtocol();
 	
 	private static final int MY_CHANNEL_NUMBER = ROBOT_CONTROL_CHANNEL_NUMBER;
 	
@@ -59,6 +59,16 @@ public class RobotControlProtocol extends AbstractProtocol {
 		RobotControlProtocol iproto = new RobotControlProtocol(rol);
 		RobotControlProtocol oproto = new RobotControlProtocol(rol);
 		link.addProtocol(iproto, oproto);
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static RobotControlProtocol getLinkInputProtocol (AbstractLink link) {
+		return (RobotControlProtocol) link.getInputProtocol(REPRESENTATIVE);
+	}
+	
+	public static RobotControlProtocol getLinkOutputProtocol (AbstractLink link) {
+		return (RobotControlProtocol) link.getOutputProtocol(REPRESENTATIVE);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -123,7 +133,7 @@ public class RobotControlProtocol extends AbstractProtocol {
 	//--------------------------------------------------------------------------------
 	// Sending messages -- master to slave
 	
-	public void sendSetMode (RobotControlMessageEnum mode, boolean doWait) throws InterruptedException {
+	public void sendSetMode (RobotModeEnum mode, boolean doWait) throws InterruptedException {
 		sendRoleMessage(ProtocolRoleEnum.MASTER,
 						new RobotControlMessage(MS_SET_MODE,
 												mode.getModeNum()),

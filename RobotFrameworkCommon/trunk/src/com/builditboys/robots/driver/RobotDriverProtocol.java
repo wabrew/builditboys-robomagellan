@@ -6,7 +6,6 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
-import com.builditboys.robots.communication.LinkControlProtocol.LinkControlMessageEnum;
 import com.builditboys.robots.utilities.FillableBuffer;
 import com.builditboys.robots.utilities.MiscUtilities;
 
@@ -14,7 +13,7 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 
 public class RobotDriverProtocol extends AbstractProtocol {
 
-	public static final AbstractProtocol REPRESENTATIVE = new RobotDriverProtocol();
+	private static final AbstractProtocol REPRESENTATIVE = new RobotDriverProtocol();
 	
 	private static final int MY_CHANNEL_NUMBER = ROBOT_DRIVER_CHANNEL_NUMBER;
 		
@@ -57,6 +56,16 @@ public class RobotDriverProtocol extends AbstractProtocol {
 		RobotDriverProtocol iproto = new RobotDriverProtocol(rol);
 		RobotDriverProtocol oproto = new RobotDriverProtocol(rol);
 		link.addProtocol(iproto, oproto);
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static RobotDriverProtocol getLinkInputProtocol (AbstractLink link) {
+		return (RobotDriverProtocol) link.getInputProtocol(REPRESENTATIVE);
+	}
+	
+	public static RobotDriverProtocol getLinkOutputProtocol (AbstractLink link) {
+		return (RobotDriverProtocol) link.getOutputProtocol(REPRESENTATIVE);
 	}
 	
 	// --------------------------------------------------------------------------------

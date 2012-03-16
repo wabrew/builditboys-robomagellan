@@ -1,7 +1,7 @@
 package com.builditboys.robots.time;
 
 /*
- Java is the slave, PSoC is the master
+ Java is the Master, PSoC is the slave
  
  Java side does
  
@@ -39,7 +39,7 @@ import com.builditboys.robots.utilities.FillableBuffer;
 
 public class TimeSyncProtocol extends AbstractProtocol {
 
-	public static final AbstractProtocol REPRESENTATIVE = new TimeSyncProtocol();
+	private static final AbstractProtocol REPRESENTATIVE = new TimeSyncProtocol();
 
 	private static final int MY_CHANNEL_NUMBER = TIME_SYNC_CHANNEL_NUMBER;
 
@@ -83,6 +83,16 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		TimeSyncProtocol iproto = new TimeSyncProtocol(rol);
 		TimeSyncProtocol oproto = new TimeSyncProtocol(rol);
 		link.addProtocol(iproto, oproto);
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static TimeSyncProtocol getLinkInputProtocol (AbstractLink link) {
+		return (TimeSyncProtocol) link.getInputProtocol(REPRESENTATIVE);
+	}
+	
+	public static TimeSyncProtocol getLinkOutputProtocol (AbstractLink link) {
+		return (TimeSyncProtocol) link.getOutputProtocol(REPRESENTATIVE);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -144,7 +154,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 						doWait);
 	}
 	
-	public void sendCorrespondClock (boolean doWait) throws InterruptedException {
+	public void sendCorrespondTime (boolean doWait) throws InterruptedException {
 		sendRoleMessage(ProtocolRoleEnum.MASTER,
 						new TimeSyncMessage(MS_CORRESPOND_TIME,
 											LocalTimeSystem.currentTime()),

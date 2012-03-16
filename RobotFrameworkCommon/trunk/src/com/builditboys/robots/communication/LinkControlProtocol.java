@@ -2,11 +2,9 @@ package com.builditboys.robots.communication;
 
 import static com.builditboys.robots.communication.LinkParameters.*;
 
-import com.builditboys.robots.system.RobotState.RobotModeEnum;
-
 public class LinkControlProtocol extends AbstractProtocol {
 
-	public static final AbstractProtocol REPRESENTATIVE = new LinkControlProtocol();
+	private static final AbstractProtocol REPRESENTATIVE = new LinkControlProtocol();
 
 	private static final int MY_CHANNEL_NUMBER = LINK_CONTROL_CHANNEL_NUMBER;
 
@@ -49,6 +47,16 @@ public class LinkControlProtocol extends AbstractProtocol {
 		LinkControlProtocol iproto = new LinkControlProtocol(rol);
 		LinkControlProtocol oproto = new LinkControlProtocol(rol);
 		link.addProtocol(iproto, oproto);
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static LinkControlProtocol getLinkInputProtocol (AbstractLink link) {
+		return (LinkControlProtocol) link.getInputProtocol(REPRESENTATIVE);
+	}
+	
+	public static LinkControlProtocol getLinkOutputProtocol (AbstractLink link) {
+		return (LinkControlProtocol) link.getOutputProtocol(REPRESENTATIVE);
 	}
 	
 	// --------------------------------------------------------------------------------

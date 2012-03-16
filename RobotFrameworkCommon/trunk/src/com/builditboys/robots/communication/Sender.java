@@ -74,6 +74,7 @@ public class Sender extends AbstractSenderReceiver {
 					sendMessage(message);
 				}
 				else {
+					LinkMessage message = sentChannel.getMessage();  // get but don't use
 					System.out.println(link.getRole() + " discarding unsent message for channel " + sentChannel.getChannelNumber());
 				}
 			}
