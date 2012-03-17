@@ -44,6 +44,7 @@ public class SimpleGUI extends JFrame {
 		addExitButton();
 		addShowParametersButton();
 		addShowRobotStateButton();
+		addEnableLinkButton();
 		addSetClockButton();
 		addCorrespondTimeButton();
 		addSetModeButton();
@@ -135,7 +136,20 @@ public class SimpleGUI extends JFrame {
 		button.setToolTipText("Show the robot state");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				RobotState.print();
+				AbstractRobotSystem.printState();
+			}
+		});
+		panel.add(button);
+	}
+
+	private void addEnableLinkButton () {
+		JButton button = new JButton("Enable Link");
+		button.setBounds(100, 60, 100, 30);
+		button.setToolTipText("Enable the link for normal traffic");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				AbstractLink link = AbstractLink.getParameter("ROBOT_LINK");
+				link.enable();
 			}
 		});
 		panel.add(button);
@@ -150,7 +164,7 @@ public class SimpleGUI extends JFrame {
 				AbstractLink link = AbstractLink.getParameter("ROBOT_LINK");
 				TimeSyncProtocol proto = TimeSyncProtocol.getLinkOutputProtocol(link);
 				try {
-					proto.sendSetClock(false);
+					proto.sendResetClock(false);
 				} catch (InterruptedException e) {
 					System.out.println("Clock set interrupted");
 					e.printStackTrace();
@@ -214,6 +228,8 @@ public class SimpleGUI extends JFrame {
 		});
 		panel.add(button);
 	}
+	
+	
 	
 	//--------------------------------------------------------------------------------
 

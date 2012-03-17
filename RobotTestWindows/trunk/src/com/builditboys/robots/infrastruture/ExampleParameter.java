@@ -26,7 +26,7 @@ public class ExampleParameter implements ParameterInterface {
 	}
 	
 	public static ExampleParameter maybeGetParameter (String key) {
-		return (ExampleParameter) ParameterServer.getParameter(key);
+		return (ExampleParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	// --------------------------------------------------------------------------------
