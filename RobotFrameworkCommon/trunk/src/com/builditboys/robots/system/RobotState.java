@@ -192,33 +192,23 @@ public class RobotState implements ParameterInterface {
 	// State variables
 	
 	int captureTime = 0;   // local time
+	
 	RobotModeEnum mode = RobotModeEnum.UNKNOWN;
+	
 	EStopBits eStopByte = new EStopBits((byte) 0);
 	
-	private static final RobotState INSTANCE;
-	
-	// create the singleton and add it to the parameter server
-	static {
-		RobotState state = new RobotState();
-		ParameterServer.addParameter(state);
-		INSTANCE = state;
-	}
-	
+	String name;
+
 	//--------------------------------------------------------------------------------
 
-	private RobotState () {
+	public RobotState (String nm) {
+		name = nm;
 	}
-	
-	//--------------------------------------------------------------------------------
-
-	public static RobotState getInstance () {
-		return INSTANCE;
-	}
-	
+		
 	//--------------------------------------------------------------------------------
 	
 	public String getName () {
-		return "ROBOT_STATE";
+		return name;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -228,7 +218,7 @@ public class RobotState implements ParameterInterface {
 	}
 	
 	public static RobotState maybeGetParameter (String key) {
-		return (RobotState) ParameterServer.getParameter(key);
+		return (RobotState) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -241,12 +231,11 @@ public class RobotState implements ParameterInterface {
 	
 	//--------------------------------------------------------------------------------
 	
-	public static void print () {
-		System.out.println("Robot State:");
-		System.out.println("  Time: " + INSTANCE.captureTime);
-		System.out.println("  Mode: " + INSTANCE.mode);
+	public void print () {
+		System.out.println("  Time: " + captureTime);
+		System.out.println("  Mode: " + mode);
 		System.out.print("  Estop: ");
-		EStopBitsEnum.printBits(INSTANCE.eStopByte);
+		EStopBitsEnum.printBits(eStopByte);
 		System.out.println();
 	}
 	

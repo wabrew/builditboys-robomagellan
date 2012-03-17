@@ -24,7 +24,7 @@ public class ObjectParameter extends AbstractParameter implements ParameterInter
 	}
 	
 	public static ObjectParameter maybeGetParameter (String key) {
-		return (ObjectParameter) ParameterServer.getParameter(key);
+		return (ObjectParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

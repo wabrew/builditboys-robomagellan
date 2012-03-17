@@ -44,11 +44,13 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	private static final int MY_CHANNEL_NUMBER = TIME_SYNC_CHANNEL_NUMBER;
 
 	// --------------------------------------------------------------------------------
-	// Constructors
+	// Constructors -- you don't construct a protocol directly, use addProtocolToLink
 
+	// for the indicator
 	private TimeSyncProtocol() {
 	}
 
+	// for the real protocol objects
 	private TimeSyncProtocol(ProtocolRoleEnum rol) {
 		protocolRole = rol;
 	}
@@ -147,10 +149,17 @@ public class TimeSyncProtocol extends AbstractProtocol {
 	// --------------------------------------------------------------------------------(non-Javadoc)
  	// Sending Messages -- Master to Slave
 	
-	public void sendSetClock (boolean doWait) throws InterruptedException {
+	public void sendResetClock (boolean doWait) throws InterruptedException {
 		sendRoleMessage(ProtocolRoleEnum.MASTER,
 						new TimeSyncMessage(MS_SET_CLOCK,
-											LocalTimeSystem.currentTime()),
+											0),
+						doWait);
+	}
+	
+	public void xsendSetClock (int time, boolean doWait) throws InterruptedException {
+		sendRoleMessage(ProtocolRoleEnum.MASTER,
+						new TimeSyncMessage(MS_SET_CLOCK,
+											time),
 						doWait);
 	}
 	

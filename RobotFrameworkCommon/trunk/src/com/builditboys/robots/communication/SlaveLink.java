@@ -31,6 +31,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 
 	public synchronized void doWork () throws InterruptedException {
 		while (true) {
+			System.out.println("Starting " + role + " link synchronization " + syncAttempts++);
 			setLinkState(LinkStateEnum.LinkInitState);
 			
 			// --------------------
@@ -77,6 +78,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			// if we got an IM_ALIVE, then the link is happy
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
+				System.out.println("Successful " + role + " link synchronization");
 				setLinkState(LinkStateEnum.LinkReadyState);
 				lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
@@ -95,7 +97,7 @@ public class SlaveLink extends AbstractLink implements Runnable {
 						}
 					}
 					else {
-						System.out.println("Slave Keep Alive Timout");
+						System.out.println("Slave Keep Alive Timout: " + keepAliveDiff());
 						break;
 					}
 				}

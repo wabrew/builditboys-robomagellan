@@ -22,7 +22,7 @@ public class IntegerParameter extends AbstractParameter implements ParameterInte
 	}
 	
 	public static IntegerParameter maybeGetParameter (String key) {
-		return (IntegerParameter) ParameterServer.getParameter(key);
+		return (IntegerParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	// --------------------------------------------------------------------------------

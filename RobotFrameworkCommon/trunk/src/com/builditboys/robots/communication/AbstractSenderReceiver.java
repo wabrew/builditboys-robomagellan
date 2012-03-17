@@ -5,6 +5,7 @@ import static com.builditboys.robots.communication.LinkParameters.*;
 import java.io.IOException;
 
 import com.builditboys.robots.system.AbstractRobotSystem;
+import com.builditboys.robots.time.LocalTimeSystem;
 
 public abstract class AbstractSenderReceiver implements Runnable {
 
@@ -142,6 +143,49 @@ public abstract class AbstractSenderReceiver implements Runnable {
 			}
 		}
 		return sequenceNumber;
+	}
+
+	// --------------------------------------------------------------------------------
+
+	private static boolean doDebugPrint = true;
+	private static boolean doDebugPrintImAlive = false;
+	
+	protected void debugPrintMessage (String direction, int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
+		if (doDebugPrint) {
+			if (LinkControlProtocol.isKeepAliveMessage(message)) {
+				if (doDebugPrintImAlive) {
+					debugPrintMessage1(direction, seqNr, channelNr, length, CRC1, message, CRC2);
+				}
+			}
+			else {
+				debugPrintMessage1(direction, seqNr, channelNr, length, CRC1, message, CRC2);				
+			}
+		}
+	}
+	
+	private void debugPrintMessage1 (String direction, int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
+		synchronized (System.out) {
+			System.out.print(LocalTimeSystem.currentTime());
+			System.out.print(" : " + link.getRole() + " " + direction + ": ");
+			printRawMessage(seqNr, channelNr, length, CRC1, message, CRC2);
+			System.out.println();
+		}		
+	}
+	
+	private static void printRawMessage(int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
+		System.out.print(seqNr);
+		System.out.print(" ");
+		System.out.print(channelNr);
+		System.out.print(" ");
+		System.out.print(length);
+		System.out.print(" ");
+		System.out.print(CRC1);
+		System.out.print(" ");
+
+		message.printBuffer();
+
+		System.out.print(CRC2);
+		System.out.print(" ");
 	}
 
 }

@@ -22,7 +22,7 @@ public class StringParameter extends AbstractParameter implements ParameterInter
 	}
 	
 	public static StringParameter maybeGetParameter (String key) {
-		return (StringParameter) ParameterServer.getParameter(key);
+		return (StringParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ import com.builditboys.robots.communication.AbstractProtocolMessage;
 import com.builditboys.robots.communication.InputChannel;
 import com.builditboys.robots.communication.LinkMessage;
 import com.builditboys.robots.communication.OutputChannel;
+import com.builditboys.robots.infrastructure.ParameterServer;
 import com.builditboys.robots.system.RobotState.EStopIndicatorEnum;
 import com.builditboys.robots.system.RobotState.RobotModeEnum;
 import com.builditboys.robots.time.LocalTimeSystem;
@@ -21,11 +22,13 @@ public class RobotControlProtocol extends AbstractProtocol {
 	RobotStateMessage robotStateMessage = new RobotStateMessage();
 	
 	// --------------------------------------------------------------------------------
-	// Constructors
+	// Constructors -- you don't construct a protocol directly, use addProtocolToLink
 
+	// for the indicator
 	private RobotControlProtocol() {
 	}
 
+	// for the real protocol objects
 	private RobotControlProtocol (ProtocolRoleEnum rol) {
 		protocolRole = rol;
 	}
@@ -55,10 +58,14 @@ public class RobotControlProtocol extends AbstractProtocol {
 
 	// --------------------------------------------------------------------------------
 
-	public static void addProtocolToLink (AbstractLink link, ProtocolRoleEnum rol) {
+	public static void addProtocolToLink (AbstractLink link, ProtocolRoleEnum rol, String stateName) {
 		RobotControlProtocol iproto = new RobotControlProtocol(rol);
 		RobotControlProtocol oproto = new RobotControlProtocol(rol);
 		link.addProtocol(iproto, oproto);
+		
+		// special to this protocol, create a place to store state results
+		RobotState state = new RobotState(stateName);
+		ParameterServer.addParameter(state);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -226,9 +233,9 @@ public class RobotControlProtocol extends AbstractProtocol {
 		case SM_HERE_IS_MY_STATE:
 			// update the state and publish event
 			robotStateMessage.reConstruct(message);
-			RobotState.getInstance().updateState(robotStateMessage.time,
-												 robotStateMessage.mode,
-												 robotStateMessage.estop);
+			RobotState.getParameter("ROBOT_STATE").updateState(robotStateMessage.time,
+												   robotStateMessage.mode,
+												   robotStateMessage.estop);
 			notice = RobotControlNotification.newRobotStateNotice();
 			notice.publish(this);
 			break;

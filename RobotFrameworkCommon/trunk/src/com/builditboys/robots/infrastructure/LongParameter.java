@@ -22,7 +22,7 @@ public class LongParameter extends AbstractParameter implements ParameterInterfa
 	}
 	
 	public static LongParameter maybeGetParameter (String key) {
-		return (LongParameter) ParameterServer.getParameter(key);
+		return (LongParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ package com.builditboys.robots.system;
 import java.io.IOException;
 
 import com.builditboys.robots.communication.AbstractProtocol.ProtocolRoleEnum;
+import com.builditboys.robots.communication.AbstractLink;
 import com.builditboys.robots.communication.AbstractProtocol;
 import com.builditboys.robots.communication.LinkPortInterface;
 import com.builditboys.robots.communication.MasterLink;
@@ -62,7 +63,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		return INSTANCE;
 	}
 
-	public static void setInstance(AbstractRobotSystem instance) {
+	protected static void setInstance(AbstractRobotSystem instance) {
 		if (INSTANCE == null) {
 			INSTANCE = instance;
 		}
@@ -80,7 +81,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		
 		System.out.println("**Basic setup complete");
 		ParameterServer.print();
-		RobotState.print();
+		RobotState.getParameter("ROBOT_STATE").print();
 		System.out.println();
 	}
 	
@@ -108,7 +109,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		ParameterServer.addParameter(masterLink);
 		
 		TimeSyncProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
-		RobotControlProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
+		RobotControlProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER, "ROBOT_STATE");
 		RobotDriverProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
 		masterLink.startLink();
 		System.out.println("Link started");
@@ -120,6 +121,10 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	private void startRobotSystemPhase3 () throws InterruptedException {
 		System.out.println("**Starting phase 3 setup");
+		
+		masterLink.sleepUntilReady();
+		masterLink.enable();
+		System.out.println("Link enabled");
 		
 		// other stuff here
 		
@@ -197,7 +202,7 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	}
 	
 	public static AbstractRobotSystem maybeGetParameter (String key) {
-		return (AbstractRobotSystem) ParameterServer.getParameter(key);
+		return (AbstractRobotSystem) ParameterServer.maybeGetParameter(key);
 	}
 		
 	// --------------------------------------------------------------------------------
@@ -209,6 +214,27 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	public static AbstractProtocol getRobotOutputProtocol (AbstractProtocol representative) {
 		return INSTANCE.masterLink.getOutputProtocol(representative);
 	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static void printState () {
+		System.out.println("Robot State:");
+		RobotState state = RobotState.maybeGetParameter("ROBOT_STATE");
+		if (state != null) {
+			state.print();
+		}
+		else {
+			System.out.println("  No current robot state");
+		}
+		AbstractLink link = AbstractLink.maybeGetParameter("ROBOT_LINK");
+		if (link != null) {
+			System.out.println("  Link state: " + link.getLinkState());
+		}
+		else {
+			System.out.println("  No current link state");
+		}
+	}
+
 	
 	// --------------------------------------------------------------------------------
 

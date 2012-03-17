@@ -31,6 +31,7 @@ public class MasterLink extends AbstractLink {
 
 	public synchronized void doWork () throws InterruptedException {
 		while (true) {
+			System.out.println("Starting " + role + " link synchronization: " + syncAttempts++);
 			setLinkState(LinkStateEnum.LinkInitState);
 			
 			// --------------------
@@ -56,6 +57,7 @@ public class MasterLink extends AbstractLink {
 			// if we got a DID_PROCEED, then the link is happy
 			// just keep it that way
 			if (linkState == LinkStateEnum.LinkReceivedDidProceedState) {
+				System.out.println("Successful " + role + " link synchronization");
 				setLinkState(LinkStateEnum.LinkReadyState);
 				lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
 				while ((linkState == LinkStateEnum.LinkReadyState)
@@ -74,7 +76,7 @@ public class MasterLink extends AbstractLink {
 						}
 					}
 					else {
-						System.out.println("Master Keep Alive Timout");
+						System.out.println("Master Keep Alive Timout: " + keepAliveDiff());
 						break;
 					}
 				}

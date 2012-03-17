@@ -108,13 +108,7 @@ public class Receiver extends AbstractSenderReceiver {
 
 		if (receivedOk) {
 			receivedTime = InternalTimeSystem.currentTime();
-
-			synchronized (System.out) {
-				System.out.print(LocalTimeSystem.currentTime());
-				System.out.print(" : " + link.getRole() + " Received: ");
-				printRaw();
-				System.out.println();
-			}
+			debugPrintMessage("Received", receivedSequenceNumber, receivedChannelNumber, receivedLength, receivedCRC1, receivedMessage, receivedCRC2);
 		}
 	}
 
@@ -246,22 +240,5 @@ public class Receiver extends AbstractSenderReceiver {
 		link.receiveReceiverException(e);
 	}
 
-	// --------------------------------------------------------------------------------
-
-	private void printRaw() {
-		System.out.print(receivedSequenceNumber);
-		System.out.print(" ");
-		System.out.print(receivedChannelNumber);
-		System.out.print(" ");
-		System.out.print(receivedLength);
-		System.out.print(" ");
-		System.out.print(receivedCRC1);
-		System.out.print(" ");
-
-		receivedMessage.printBuffer();
-
-		System.out.print(receivedCRC2);
-		System.out.print(" ");
-	}
 
 }

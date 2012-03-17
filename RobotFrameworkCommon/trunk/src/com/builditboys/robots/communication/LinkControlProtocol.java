@@ -9,11 +9,13 @@ public class LinkControlProtocol extends AbstractProtocol {
 	private static final int MY_CHANNEL_NUMBER = LINK_CONTROL_CHANNEL_NUMBER;
 
 	// --------------------------------------------------------------------------------
-	// Constructors
+	// Constructors -- you don't construct a protocol directly, use addProtocolToLink
 
+	// for the indicator
 	private LinkControlProtocol() {
 	}
 
+	// for the real protocol objects
 	private LinkControlProtocol(ProtocolRoleEnum role) {
 		protocolRole = role;
 	}
@@ -225,6 +227,13 @@ public class LinkControlProtocol extends AbstractProtocol {
 		default:
 			throw new IllegalStateException();
 		}
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public static boolean isKeepAliveMessage(LinkMessage message) {
+		return (message.getChannelNumber() == MY_CHANNEL_NUMBER)
+			   && (message.peekByte() == IM_ALIVE);
 	}
 
 }

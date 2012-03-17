@@ -6,7 +6,7 @@ public class LinkParameters {
 	// Sequence numbers
 	
 	public static final int SEQUENCE_NUM_MIN = 1;
-	public static final int SEQUENCE_NUM_MAX = 200;
+	public static final int SEQUENCE_NUM_MAX = 125;
 
 	//--------------------------------------------------------------------------------
 	// Channel numbers
@@ -78,7 +78,7 @@ public class LinkParameters {
 	public static final long NEED_PREPARE_TIMEOUT = 5000;
 	public static final long DO_PROCEED_TIMEOUT = 1000;
 	
-	public static final long IM_ALIVE_TIMEOUT = 1000;
+	public static final long IM_ALIVE_TIMEOUT = 1250;
 	public static final long KEEP_ALIVE_INTERVAL = 750;
 
 	//--------------------------------------------------------------------------------

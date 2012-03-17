@@ -22,7 +22,7 @@ public class ShortParameter extends AbstractParameter implements ParameterInterf
 	}
 	
 	public static ShortParameter maybeGetParameter (String key) {
-		return (ShortParameter) ParameterServer.getParameter(key);
+		return (ShortParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

@@ -18,11 +18,13 @@ public class RobotDriverProtocol extends AbstractProtocol {
 	private static final int MY_CHANNEL_NUMBER = ROBOT_DRIVER_CHANNEL_NUMBER;
 		
 	// --------------------------------------------------------------------------------
-	// Constructors
+	// Constructors -- you don't construct a protocol directly, use addProtocolToLink
 
+	// for the indicator
 	private RobotDriverProtocol() {
 	}
 
+	// for the real protocol objects
 	private RobotDriverProtocol (ProtocolRoleEnum rol) {
 		protocolRole = rol;
 	}

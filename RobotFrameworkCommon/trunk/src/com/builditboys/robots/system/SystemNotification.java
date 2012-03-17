@@ -41,7 +41,7 @@ public class SystemNotification extends AbstractNotification {
 	}
 	
 	public static SystemNotification newStart3Notification () {
-		return new SystemNotification(SystemActionEnum.START2);
+		return new SystemNotification(SystemActionEnum.START3);
 	}
 	
 	public static SystemNotification newEstopNotification () {

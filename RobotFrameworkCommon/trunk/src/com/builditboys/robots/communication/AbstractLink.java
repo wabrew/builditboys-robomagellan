@@ -73,6 +73,8 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 
 	protected long lastKeepAliveSentTime = 0;       // system time
 	protected long lastKeepAliveReceivedTime = 0;   // system time
+	
+	protected int syncAttempts = 0;
 
 	// --------------------------------------------------------------------------------
 	// Constructors
@@ -107,7 +109,13 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		// for any other states, just do nothing since you are already
 		// effectively disabled
 	}
-	
+
+	// --------------------------------------------------------------------------------
+
+	public LinkStateEnum getLinkState() {
+		return linkState;
+	}
+
 	// --------------------------------------------------------------------------------
 	// Adding a protocol
 
@@ -142,7 +150,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	}
 	
 	public static AbstractLink maybeGetParameter (String key) {
-		return (AbstractLink) ParameterServer.getParameter(key);
+		return (AbstractLink) ParameterServer.maybeGetParameter(key);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -334,6 +342,10 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	protected boolean keepAliveOk() {
 		return ((SystemTimeSystem.currentTime() - lastKeepAliveReceivedTime) < IM_ALIVE_TIMEOUT);
 	}
+	
+	protected long keepAliveDiff () {
+		return (SystemTimeSystem.currentTime() - lastKeepAliveReceivedTime);
+	}
 
 	protected long timeToNextKeepAlive() {
 		return ((lastKeepAliveSentTime + KEEP_ALIVE_INTERVAL) - SystemTimeSystem.currentTime());
@@ -343,6 +355,7 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	// The receiver calls this when it detects an error
 	
 	protected synchronized void receiveReceiverException (Exception e) {
+		System.out.println();
 		System.out.println(role + "Link Receive Exception");
 		setLinkState(LinkStateEnum.LinkInitState);
 		notify();
@@ -411,6 +424,18 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 		// System.out.println(getRole() + " end wait");
 	}
 
+	// --------------------------------------------------------------------------------
+
+	private static int WAIT_FOR_LINK_READY_INTERVAL = 200;
+	
+	public void sleepUntilReady () throws InterruptedException {
+		System.out.print("Waiting for " + role + " link to become ready ... ");
+		while ((linkState != LinkStateEnum.LinkReadyState) && (linkState != LinkStateEnum.LinkActiveState)) {
+			Thread.sleep(WAIT_FOR_LINK_READY_INTERVAL);
+		}
+		System.out.println("Ready");
+	}
+	
 	// --------------------------------------------------------------------------------
 
 	protected void setLinkState (LinkStateEnum state) {

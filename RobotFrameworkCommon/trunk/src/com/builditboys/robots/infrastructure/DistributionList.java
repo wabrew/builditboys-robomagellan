@@ -81,7 +81,7 @@ public class DistributionList implements ParameterInterface {
 	}
 	
 	public static DistributionList maybeGetParameter (String key) {
-		return (DistributionList) ParameterServer.getParameter(key);
+		return (DistributionList) ParameterServer.maybeGetParameter(key);
 	}
 		
 	//--------------------------------------------------------------------------------

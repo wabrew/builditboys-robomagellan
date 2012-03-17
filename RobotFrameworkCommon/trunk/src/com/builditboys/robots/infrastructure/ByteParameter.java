@@ -22,7 +22,7 @@ public class ByteParameter extends AbstractParameter implements ParameterInterfa
 	}
 	
 	public static ByteParameter maybeGetParameter (String key) {
-		return (ByteParameter) ParameterServer.getParameter(key);
+		return (ByteParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------

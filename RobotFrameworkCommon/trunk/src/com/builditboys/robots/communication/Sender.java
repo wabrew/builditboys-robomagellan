@@ -108,14 +108,8 @@ public class Sender extends AbstractSenderReceiver {
 		sendPostSync();
 
 		sentTime = InternalTimeSystem.currentTime();
-
-		synchronized (System.out){
-			System.out.print(LocalTimeSystem.currentTime());
-			System.out.print(" : " + link.getRole() + " Sent    : ");
-			printRaw();
-			System.out.println();
-		}
-		
+		debugPrintMessage("Sent    ", sentSequenceNumber, sentChannelNumber, sentLength, sentCRC1, sentMessage, sentCRC2);
+	
 		if (message.isSendNotify()) {
 			message.doNotify();
 		}
@@ -198,24 +192,6 @@ public class Sender extends AbstractSenderReceiver {
 		for (int i = 0; i < buff.size(); i++) {
 			sendByte(buff.getByte(i));
 		}
-	}
-
-	// --------------------------------------------------------------------------------
-
-	private void printRaw() {
-		System.out.print(sentSequenceNumber);
-		System.out.print(" ");
-		System.out.print(sentChannelNumber);
-		System.out.print(" ");
-		System.out.print(sentLength);
-		System.out.print(" ");
-		System.out.print(sentCRC1);
-		System.out.print(" ");
-
-		sentMessage.printBuffer();
-
-		System.out.print(sentCRC2);
-		System.out.print(" ");
 	}
 
 	// --------------------------------------------------------------------------------

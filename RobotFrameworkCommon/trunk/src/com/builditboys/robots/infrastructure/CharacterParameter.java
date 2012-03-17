@@ -22,7 +22,7 @@ public class CharacterParameter extends AbstractParameter implements ParameterIn
 	}
 	
 	public static CharacterParameter maybeGetParameter (String key) {
-		return (CharacterParameter) ParameterServer.getParameter(key);
+		return (CharacterParameter) ParameterServer.maybeGetParameter(key);
 	}
 	
 	//--------------------------------------------------------------------------------
