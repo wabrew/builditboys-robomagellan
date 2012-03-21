@@ -149,6 +149,7 @@ public abstract class AbstractSenderReceiver implements Runnable {
 
 	private static boolean doDebugPrint = true;
 	private static boolean doDebugPrintImAlive = false;
+	private static boolean doPrintRaw = false;
 	
 	protected void debugPrintMessage (String direction, int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
 		if (doDebugPrint) {
@@ -167,25 +168,42 @@ public abstract class AbstractSenderReceiver implements Runnable {
 		synchronized (System.out) {
 			System.out.print(LocalTimeSystem.currentTime());
 			System.out.print(" : " + link.getRole() + " " + direction + ": ");
-			printRawMessage(seqNr, channelNr, length, CRC1, message, CRC2);
+			if (doPrintRaw) {
+				printRawMessage(seqNr, channelNr, length, CRC1, message, CRC2);
+			}
+			else {
+				printNiceMessage(seqNr, channelNr, length, CRC1, message, CRC2);			
+			}
 			System.out.println();
 		}		
 	}
 	
 	private static void printRawMessage(int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
-		System.out.print(seqNr);
+		System.out.printf("%02x ", (byte) seqNr);
 		System.out.print(" ");
-		System.out.print(channelNr);
+		System.out.printf("%02x ", (byte) channelNr);
 		System.out.print(" ");
-		System.out.print(length);
+		System.out.printf("%02x ", (byte) length);
 		System.out.print(" ");
-		System.out.print(CRC1);
+		System.out.printf("%02x ", (byte) CRC1);
 		System.out.print(" ");
 
+		System.out.print("[ ");
 		message.printBuffer();
+		System.out.print(" ]");
 
-		System.out.print(CRC2);
-		System.out.print(" ");
+		System.out.printf("%02x ", (byte) CRC2);
+		System.out.printf("%02x ", (byte) CRC2 >> 8);
 	}
+
+
+	private static void printNiceMessage(int seqNr, int channelNr, int length, int CRC1, LinkMessage message, int CRC2) {
+		System.out.print("Ch: " + channelNr);
+		System.out.print(" Nr: " + seqNr);
+
+		System.out.print(" Msg: ");
+		message.printBuffer();
+	}
+
 
 }

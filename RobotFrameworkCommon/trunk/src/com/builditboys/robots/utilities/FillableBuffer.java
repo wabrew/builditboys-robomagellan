@@ -149,18 +149,18 @@ public class FillableBuffer implements Iterable<Byte> {
 	// The de-serialization methods
 
 	public int reConstructBytes1() {
-		byte bite1 = getByte();
-		byte value;
+		int bite1 = getByte();
+		int value;
 
 		value = bite1;
 		return value;
 	}
 
 	public int reConstructBytes2() {
-		byte bite1 = getByte();
-		byte bite2 = getByte();
-		short value;
-
+		int bite1 = getByte() & 0x000000FF;
+		int bite2 = getByte();
+		int value;
+		
 		value = bite2;
 		value <<= 8;
 		value |= bite1;
@@ -169,10 +169,10 @@ public class FillableBuffer implements Iterable<Byte> {
 	}
 
 	public int reConstructBytes4() {
-		byte bite1 = getByte();
-		byte bite2 = getByte();
-		byte bite3 = getByte();
-		byte bite4 = getByte();
+		int bite1 = getByte() & 0x000000FF;
+		int bite2 = getByte() & 0x000000FF;
+		int bite3 = getByte() & 0x000000FF;
+		int bite4 = getByte();
 		int value;
 
 		value = bite4;

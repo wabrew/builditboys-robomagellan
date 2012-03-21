@@ -217,7 +217,7 @@ public class TimeSyncProtocol extends AbstractProtocol {
 		// got a sync request, reply to it
 		case SM_START_SYNC:
 			messageObject.time2 = LocalTimeSystem.currentTime();
-			sendReplySync(messageObject, false);
+			((TimeSyncProtocol) oppositeProtocol).sendReplySync(messageObject, false);
 			break;
 			
 		default:

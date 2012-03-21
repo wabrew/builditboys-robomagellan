@@ -80,7 +80,9 @@ public class SlaveLink extends AbstractLink implements Runnable {
 			if (linkState == LinkStateEnum.LinkReceivedImAliveState) {
 				System.out.println("Successful " + role + " link synchronization");
 				setLinkState(LinkStateEnum.LinkReadyState);
-				lastKeepAliveReceivedTime = SystemTimeSystem.currentTime();
+				long time = SystemTimeSystem.currentTime();
+				lastKeepAliveReceivedTime = time;
+				lastKeepAliveSentTime = time;
 				while ((linkState == LinkStateEnum.LinkReadyState)
 						|| (linkState == LinkStateEnum.LinkActiveState)) {
 					// make sure you have recently received a keep alive message

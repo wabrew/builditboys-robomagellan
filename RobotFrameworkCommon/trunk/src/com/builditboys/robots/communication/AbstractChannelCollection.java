@@ -73,6 +73,7 @@ public abstract class AbstractChannelCollection {
 	public synchronized AbstractChannel getChannelWithMessages () {
 		AbstractChannel channel;
 		for (int i = 0; i <= highestChannelNumber; i++) {
+//			System.out.println("Checking channel " + i);
 			channel = channels[i];
 			if (channel != null) {
 				if (channel.hasMessages()) {
@@ -100,6 +101,19 @@ public abstract class AbstractChannelCollection {
 	// called by a channel when it adds a message
 	public synchronized void notifyMessageAdded (AbstractChannel channel) {
 		notify();
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public void describe () {
+		AbstractChannel chan;
+		for (int i = 0; i < highestChannelNumber; i++) {
+			chan = channels[i];
+			if (chan != null) {
+				chan.describe();
+				System.out.println();
+			}
+		}
 	}
 
 	

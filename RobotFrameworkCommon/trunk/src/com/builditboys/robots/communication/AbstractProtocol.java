@@ -11,15 +11,18 @@ public abstract class AbstractProtocol {
 	protected AbstractChannel channel;
 	protected int channelNumber;
 	
+	protected AbstractChannel oppositeChannel;
+	protected AbstractProtocol oppositeProtocol;
+	
 	//--------------------------------------------------------------------------------
 	// Constructors
 	
 	protected AbstractProtocol () {
 	}
 
-	protected AbstractProtocol (AbstractChannel chan) {
-		channel = chan;
-	}
+//	protected AbstractProtocol (AbstractChannel chan) {
+//		channel = chan;
+//	}
 	
 	//--------------------------------------------------------------------------------
 	// Channel factories - call one or the other, not both
@@ -43,8 +46,8 @@ public abstract class AbstractProtocol {
 	//--------------------------------------------------------------------------------
 	
 	protected void sendRoleMessage (ProtocolRoleEnum role,
-			  					  AbstractProtocolMessage messageObject,
-			  					  boolean doWait) throws InterruptedException {
+			  					    AbstractProtocolMessage messageObject,
+			  					    boolean doWait) throws InterruptedException {
 		if (role != protocolRole) {
 			throw new IllegalStateException();
 		}	
@@ -82,5 +85,9 @@ public abstract class AbstractProtocol {
 	
 //	public abstract LinkMessage xserialize (AbstractNotification notice);
 
+	//--------------------------------------------------------------------------------
 
+	public void describe () {
+		System.out.println("    Channel" + channel);
+	}
 }

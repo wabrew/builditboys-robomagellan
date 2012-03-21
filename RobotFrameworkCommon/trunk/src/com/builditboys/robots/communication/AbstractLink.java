@@ -429,11 +429,11 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	private static int WAIT_FOR_LINK_READY_INTERVAL = 200;
 	
 	public void sleepUntilReady () throws InterruptedException {
-		System.out.print("Waiting for " + role + " link to become ready ... ");
+		System.out.println("Waiting for " + role + " link to become ready ... ");
 		while ((linkState != LinkStateEnum.LinkReadyState) && (linkState != LinkStateEnum.LinkActiveState)) {
 			Thread.sleep(WAIT_FOR_LINK_READY_INTERVAL);
 		}
-		System.out.println("Ready");
+		System.out.println(role + "link ready");
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -441,6 +441,21 @@ public abstract class AbstractLink implements ParameterInterface, Runnable {
 	protected void setLinkState (LinkStateEnum state) {
 //		System.out.println("Master -> " + state.toString());
 		linkState = state;
+	}
+	
+	// --------------------------------------------------------------------------------
+
+	public void describe () {
+		System.out.println(this);
+		System.out.println("Name: " + name);
+		System.out.println("Role: " + role);
+		System.out.println("CommPort: " + commPort);
+		System.out.println("Sender " + sender);
+		System.out.println("Receiver " + receiver);
+		System.out.println("Input Channels: " + inputChannels);
+		inputChannels.describe();
+		System.out.println("Output Channels: " + outputChannels);
+		outputChannels.describe();
 	}
 
 }

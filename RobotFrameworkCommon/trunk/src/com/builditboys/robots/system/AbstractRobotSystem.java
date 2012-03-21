@@ -52,9 +52,6 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 
 	private static final int ROBOT_SYSTEM_PHASE_WAIT = 200;
 
-	protected LinkPortInterface linkPort;
-	protected MasterLink masterLink;
-	
 	protected DistributionList systemDistList = SystemNotification.getDistributionList();
 
 	// --------------------------------------------------------------------------------
@@ -73,84 +70,39 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	}
 	
 	// --------------------------------------------------------------------------------
-
-	protected synchronized void startRobotSystem() throws InterruptedException, IOException {
-		startRobotSystemPhase1();
-		startRobotSystemPhase2();
-		startRobotSystemPhase3();
-		
-		System.out.println("**Basic setup complete");
-		ParameterServer.print();
-		RobotState.getParameter("ROBOT_STATE").print();
-		System.out.println();
+	// Build
+	
+	protected void build () throws IOException {
+		ParameterServer.addParameter(this);
 	}
 	
-	private void startRobotSystemPhase1 () throws InterruptedException {
-		System.out.println("**Starting phase 1 setup");
-
-		ParameterServer.addParameter(this);
-		
+	// --------------------------------------------------------------------------------
+	// Start
+	
+	protected void start () throws InterruptedException, IOException {
 		// set up local time first, many things depend on it including notifications
 		LocalTimeSystem.startLocalTimeNow();
 		System.out.println("Local time initialized");
-		
-		// other stuff here
 
-		START1_NOTICE.publish(this);
-		System.out.println("Phase 1 notification sent");
-		wait(ROBOT_SYSTEM_PHASE_WAIT);		
 	}
+		
+	// --------------------------------------------------------------------------------
+	// Stop
 	
-	private void startRobotSystemPhase2 () throws InterruptedException, IOException {
-		System.out.println("**Starting phase 2 setup");
-
-		// get the link to the robot set up
-		masterLink = new MasterLink("ROBOT_LINK", linkPort);
-		ParameterServer.addParameter(masterLink);
-		
-		TimeSyncProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
-		RobotControlProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER, "ROBOT_STATE");
-		RobotDriverProtocol.addProtocolToLink(masterLink, ProtocolRoleEnum.MASTER);
-		masterLink.startLink();
-		System.out.println("Link started");
-		
-		START2_NOTICE.publish(this);
-		System.out.println("Phase 2 notification sent");
-		wait(ROBOT_SYSTEM_PHASE_WAIT);		
-	}
-
-	private void startRobotSystemPhase3 () throws InterruptedException {
-		System.out.println("**Starting phase 3 setup");
-		
-		masterLink.sleepUntilReady();
-		masterLink.enable();
-		System.out.println("Link enabled");
-		
-		// other stuff here
-		
-		START3_NOTICE.publish(this);
-		System.out.println("Phase 3 notification sent");
-		wait(ROBOT_SYSTEM_PHASE_WAIT);				
+	protected synchronized void stop() throws InterruptedException, IOException {
 	}
 
 	// --------------------------------------------------------------------------------
-
-	protected synchronized void stopRobotSystem() throws InterruptedException, IOException {
-		System.out.println();
-		System.out.println("Shutting down");
-		STOP_NOTICE.publish(this);
-		System.out.println("Stop notification sent");
-		wait(ROBOT_SYSTEM_PHASE_WAIT);
-
-// should really just listen for the stop notice
-		masterLink.stopLink();
+	// Destroy
+	
+	protected void destroy () {
 	}
 
 	// --------------------------------------------------------------------------------
-
+	// Let other stuff stop the robot system
 
 	public static void stopTheRobotSystem () throws InterruptedException, IOException {
-		AbstractRobotSystem.getInstance().stopRobotSystem();
+		AbstractRobotSystem.getInstance().stop();
 	}
 	
 	public static void safeStopTheRobotSystem () {
@@ -183,20 +135,19 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 		INSTANCE.acknowledgeRobotSystemErrorI(threadName, e);
 	}
 	
-	public void acknowledgeRobotSystemErrorI(String threadName, Exception e) {
+	public void acknowledgeRobotSystemErrorI (String threadName, Exception e) {
 		System.out.println("Exception in thread " + threadName + ": " + e);
 		e.printStackTrace();
 		ESTOP_NOTICE.publish(INSTANCE, systemDistList);
 	}
 	
 	// --------------------------------------------------------------------------------
-
+	// For the parameter server
+	
 	public String getName () {
 		return "ROBOT_SYSTEM";
 	}
 	
-	// --------------------------------------------------------------------------------
-
 	public static AbstractRobotSystem getParameter (String key) {
 		return (AbstractRobotSystem) ParameterServer.getParameter(key);
 	}
@@ -204,37 +155,6 @@ public abstract class AbstractRobotSystem implements ParameterInterface {
 	public static AbstractRobotSystem maybeGetParameter (String key) {
 		return (AbstractRobotSystem) ParameterServer.maybeGetParameter(key);
 	}
-		
-	// --------------------------------------------------------------------------------
-
-	public static AbstractProtocol getRobotInputProtocol (AbstractProtocol representative) {
-		return INSTANCE.masterLink.getInputProtocol(representative);
-	}
-	
-	public static AbstractProtocol getRobotOutputProtocol (AbstractProtocol representative) {
-		return INSTANCE.masterLink.getOutputProtocol(representative);
-	}
-	
-	// --------------------------------------------------------------------------------
-
-	public static void printState () {
-		System.out.println("Robot State:");
-		RobotState state = RobotState.maybeGetParameter("ROBOT_STATE");
-		if (state != null) {
-			state.print();
-		}
-		else {
-			System.out.println("  No current robot state");
-		}
-		AbstractLink link = AbstractLink.maybeGetParameter("ROBOT_LINK");
-		if (link != null) {
-			System.out.println("  Link state: " + link.getLinkState());
-		}
-		else {
-			System.out.println("  No current link state");
-		}
-	}
-
 	
 	// --------------------------------------------------------------------------------
 

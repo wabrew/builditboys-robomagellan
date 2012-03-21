@@ -82,7 +82,7 @@ public class LinkMessage extends FillableBuffer {
 
 	public void print () {
 		System.out.print("Channel: ");
-		System.out.print(channelNumber);
+		System.out.print(channelNumber + "  Buf: ");
 		printBuffer();
 	}
 	

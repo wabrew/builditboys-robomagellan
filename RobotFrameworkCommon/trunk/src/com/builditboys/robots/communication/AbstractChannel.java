@@ -27,9 +27,10 @@ public abstract class AbstractChannel {
 		messagesQueue = new ArrayBlockingQueue<LinkMessage>(DEFAULT_CHANNEL_BUFFER_CAPACITY);
 	}
 	
-	public AbstractChannel (AbstractProtocol protocol, int channelNum, int capacity) {
+	public AbstractChannel (AbstractProtocol protocl, int channelNum, int capacity) {
 		channelNumber = channelNum;
-		this.protocol = protocol;
+		protocol = protocl;
+		protocol.setChannel(this);
 		messagesQueue = new ArrayBlockingQueue<LinkMessage>(capacity);
 	}
 
@@ -65,6 +66,11 @@ public abstract class AbstractChannel {
 	public static void pairChannels (AbstractChannel chan1, AbstractChannel chan2) {
 		chan1.setOppositeChannel(chan2);
 		chan2.setOppositeChannel(chan1);
+		
+		chan1.getProtocol().oppositeChannel = chan2;
+		chan1.getProtocol().oppositeProtocol = chan2.getProtocol();
+		chan2.getProtocol().oppositeChannel = chan1;
+		chan2.getProtocol().oppositeProtocol = chan1.getProtocol();
 	}
 	
 	//--------------------------------------------------------------------------------
@@ -75,11 +81,9 @@ public abstract class AbstractChannel {
 		return link;
 	}
 
-	
 	//--------------------------------------------------------------------------------
 	// Adding/Getting messages
 	
-
 	public void addMessage (LinkMessage message) {
 		if (message.getChannelNumber() != channelNumber) {
 			throw new IllegalArgumentException();	
@@ -108,6 +112,16 @@ public abstract class AbstractChannel {
 	public static boolean isLegalChannelNumber (int channelNumber) {
 		return ((channelNumber >= CHANNEL_NUMBER_MIN) 
 				&& (channelNumber <= CHANNEL_NUMBER_MAX));
+	}
+	
+	//--------------------------------------------------------------------------------
+
+	public void describe () {
+		System.out.println("  Channel: " + this);
+		System.out.println("  Channel number: " + channelNumber);
+		System.out.println("  Opposite channel: " + oppositeChannel);
+		System.out.println("  Protocol: " + protocol);
+		protocol.describe();
 	}
 
 }
