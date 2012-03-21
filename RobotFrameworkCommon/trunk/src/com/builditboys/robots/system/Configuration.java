@@ -9,7 +9,7 @@ public class Configuration {
 	public static void loadConfigurationFile (String configFileName) {
 		System.out.println("Loading configuration file " + configFileName);
 		
-		// should read from a config file, this is a temporary hack
+		// should read from a configuration file, this is a temporary hack
 		
 		StringParameter robotNameParameter = new StringParameter("ROBOT_NAME", "RoboMagellan");
 		StringParameter commPortNameParameter = new StringParameter("COMM_PORT", "COM10");
