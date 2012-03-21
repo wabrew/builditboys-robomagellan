@@ -10,10 +10,10 @@ public class TestBuffer {
 	public static void main (String args[]) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 		
 		SimpleMessage messageObj = new SimpleMessage();
-		int elements[] = {1, 2, 3};
 		
 		// fill a buffer from the default values
 		System.out.println("Filling buffer from object");
+		System.out.println(messageObj.b + " " + messageObj.s + " " + messageObj.i);
 		FillableBuffer buffer1 = new FillableBuffer(100);
 		buffer1.deConstructFields(messageObj, SIZES, FIELDS);
 		buffer1.printBuffer(); // should see serialized version of 1, 2, 3
@@ -30,8 +30,10 @@ public class TestBuffer {
 		System.out.println(messageObj.b + " " + messageObj.s + " " + messageObj.i);
 	
 		
+		int elements[] = {111, 22222, 33333333};
 		// fill a buffer from the default values
 		System.out.println("Filling buffer from elements");
+		System.out.println(elements[0] + " " + elements[1] + " " + elements[2]);
 		FillableBuffer buffer2 = new FillableBuffer(100);
 		buffer2.deConstructElements(elements, SIZES);
 		buffer2.printBuffer(); // should see serialized version of 1, 2, 3

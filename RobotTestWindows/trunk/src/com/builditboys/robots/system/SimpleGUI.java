@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import com.builditboys.robots.communication.AbstractLink;
 import com.builditboys.robots.communication.AbstractProtocol;
 import com.builditboys.robots.infrastructure.ParameterServer;
+import com.builditboys.robots.robomagellan.AbstractRoboMagellanRobotSystem;
 import com.builditboys.robots.system.RobotState.RobotModeEnum;
 import com.builditboys.robots.time.TimeSyncProtocol;
 
@@ -65,13 +66,13 @@ public class SimpleGUI extends JFrame {
 	//--------------------------------------------------------------------------------
 
 	private void addStartButton () {
-		JButton button = new JButton("Start");
+		JButton button = new JButton("Launch");
 		button.setBounds(100, 60, 100, 30);
-		button.setToolTipText("Start the robot");
+		button.setToolTipText("Launch the robot");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				if (!robotStarted) {
-					System.out.println("Starting robot");
+					System.out.println("Launch robot");
 					launchTestWindowsRobotSystemRunnable();
 					robotStarted = true;
 				}
@@ -136,7 +137,7 @@ public class SimpleGUI extends JFrame {
 		button.setToolTipText("Show the robot state");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				AbstractRobotSystem.printState();
+				AbstractRoboMagellanRobotSystem.printState();
 			}
 		});
 		panel.add(button);
