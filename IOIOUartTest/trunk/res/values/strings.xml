@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">IOIO Uart Test</string>
+    <string name="connected">IOIO Connected</string>
+    <string name="beginSpeedTest">Run speed test</string>
+    <string name="beginReliabilityTest">Run reliability test</string>
+    <string name="beginOverflowTest">Run overflow test</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent" android:weightSum="1">
+	<CheckBox android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_gravity="center"
+		android:text="@string/connected" android:clickable="false" android:id="@+id/checkBox"
+		android:checked="false"></CheckBox>
+	<ToggleButton android:layout_height="wrap_content"
+		android:layout_width="match_parent" android:text="ToggleButton"
+		android:id="@+id/echoButton" android:checked="true" android:textOn="Echo"
+		android:textOff="Echo off"></ToggleButton>
+	<Button android:layout_width="match_parent"
+		android:layout_height="wrap_content" android:id="@+id/speedTestButton"
+		android:text="@string/beginSpeedTest"></Button>
+	<EditText android:layout_height="wrap_content"
+		android:layout_width="match_parent" android:id="@+id/speedTestResults"
+		android:clickable="false" android:cursorVisible="false">
+		<requestFocus></requestFocus>
+	</EditText>
+	<Button android:layout_height="wrap_content"
+		android:layout_width="match_parent" android:id="@+id/reliablityTestButton"
+		android:text="@string/beginReliabilityTest"></Button>
+	<EditText android:layout_height="wrap_content"
+		android:layout_width="match_parent" android:id="@+id/reliabilityTestResults"
+		android:clickable="false" android:cursorVisible="false"></EditText>
+	<Button android:layout_height="wrap_content"
+		android:layout_width="match_parent" android:text="@string/beginOverflowTest"
+		android:id="@+id/overflowTestButton"></Button>
+</LinearLayout>
