@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">IOIO Debug</string>
+	<string name="inPin">Pin 4</string>
+	<string name="outPin">Pin 5</string>
+	<string name="connected">IOIO Connected</string>
+	<string name="test">Send test message</string>
+	<string name="defaultTestMessage">test</string>
+</resources>
