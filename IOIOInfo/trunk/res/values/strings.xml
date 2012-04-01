@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hardware">Hardware Version</string><string name="app_name">IOIO Info</string>
+    <string name="bootloader">Bootloader Version</string>
+    <string name="library">IOIO Library Version</string>
+    <string name="firmware">Firmware Version</string>
+    
+</resources>
