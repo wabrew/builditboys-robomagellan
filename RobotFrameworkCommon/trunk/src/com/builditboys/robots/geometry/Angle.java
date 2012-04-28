@@ -1,7 +1,7 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.AngleUnits.*;
-import com.builditboys.robots.units.AngleUnits;
+import static com.builditboys.misc.units.AngleUnits.*;
+import com.builditboys.misc.units.AngleUnits;
 
 // Angle objects model angles.  They are lockable.  For efficiency, they cache
 // their trig functions.   Static methods are provided for making angles in various 

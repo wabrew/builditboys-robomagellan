@@ -1,7 +1,8 @@
 package com.builditboys.robots.time;
 
-import static com.builditboys.robots.units.TimeUnits.*;
-import com.builditboys.robots.units.TimeUnits;
+import com.builditboys.misc.units.TimeUnits;
+import static com.builditboys.misc.units.TimeUnits.*;
+
 
 public abstract class AbstractTimeSystem {
 	

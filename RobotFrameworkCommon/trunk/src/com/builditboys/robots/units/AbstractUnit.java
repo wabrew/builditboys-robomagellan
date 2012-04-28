@@ -1,6 +1,6 @@
 package com.builditboys.robots.units;
 
-// keep in sync with version in misc
+// no longer used, now hooks up to misc
 
 public abstract class AbstractUnit {
 

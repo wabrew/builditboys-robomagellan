@@ -1,6 +1,7 @@
 package com.builditboys.robots.units;
 
-import com.builditboys.robots.units.AbstractUnit.UnitKindEnum;
+import com.builditboys.misc.units.AbstractUnit;
+import com.builditboys.misc.units.LengthUnits;
 
 public class RobotLengthUnits extends AbstractUnit {
 
