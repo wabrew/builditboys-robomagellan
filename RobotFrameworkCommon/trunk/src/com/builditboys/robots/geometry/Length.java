@@ -1,9 +1,7 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.LengthUnits.*;
-
-
-import com.builditboys.robots.units.LengthUnits;
+import static com.builditboys.misc.units.LengthUnits.*;
+import com.builditboys.misc.units.LengthUnits;
 
 
 public class Length {

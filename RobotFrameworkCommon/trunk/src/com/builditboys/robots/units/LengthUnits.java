@@ -1,5 +1,6 @@
 package com.builditboys.robots.units;
 
+// no longer used, now hooks up to misc
 
 public class LengthUnits extends AbstractUnit {
 	
