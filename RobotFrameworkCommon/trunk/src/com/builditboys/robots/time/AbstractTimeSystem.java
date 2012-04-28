@@ -1,13 +1,13 @@
 package com.builditboys.robots.time;
 
-import static com.builditboys.robots.units.TimeUnit.*;
-import com.builditboys.robots.units.TimeUnit;
+import static com.builditboys.robots.units.TimeUnits.*;
+import com.builditboys.robots.units.TimeUnits;
 
 public abstract class AbstractTimeSystem {
 	
 	// currently, all time systems are lock to this unit
 	// to change this requires making the time system converter smarter
-	protected static final TimeUnit UNITS = MILLISECONDS;
+	protected static final TimeUnits UNITS = MILLISECONDS;
 
 	private long absoluteOffset = 0;
 	
@@ -49,29 +49,29 @@ public abstract class AbstractTimeSystem {
 		absoluteOffset = readClock();
 	}
 
-	public void correspondNow (double time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
+	public void correspondNow (double time, TimeUnits tunits) {
+		absoluteOffset = readClock() - (long) TimeUnits.convert(time, tunits, UNITS);
 	}
 
-	public void correspondNow (long time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
+	public void correspondNow (long time, TimeUnits tunits) {
+		absoluteOffset = readClock() - (long) TimeUnits.convert(time, tunits, UNITS);
 	}
 
-	public void correspondNow (int time, TimeUnit tunits) {
-		absoluteOffset = readClock() - (long) TimeUnit.convert(time, tunits, UNITS);
+	public void correspondNow (int time, TimeUnits tunits) {
+		absoluteOffset = readClock() - (long) TimeUnits.convert(time, tunits, UNITS);
 	}
 
 	
 	public void correspondNow (double time) {
-		correspondNow(time, TimeUnit.getDefaultUnit());
+		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
 	
 	public void correspondNow (long time) {
-		correspondNow(time, TimeUnit.getDefaultUnit());
+		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
 
 	public void correspondNow (int time) {
-		correspondNow(time, TimeUnit.getDefaultUnit());
+		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
 
 	//--------------------------------------------------------------------------------
@@ -79,15 +79,15 @@ public abstract class AbstractTimeSystem {
 	// put a method in your subclass that calls one of these
 	
 	public double currentTimeDouble () {
-		return TimeUnit.convert((double) (readClock() - absoluteOffset), UNITS, TimeUnit.getDefaultUnit());
+		return TimeUnits.convert((double) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
 	}
 	
 	public long currentTimeLong () {
-		return TimeUnit.convert((long) (readClock() - absoluteOffset), UNITS, TimeUnit.getDefaultUnit());
+		return TimeUnits.convert((long) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
 	}
 
 	public int currentTimeInt () {
-		long time = TimeUnit.convert(readClock() - absoluteOffset, UNITS, TimeUnit.getDefaultUnit());
+		long time = TimeUnits.convert(readClock() - absoluteOffset, UNITS, TimeUnits.getDefaultUnit());
 		if ((time > Integer.MAX_VALUE) || (time < Integer.MIN_VALUE)) {
 			throw new IllegalArgumentException("Time overflow");
 		}

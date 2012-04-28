@@ -1,34 +1,72 @@
 package com.builditboys.robots.units;
 
+// keep in sync with version in misc
+
 public abstract class AbstractUnit {
 
+	public static enum UnitKindEnum { 
+		LENGTH,
+		MASS,
+		TIME,
+		ANGLE,
+		WEIGHT,
+		VOLUME,
+		VELOCITY,
+		ANGULAR_VELOCITY,
+		POWER,
+		ENERGY };
+	
+	// The name of the unit
+	public final String name;
+	
+	// The plural name of the unit
+	public final String plural;
+	
+	// The abbreviation for the unit
+	public final String abbreviation;
+	
+	// The kind of unit, weight, length, etc.
+	public final UnitKindEnum kind;
+
 	// Conversion factor to convert a unit to the common unit
-	protected final double conversionFactor;
-	protected final String name;
-		
+	public final double conversionFactor;
+	
+	// The conversion factor converts to this
+	public final AbstractUnit baseUnit;
+
+
 	//--------------------------------------------------------------------------------
 
-	AbstractUnit (String nm, double factor) {
-		name = nm;
-		conversionFactor = factor;
+	public AbstractUnit (String name, String plural, String abbreviation,
+				  UnitKindEnum kind, double conversionFactor, AbstractUnit baseUnit) {
+		this.name = name;
+		this.plural = plural;
+		this.abbreviation = abbreviation;
+		this.kind = kind;
+		this.conversionFactor = conversionFactor;	
+		this.baseUnit = baseUnit;
 	}
 	
 	//--------------------------------------------------------------------------------
-
-	public double getConversionFactor() {
-		return conversionFactor;
-	}
 
 	public String getName() {
 		return name;
 	}
 	
+	public double getConversionFactor() {
+		return conversionFactor;
+	}
+
 	//--------------------------------------------------------------------------------
 
 	public static double convert (double val, AbstractUnit fromUnit, AbstractUnit toUnit) {
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
+		}
+		
+		if (fromUnit.baseUnit != toUnit.baseUnit) {
+			throw new IllegalStateException("Base unit mismatch");
 		}
 		
 		// same conversion factor, no conversion necessary
@@ -58,6 +96,10 @@ public abstract class AbstractUnit {
 			return val;
 		}
 		
+		if (fromUnit.baseUnit != toUnit.baseUnit) {
+			throw new IllegalStateException("Base unit mismatch");
+		}
+		
 		// same conversion factor, no conversion necessary
 		double fromConversionFactor = fromUnit.conversionFactor;
 		double toConversionFactor = toUnit.conversionFactor;
@@ -83,6 +125,10 @@ public abstract class AbstractUnit {
 		// same unit, no conversion necessary
 		if (fromUnit == toUnit) {
 			return val;
+		}
+		
+		if (fromUnit.baseUnit != toUnit.baseUnit) {
+			throw new IllegalStateException("Base unit mismatch");
 		}
 		
 		// same conversion factor, no conversion necessary

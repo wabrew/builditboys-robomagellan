@@ -1,9 +1,9 @@
 package com.builditboys.robots.geometry;
 
-import static com.builditboys.robots.units.LengthUnit.*;
+import static com.builditboys.robots.units.LengthUnits.*;
 
 
-import com.builditboys.robots.units.LengthUnit;
+import com.builditboys.robots.units.LengthUnits;
 
 
 public class Length {
@@ -11,7 +11,7 @@ public class Length {
 	// The length's value, and units
 	private double lengthValue;
 	
-	private static final LengthUnit NATIVE_UNITS = METERS;
+	private static final LengthUnits NATIVE_UNIT = METER;
 	
 	private boolean isLocked;
 	
@@ -34,33 +34,33 @@ public class Length {
 	   return new Length(len.lengthValue);
 	}
   
-	public static Length newLength (double val, LengthUnit units) {
-		return new Length(convert(val, units, NATIVE_UNITS));
+	public static Length newLength (double val, LengthUnits units) {
+		return new Length(convert(val, units, NATIVE_UNIT));
 	}
    
 	//--------------------------------------------------------------------------------
 	// Basic Accessors
 	
-	public LengthUnit getNativeUnits() {
-		return NATIVE_UNITS;
+	public LengthUnits getNativeUnits() {
+		return NATIVE_UNIT;
 	}
 	
-	public double getInUnits(LengthUnit units) {
-		if (units == NATIVE_UNITS) {
+	public double getInUnits(LengthUnits units) {
+		if (units == NATIVE_UNIT) {
 			return lengthValue;
 		}
 		else {
-			return convert(lengthValue, NATIVE_UNITS, units);
+			return convert(lengthValue, NATIVE_UNIT, units);
 		}
 	}
 	
-	public void setInUnits(double val, LengthUnit units) {
+	public void setInUnits(double val, LengthUnits units) {
 		if (!isLocked) {
-			if (units == NATIVE_UNITS) {
+			if (units == NATIVE_UNIT) {
 				lengthValue = val;
 			}
 			else {
-				lengthValue = convert(val, units, NATIVE_UNITS);
+				lengthValue = convert(val, units, NATIVE_UNIT);
 			}
 		}
 		else {
