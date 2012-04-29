@@ -8,7 +8,7 @@ public abstract class AbstractTimeSystem {
 	
 	// currently, all time systems are lock to this unit
 	// to change this requires making the time system converter smarter
-	protected static final TimeUnits UNITS = MILLISECONDS;
+	protected static final TimeUnits UNITS = MILLISECOND;
 
 	private long absoluteOffset = 0;
 	
@@ -33,10 +33,10 @@ public abstract class AbstractTimeSystem {
 	//--------------------------------------------------------------------------------
 
 	protected long readClock () {
-		if (UNITS == MILLISECONDS) {
+		if (UNITS == MILLISECOND) {
 			return System.currentTimeMillis();
 		}	
-		else if (UNITS == NANOSECONDS) {
+		else if (UNITS == NANOSECOND) {
 			return System.nanoTime();
 		}
 		else {
@@ -63,36 +63,44 @@ public abstract class AbstractTimeSystem {
 	}
 
 	
+	
 	public void correspondNow (double time) {
-		correspondNow(time, TimeUnits.getDefaultUnit());
+		throw new IllegalStateException("Not implemented");
+//		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
 	
 	public void correspondNow (long time) {
-		correspondNow(time, TimeUnits.getDefaultUnit());
+		throw new IllegalStateException("Not implemented");
+//		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
 
 	public void correspondNow (int time) {
-		correspondNow(time, TimeUnits.getDefaultUnit());
+		throw new IllegalStateException("Not implemented");
+//		correspondNow(time, TimeUnits.getDefaultUnit());
 	}
+
 
 	//--------------------------------------------------------------------------------
 
 	// put a method in your subclass that calls one of these
 	
 	public double currentTimeDouble () {
-		return TimeUnits.convert((double) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
+		throw new IllegalStateException("Not implemented");
+//		return TimeUnits.convert((double) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
 	}
 	
 	public long currentTimeLong () {
-		return TimeUnits.convert((long) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
+		throw new IllegalStateException("Not implemented");
+//		return TimeUnits.convert((long) (readClock() - absoluteOffset), UNITS, TimeUnits.getDefaultUnit());
 	}
 
 	public int currentTimeInt () {
-		long time = TimeUnits.convert(readClock() - absoluteOffset, UNITS, TimeUnits.getDefaultUnit());
-		if ((time > Integer.MAX_VALUE) || (time < Integer.MIN_VALUE)) {
-			throw new IllegalArgumentException("Time overflow");
-		}
-		return (int) time;
+		throw new IllegalStateException("Not implemented");
+//		long time = TimeUnits.convert(readClock() - absoluteOffset, UNITS, TimeUnits.getDefaultUnit());
+//		if ((time > Integer.MAX_VALUE) || (time < Integer.MIN_VALUE)) {
+//			throw new IllegalArgumentException("Time overflow");
+//		}
+//		return (int) time;
 	}
 	
 	//--------------------------------------------------------------------------------
