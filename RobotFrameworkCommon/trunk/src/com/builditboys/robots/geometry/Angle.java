@@ -12,7 +12,7 @@ public final class Angle {
 	// The angle value and units
 	private double angleValue;
 
-	private static final AngleUnits NATIVE_UNITS = RADIANS;
+	private static final AngleUnits NATIVE_UNITS = RADIAN;
 
 	private boolean isLocked;
 
@@ -76,7 +76,7 @@ public final class Angle {
 	}
 
 	public double getInDegrees() {
-		return convert(angleValue, NATIVE_UNITS, DEGREES);
+		return convert(angleValue, NATIVE_UNITS, DEGREE);
 	}
 
 	public double getInUnits(AngleUnits units) {
@@ -99,7 +99,7 @@ public final class Angle {
 
 	public void setInDegrees(double val) {
 		if (!isLocked) {
-			angleValue = convert(val, DEGREES, NATIVE_UNITS);
+			angleValue = convert(val, DEGREE, NATIVE_UNITS);
 			decache();
 		} else {
 			throw new IllegalStateException();
@@ -111,7 +111,7 @@ public final class Angle {
 			if (units == NATIVE_UNITS) {
 				angleValue = val;
 			} else {
-				setInRadians(convert(val, units, RADIANS));
+				setInRadians(convert(val, units, RADIAN));
 			}
 		} else {
 			throw new IllegalStateException();
@@ -221,8 +221,8 @@ public final class Angle {
 
 	public String getDescription() {
 		return String.format("Angle: %.2f radians (%.2f degrees)",
-							 convert(angleValue, NATIVE_UNITS, RADIANS),
-							 convert(angleValue, NATIVE_UNITS, DEGREES));
+							 convert(angleValue, NATIVE_UNITS, RADIAN),
+							 convert(angleValue, NATIVE_UNITS, DEGREE));
 	}
 
 	public void describe() {
