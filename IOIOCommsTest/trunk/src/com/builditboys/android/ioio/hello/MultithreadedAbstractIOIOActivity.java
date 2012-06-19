@@ -33,7 +33,7 @@ public abstract class MultithreadedAbstractIOIOActivity extends Activity {
 
 	protected abstract MasterIOIOThread createMasterIOIOThread();
 
-	protected abstract class MasterIOIOThread extends Thread {
+	protected static abstract class MasterIOIOThread extends Thread {
 		protected IOIO ioio;
 		private boolean abort_ = false;
 		private List<SlaveIOIOThread> slaves = new ArrayList<SlaveIOIOThread>();
@@ -100,7 +100,7 @@ public abstract class MultithreadedAbstractIOIOActivity extends Activity {
 		}
 	}
 
-	protected abstract class SlaveIOIOThread extends Thread {
+	protected static abstract class SlaveIOIOThread extends Thread {
 		private boolean abort_ = false;
 
 		public final void run() {
